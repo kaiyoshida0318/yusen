@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>優先順位決定くん</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="app-header">
+  <div class="header-inner">
+    <h1 class="logo">優先順位決定くん</h1>
+    <span class="version" id="version">v1.0.0</span>
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="btnSettings">⚙️ 設定</button>
+      <button class="btn btn-primary" id="btnSave">💾 GitHubに保存</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="toolbar">
+    <button class="btn btn-add" id="btnAddRow">＋ 行を追加</button>
+    <button class="btn btn-ghost" id="btnAddCol">＋ 列を追加</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="grid">
+      <thead id="gridHead"></thead>
+      <tbody id="gridBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- 設定モーダル -->
+<div class="modal-overlay" id="settingsModal" hidden>
+  <div class="modal">
+    <h2>GitHub設定</h2>
+    <p class="hint">既存ツールと同じPAT方式です。入力情報はこのブラウザ内（localStorage）にのみ保存されます。</p>
+    <label>Personal Access Token (PAT)
+      <input type="password" id="cfgPat" placeholder="ghp_xxxx">
+    </label>
+    <label>オーナー（ユーザー名）
+      <input type="text" id="cfgOwner" placeholder="kaiyoshida0318">
+    </label>
+    <label>リポジトリ名
+      <input type="text" id="cfgRepo" placeholder="yusen">
+    </label>
+    <label>ブランチ
+      <input type="text" id="cfgBranch" placeholder="main" value="main">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCloseSettings">閉じる</button>
+      <button class="btn btn-primary" id="btnSaveSettings">保存</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
