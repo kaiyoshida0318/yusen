@@ -1,9 +1,11 @@
 /* 優先順位決定くん app.js
-   - データ構造: { rows:[{date, image, name, rival, supply}] }
+   - データ構造: { rows:[ {date, image, name, rival, suppliers:[{image,url,memo}]} ] }
+     image = メインライバル画像 / rival = ライバルURL
+     suppliers = 仕入先（中国輸入元）の配列。各 {image, url, memo}
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -14,15 +16,15 @@ const COLUMNS = [
   { key:"image",  label:"画像" },
   { key:"name",   label:"項目名" },
   { key:"rival",  label:"ライバルURL" },
-  { key:"supply", label:"仕入URL" },
+  { key:"supply", label:"仕入先" },
 ];
 
 let state = { rows: [] };
 let cfg = { pat:"", owner:"", repo:"", branch:"main" };
 let dataSha = null;
 
-// 登録モーダルの作業用
-let entry = { editIndex:-1, image:"", imageIsDataUrl:false };
+// 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
+let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[] };
 
 /* ---------- 初期化 ---------- */
 function init(){
@@ -42,14 +44,24 @@ function saveCfg(){ localStorage.setItem(LS_CFG, JSON.stringify(cfg)); }
 function loadData(){
   let saved = null;
   try{ saved = JSON.parse(localStorage.getItem(LS_DATA)); }catch(e){}
-  if(saved && Array.isArray(saved.rows)){ state = saved; return; }
+  if(saved && Array.isArray(saved.rows)){ state = migrate(saved); return; }
   state = { rows: [] };
+}
+// 旧データ（supply文字列）を suppliers 配列に変換
+function migrate(data){
+  data.rows.forEach(r=>{
+    if(!Array.isArray(r.suppliers)){
+      r.suppliers = [];
+      if(r.supply){ r.suppliers.push({ image:"", url:r.supply, memo:"" }); delete r.supply; }
+    }
+  });
+  return data;
 }
 function persistLocal(){ localStorage.setItem(LS_DATA, JSON.stringify(state)); }
 
 function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
 
-/* ---------- レンダリング ---------- */
+/* ---------- 一覧レンダリング ---------- */
 function render(){
   const head = document.getElementById("gridHead");
   const body = document.getElementById("gridBody");
@@ -81,38 +93,55 @@ function render(){
   state.rows.forEach((row, ri)=>{
     const trb = document.createElement("tr");
 
-    // 日付
     const tdDate = document.createElement("td");
     tdDate.className="col-date"; tdDate.textContent = row.date || "";
     trb.appendChild(tdDate);
 
-    // 画像
+    // 画像列: メインライバル画像 + 仕入先画像の先頭2枚
     const tdImg = document.createElement("td");
     tdImg.className="col-image";
-    const wrap = document.createElement("div"); wrap.className="img-cell";
-    if(row.image){
-      const img = document.createElement("img");
-      img.src = imgUrl(row.image);
-      wrap.appendChild(img);
+    const imgWrap = document.createElement("div"); imgWrap.className="img-cell-multi";
+    const imgs = [];
+    if(row.image) imgs.push(row.image);
+    (row.suppliers||[]).forEach(s=>{ if(s.image) imgs.push(s.image); });
+    const top2 = imgs.slice(0,2);
+    if(top2.length===0){
+      const span=document.createElement("span"); span.className="muted"; span.textContent="—";
+      imgWrap.appendChild(span);
     }else{
-      const span = document.createElement("span");
-      span.className="muted"; span.textContent="—";
-      wrap.appendChild(span);
+      top2.forEach(fn=>{ const im=document.createElement("img"); im.src=imgUrl(fn); imgWrap.appendChild(im); });
     }
-    tdImg.appendChild(wrap);
+    tdImg.appendChild(imgWrap);
     trb.appendChild(tdImg);
 
-    // 項目名
     const tdName = document.createElement("td");
     tdName.textContent = row.name || "";
     trb.appendChild(tdName);
 
-    // ライバルURL
     trb.appendChild(urlCell(row.rival));
-    // 仕入URL
-    trb.appendChild(urlCell(row.supply));
 
-    // 操作（編集・削除）
+    // 仕入先列: 件数 + 各URLリンク
+    const tdSup = document.createElement("td");
+    const sups = row.suppliers||[];
+    if(sups.length===0){
+      const span=document.createElement("span"); span.className="muted"; span.textContent="—";
+      tdSup.appendChild(span);
+    }else{
+      sups.forEach((s,i)=>{
+        const line=document.createElement("div"); line.className="sup-line";
+        if(s.url){
+          const a=document.createElement("a"); a.href=s.url; a.target="_blank"; a.rel="noopener";
+          a.className="url-link"; a.textContent=`仕入${i+1}: ${shorten(s.url)}`; a.title=s.url;
+          line.appendChild(a);
+        }else{
+          const sp=document.createElement("span"); sp.textContent=`仕入${i+1}`; line.appendChild(sp);
+        }
+        if(s.memo){ const m=document.createElement("span"); m.className="sup-memo"; m.textContent=" "+s.memo; line.appendChild(m); }
+        tdSup.appendChild(line);
+      });
+    }
+    trb.appendChild(tdSup);
+
     const tdAct = document.createElement("td");
     tdAct.className="col-actions";
     const edit = document.createElement("button");
@@ -133,12 +162,10 @@ function urlCell(url){
   if(url){
     const a = document.createElement("a");
     a.href = url; a.target="_blank"; a.rel="noopener";
-    a.className="url-link"; a.textContent = shorten(url);
-    a.title = url;
+    a.className="url-link"; a.textContent = shorten(url); a.title = url;
     td.appendChild(a);
   }else{
-    const span = document.createElement("span");
-    span.className="muted"; span.textContent="—";
+    const span = document.createElement("span"); span.className="muted"; span.textContent="—";
     td.appendChild(span);
   }
   return td;
@@ -158,18 +185,22 @@ function imgUrl(filename){
 
 /* ---------- 登録モーダル ---------- */
 function openEntry(editIndex){
-  entry = { editIndex: (typeof editIndex==="number"?editIndex:-1), image:"", imageIsDataUrl:false };
-  const isEdit = entry.editIndex>=0;
+  const isEdit = (typeof editIndex==="number" && editIndex>=0);
+  entry = { editIndex: isEdit?editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[] };
   document.getElementById("entryTitle").textContent = isEdit ? "編集" : "新規作成";
 
-  let row = isEdit ? state.rows[entry.editIndex] : null;
-  document.getElementById("fDate").value   = row ? (row.date||today()) : today();
-  document.getElementById("fName").value   = row ? (row.name||"") : "";
-  document.getElementById("fRival").value  = row ? (row.rival||"") : "";
-  document.getElementById("fSupply").value = row ? (row.supply||"") : "";
+  let row = isEdit ? state.rows[editIndex] : null;
+  document.getElementById("fDate").value  = row ? (row.date||today()) : today();
+  document.getElementById("fName").value  = row ? (row.name||"") : "";
+  document.getElementById("fRival").value = row ? (row.rival||"") : "";
   entry.image = row ? (row.image||"") : "";
+  // 仕入先はディープコピー（編集途中でキャンセルできるよう）
+  entry.suppliers = row && Array.isArray(row.suppliers)
+    ? row.suppliers.map(s=>({ image:s.image||"", imageIsDataUrl:false, url:s.url||"", memo:s.memo||"" }))
+    : [];
 
   renderEntryImage();
+  renderSuppliers();
   document.getElementById("entryModal").hidden = false;
 }
 function closeEntry(){ document.getElementById("entryModal").hidden = true; }
@@ -180,26 +211,80 @@ function renderEntryImage(){
   if(entry.image){
     const img = document.createElement("img");
     img.src = entry.imageIsDataUrl ? entry.image : imgUrl(entry.image);
-    img.className = "entry-preview";
-    img.title = "クリックで差し替え";
-    img.onclick = pickEntryImage;
+    img.className = "entry-preview"; img.title = "クリックで差し替え";
+    img.onclick = ()=>pickImageInto(entry, "image");
     box.appendChild(img);
   }else{
     const drop = document.createElement("div");
     drop.className="img-drop"; drop.textContent="画像を選択";
-    drop.onclick = pickEntryImage;
+    drop.onclick = ()=>pickImageInto(entry, "image");
     box.appendChild(drop);
   }
 }
 
-function pickEntryImage(){
+// 仕入先セットの描画
+function renderSuppliers(){
+  const list = document.getElementById("supplierList");
+  list.innerHTML = "";
+  entry.suppliers.forEach((s, idx)=>{
+    const card = document.createElement("div"); card.className="supplier-card";
+
+    const head = document.createElement("div"); head.className="supplier-head";
+    const ttl = document.createElement("span"); ttl.className="supplier-ttl"; ttl.textContent=`仕入先 ${idx+1}`;
+    const rm = document.createElement("button"); rm.className="supplier-del"; rm.textContent="×"; rm.title="この仕入先を削除";
+    rm.onclick = ()=>{ entry.suppliers.splice(idx,1); renderSuppliers(); };
+    head.appendChild(ttl); head.appendChild(rm);
+    card.appendChild(head);
+
+    const bodyRow = document.createElement("div"); bodyRow.className="supplier-body";
+
+    // 左: 画像
+    const imgBox = document.createElement("div"); imgBox.className="supplier-image";
+    if(s.image){
+      const im=document.createElement("img"); im.src=s.imageIsDataUrl?s.image:imgUrl(s.image);
+      im.className="supplier-preview"; im.title="クリックで差し替え";
+      im.onclick=()=>pickImageInto(s,"image", renderSuppliers);
+      imgBox.appendChild(im);
+    }else{
+      const drop=document.createElement("div"); drop.className="img-drop"; drop.textContent="仕入先画像";
+      drop.onclick=()=>pickImageInto(s,"image", renderSuppliers);
+      imgBox.appendChild(drop);
+    }
+    bodyRow.appendChild(imgBox);
+
+    // 右: URL + メモ
+    const fields = document.createElement("div"); fields.className="supplier-fields";
+    const lUrl=document.createElement("label"); lUrl.textContent="仕入先URL";
+    const iUrl=document.createElement("input"); iUrl.type="text"; iUrl.placeholder="https://..."; iUrl.value=s.url;
+    iUrl.oninput=e=>{ s.url=e.target.value; }; lUrl.appendChild(iUrl);
+    const lMemo=document.createElement("label"); lMemo.textContent="メモ";
+    const iMemo=document.createElement("input"); iMemo.type="text"; iMemo.placeholder="単価・MOQ・備考など"; iMemo.value=s.memo;
+    iMemo.oninput=e=>{ s.memo=e.target.value; }; lMemo.appendChild(iMemo);
+    fields.appendChild(lUrl); fields.appendChild(lMemo);
+    bodyRow.appendChild(fields);
+
+    card.appendChild(bodyRow);
+    list.appendChild(card);
+  });
+}
+
+function addSupplier(){
+  entry.suppliers.push({ image:"", imageIsDataUrl:false, url:"", memo:"" });
+  renderSuppliers();
+}
+
+/* obj[key] に画像を取り込む（メインライバル/仕入先 共通）。cb で再描画 */
+function pickImageInto(obj, key, cb){
   const input = document.createElement("input");
   input.type="file"; input.accept="image/*";
   input.onchange = async ()=>{
     const file = input.files[0]; if(!file) return;
     if(!cfg.pat){
       const reader = new FileReader();
-      reader.onload = e=>{ entry.image=e.target.result; entry.imageIsDataUrl=true; renderEntryImage(); };
+      reader.onload = e=>{
+        obj[key]=e.target.result; obj.imageIsDataUrl=true;
+        if(cb) cb(); else renderEntryImage();
+      };
       reader.readAsDataURL(file);
       setStatus("⚠️ GitHub未設定のためローカルプレビュー（保存時はアップロードされません）");
       return;
@@ -207,8 +292,8 @@ function pickEntryImage(){
     setStatus("画像アップロード中…");
     try{
       const filename = await uploadImage(file);
-      entry.image = filename; entry.imageIsDataUrl=false;
-      renderEntryImage();
+      obj[key]=filename; obj.imageIsDataUrl=false;
+      if(cb) cb(); else renderEntryImage();
       setStatus("✅ 画像アップロード完了");
     }catch(e){ setStatus("❌ 画像アップロード失敗: "+e.message); }
   };
@@ -217,11 +302,11 @@ function pickEntryImage(){
 
 function saveEntry(){
   const row = {
-    date:   document.getElementById("fDate").value || today(),
-    image:  entry.imageIsDataUrl ? entry.image : (entry.image||""),
-    name:   document.getElementById("fName").value.trim(),
-    rival:  document.getElementById("fRival").value.trim(),
-    supply: document.getElementById("fSupply").value.trim(),
+    date:  document.getElementById("fDate").value || today(),
+    image: entry.image || "",
+    name:  document.getElementById("fName").value.trim(),
+    rival: document.getElementById("fRival").value.trim(),
+    suppliers: entry.suppliers.map(s=>({ image:s.image||"", url:(s.url||"").trim(), memo:(s.memo||"").trim() })),
   };
   if(entry.editIndex>=0){ state.rows[entry.editIndex] = row; }
   else { state.rows.push(row); }
@@ -232,7 +317,7 @@ function saveEntry(){
 /* ---------- 画像アップロード ---------- */
 async function uploadImage(file){
   const ext = (file.name.split(".").pop()||"png").toLowerCase();
-  const filename = `img_${Date.now().toString(36)}.${ext}`;
+  const filename = `img_${Date.now().toString(36)}_${Math.floor(Math.random()*1000)}.${ext}`;
   const b64 = await fileToBase64(file);
   const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${IMG_DIR}/${filename}`;
   const res = await fetch(url, {
@@ -287,7 +372,7 @@ async function loadFromGitHub(){
     const res = await fetch(raw);
     if(res.ok){
       const data = await res.json();
-      if(data && Array.isArray(data.rows)){ state = data; persistLocal(); render(); }
+      if(data && Array.isArray(data.rows)){ state = migrate(data); persistLocal(); render(); }
     }
   }catch(e){ /* 初回はファイルが無いので無視 */ }
 }
@@ -309,6 +394,7 @@ function bindUI(){
   document.getElementById("btnNew").onclick = ()=>openEntry(-1);
   document.getElementById("btnCloseEntry").onclick = closeEntry;
   document.getElementById("btnSaveEntry").onclick = saveEntry;
+  document.getElementById("btnAddSupplier").onclick = addSupplier;
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnCloseSettings").onclick = closeSettings;
