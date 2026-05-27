@@ -1,99 +1,81 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>優先順位決定くん</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
-<link rel="apple-touch-icon" href="favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<header class="app-header">
-  <div class="header-inner">
-    <img class="logo-img" src="logo.png" alt="優先順位決定くん" height="40">
-    <span class="version" id="version">v1.0.0</span>
-    <div class="header-actions">
-      <button class="btn btn-ghost" id="btnSettings">⚙️ 設定</button>
-      <button class="btn btn-primary" id="btnSave">💾 GitHubに保存</button>
-    </div>
-  </div>
-</header>
+:root{
+  --bg:#f4f2ee; --surface:#ffffff; --text:#1f1d1a; --muted:#7a756d;
+  --border:#e3ded6; --accent:#e2664a; --accent-dark:#c8503a;
+  --green:#3f9b6e; --row-alt:#faf8f4; --radius:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text);font-size:14px}
 
-<main class="container">
-  <div class="toolbar">
-    <button class="btn btn-add" id="btnNew">＋ 新規作成</button>
-    <span class="status" id="status"></span>
-  </div>
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.header-inner{margin:0;padding:12px 16px;display:flex;align-items:center;gap:14px}
+.logo{font-family:"Zen Kaku Gothic New",sans-serif;font-size:20px;font-weight:700;letter-spacing:.02em}
+.logo-img{display:block;height:40px;width:auto}
+.version{font-size:11px;color:var(--muted);background:var(--bg);padding:2px 8px;border-radius:20px}
+.header-actions{margin-left:auto;display:flex;gap:8px}
 
-  <div class="table-wrap">
-    <table id="grid">
-      <thead id="gridHead"></thead>
-      <tbody id="gridBody"></tbody>
-    </table>
-  </div>
-</main>
+.container{max-width:1200px;margin:0 auto;padding:24px 20px}
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.status{margin-left:auto;font-size:13px;color:var(--muted)}
 
-<!-- 登録モーダル -->
-<div class="modal-overlay" id="entryModal" hidden>
-  <div class="modal modal-entry">
-    <h2 id="entryTitle">新規作成</h2>
-    <div class="entry-body">
-      <div class="entry-left">
-        <div class="entry-image" id="entryImageBox">
-          <div class="img-drop" id="entryImageDrop">画像を選択</div>
-        </div>
-      </div>
-      <div class="entry-right">
-        <label>日付
-          <input type="date" id="fDate">
-        </label>
-        <label>項目名
-          <input type="text" id="fName" placeholder="商品名など">
-        </label>
-        <label>ライバルURL
-          <input type="text" id="fRival" placeholder="https://...">
-        </label>
-        <label>仕入URL
-          <input type="text" id="fSupply" placeholder="https://...">
-        </label>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="btnCloseEntry">キャンセル</button>
-      <button class="btn btn-primary" id="btnSaveEntry">登録</button>
-    </div>
-  </div>
-</div>
+.btn{font-family:inherit;font-size:13px;font-weight:500;padding:8px 14px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dark)}
+.btn-add{background:var(--green);color:#fff}
+.btn-add:hover{filter:brightness(.94)}
+.btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--bg)}
 
-<!-- 設定モーダル -->
-<div class="modal-overlay" id="settingsModal" hidden>
-  <div class="modal">
-    <h2>GitHub設定</h2>
-    <p class="hint">既存ツールと同じPAT方式です。入力情報はこのブラウザ内（localStorage）にのみ保存されます。</p>
-    <label>Personal Access Token (PAT)
-      <input type="password" id="cfgPat" placeholder="ghp_xxxx">
-    </label>
-    <label>オーナー（ユーザー名）
-      <input type="text" id="cfgOwner" placeholder="kaiyoshida0318">
-    </label>
-    <label>リポジトリ名
-      <input type="text" id="cfgRepo" placeholder="yusen">
-    </label>
-    <label>ブランチ
-      <input type="text" id="cfgBranch" placeholder="main" value="main">
-    </label>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="btnCloseSettings">閉じる</button>
-      <button class="btn btn-primary" id="btnSaveSettings">保存</button>
-    </div>
-  </div>
-</div>
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
+table{width:100%;border-collapse:collapse}
+th,td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:0;text-align:left;vertical-align:middle}
+th:last-child,td:last-child{border-right:none}
+thead th{background:var(--bg);font-weight:700;font-size:13px;position:relative}
+th .th-label{padding:12px 14px;display:block;outline:none}
+th .th-label[contenteditable]:focus{background:#fff;box-shadow:inset 0 0 0 2px var(--accent)}
+tbody tr:nth-child(even){background:var(--row-alt)}
+tbody td{padding:10px 12px}
+tbody td input[type=text]{width:100%;border:none;background:transparent;font:inherit;color:inherit;outline:none;padding:4px}
+tbody td input[type=text]:focus{background:#fff;box-shadow:inset 0 0 0 2px var(--accent);border-radius:6px}
 
-<script src="app.js"></script>
-</body>
-</html>
+.col-date{width:130px}
+.col-image{width:120px}
+.col-actions{width:60px;text-align:center}
+
+.img-cell{display:flex;align-items:center;justify-content:center;min-height:64px}
+.img-cell img{max-width:96px;max-height:96px;border-radius:8px;object-fit:cover;cursor:pointer}
+.img-drop{width:88px;height:64px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;cursor:pointer;text-align:center;line-height:1.3}
+.img-drop:hover{border-color:var(--accent);color:var(--accent)}
+
+.col-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+.col-del:hover{color:var(--accent)}
+
+.row-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;opacity:.7}
+.row-btn:hover{opacity:1}
+.muted{color:var(--muted)}
+.empty-row{text-align:center;color:var(--muted);padding:32px 12px!important}
+.url-link{color:var(--accent);text-decoration:none}
+.url-link:hover{text-decoration:underline}
+tbody td{font-size:13px}
+
+/* 登録モーダル */
+.modal-entry .entry-right input{width:100%}
+.modal-entry label{margin-bottom:18px}
+.entry-body{display:flex;gap:24px;margin-bottom:8px}
+.entry-left{flex:0 0 320px}
+.entry-right{flex:1}
+.entry-image{width:320px;height:320px;border:2px dashed var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.entry-image .img-drop{width:100%;height:100%;border:none;border-radius:0;font-size:13px}
+.entry-preview{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.th-del{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;opacity:.5}
+.th-del:hover{opacity:1;color:var(--accent)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:50}
+.modal{background:var(--surface);border-radius:var(--radius);padding:28px;width:420px;max-width:90vw;box-shadow:var(--shadow)}
+.modal.modal-entry{width:1600px;max-width:95vw}
+.modal h2{font-family:"Zen Kaku Gothic New",sans-serif;margin-bottom:8px}
+.modal .hint{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.modal label{display:block;font-size:12px;font-weight:500;margin-bottom:14px;color:var(--muted)}
+.modal input{width:100%;margin-top:5px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:inherit;color:var(--text)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+[hidden]{display:none!important}
