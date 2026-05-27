@@ -26,8 +26,7 @@
 
 <main class="container">
   <div class="toolbar">
-    <button class="btn btn-add" id="btnAddRow">＋ 行を追加</button>
-    <button class="btn btn-ghost" id="btnAddCol">＋ 列を追加</button>
+    <button class="btn btn-add" id="btnNew">＋ 新規作成</button>
     <span class="status" id="status"></span>
   </div>
 
@@ -38,6 +37,38 @@
     </table>
   </div>
 </main>
+
+<!-- 登録モーダル -->
+<div class="modal-overlay" id="entryModal" hidden>
+  <div class="modal modal-entry">
+    <h2 id="entryTitle">新規作成</h2>
+    <div class="entry-body">
+      <div class="entry-left">
+        <div class="entry-image" id="entryImageBox">
+          <div class="img-drop" id="entryImageDrop">画像を選択</div>
+        </div>
+      </div>
+      <div class="entry-right">
+        <label>日付
+          <input type="date" id="fDate">
+        </label>
+        <label>項目名
+          <input type="text" id="fName" placeholder="商品名など">
+        </label>
+        <label>ライバルURL
+          <input type="text" id="fRival" placeholder="https://...">
+        </label>
+        <label>仕入URL
+          <input type="text" id="fSupply" placeholder="https://...">
+        </label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCloseEntry">キャンセル</button>
+      <button class="btn btn-primary" id="btnSaveEntry">登録</button>
+    </div>
+  </div>
+</div>
 
 <!-- 設定モーダル -->
 <div class="modal-overlay" id="settingsModal" hidden>
