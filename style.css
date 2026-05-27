@@ -49,6 +49,23 @@ tbody td input[type=text]:focus{background:#fff;box-shadow:inset 0 0 0 2px var(-
 
 .col-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
 .col-del:hover{color:var(--accent)}
+
+.row-btn{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;opacity:.7}
+.row-btn:hover{opacity:1}
+.muted{color:var(--muted)}
+.empty-row{text-align:center;color:var(--muted);padding:32px 12px!important}
+.url-link{color:var(--accent);text-decoration:none}
+.url-link:hover{text-decoration:underline}
+tbody td{font-size:13px}
+
+/* 登録モーダル */
+.modal-entry{width:640px}
+.entry-body{display:flex;gap:24px;margin-bottom:8px}
+.entry-left{flex:0 0 200px}
+.entry-right{flex:1}
+.entry-image{width:200px;height:200px;border:2px dashed var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.entry-image .img-drop{width:100%;height:100%;border:none;border-radius:0;font-size:13px}
+.entry-preview{width:100%;height:100%;object-fit:cover;cursor:pointer}
 .th-del{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;opacity:.5}
 .th-del:hover{opacity:1;color:var(--accent)}
 
