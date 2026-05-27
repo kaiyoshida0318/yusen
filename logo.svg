@@ -1,0 +1,11 @@
+<svg width="620" height="105" viewBox="0 0 620 105" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>優先順位決定くん</title>
+<g transform="translate(16,16)">
+  <rect x="3" y="24" width="80" height="80" rx="14" fill="#faf3e2" stroke="#1f1d1a" stroke-width="6"/>
+  <rect x="15" y="12" width="80" height="80" rx="14" fill="#e6edf5" stroke="#1f1d1a" stroke-width="6"/>
+  <rect x="27" y="0" width="80" height="80" rx="14" fill="#ffffff" stroke="#1f1d1a" stroke-width="6"/>
+  <circle cx="52" cy="28" r="9" fill="#eda23f"/>
+  <path d="M37 64 L58 38 L72 54 L80 44 L97 64 Z" fill="#1f1d1a"/>
+</g>
+<text x="134" y="82" font-family="'Zen Kaku Gothic New','Noto Sans JP',sans-serif" font-size="60" font-weight="700" fill="#1f1d1a">優先順位<tspan fill="#e2664a">決定</tspan><tspan fill="#1f1d1a">くん</tspan></text>
+</svg>
