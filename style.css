@@ -14,7 +14,7 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .version{font-size:11px;color:var(--muted);background:var(--bg);padding:2px 8px;border-radius:20px}
 .header-actions{margin-left:auto;display:flex;gap:8px}
 
-.container{max-width:1200px;margin:0 auto;padding:24px 20px}
+.container{max-width:none;margin:0;padding:20px 16px}
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .status{margin-left:auto;font-size:13px;color:var(--muted)}
 
@@ -63,10 +63,34 @@ tbody td{font-size:13px}
 .modal-entry label{margin-bottom:18px}
 .entry-body{display:flex;gap:24px;margin-bottom:8px}
 .entry-left{flex:0 0 320px}
+.entry-img-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px}
 .entry-right{flex:1}
 .entry-image{width:320px;height:320px;border:2px dashed var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .entry-image .img-drop{width:100%;height:100%;border:none;border-radius:0;font-size:13px}
 .entry-preview{width:100%;height:100%;object-fit:cover;cursor:pointer}
+
+/* 一覧の画像セル（複数並べ） */
+.img-cell-multi{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.img-cell-multi img{width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--border)}
+.sup-line{font-size:12px;margin-bottom:3px}
+.sup-memo{color:var(--muted)}
+
+/* 仕入先セクション（モーダル右下） */
+.btn-sm{padding:5px 10px;font-size:12px}
+.supplier-section{margin-top:4px;border-top:1px solid var(--border);padding-top:14px}
+.supplier-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.supplier-section-ttl{font-size:13px;font-weight:700;color:var(--text)}
+.supplier-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px;background:var(--row-alt)}
+.supplier-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.supplier-ttl{font-size:12px;font-weight:500;color:var(--muted)}
+.supplier-del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
+.supplier-del:hover{color:var(--accent)}
+.supplier-body{display:flex;gap:14px}
+.supplier-image{flex:0 0 110px;width:110px;height:110px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--surface)}
+.supplier-image .img-drop{width:100%;height:100%;border:none;border-radius:0;font-size:11px}
+.supplier-preview{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.supplier-fields{flex:1;display:flex;flex-direction:column;gap:0}
+.supplier-fields label{margin-bottom:8px}
 .th-del{position:absolute;top:6px;right:6px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;opacity:.5}
 .th-del:hover{opacity:1;color:var(--accent)}
 
