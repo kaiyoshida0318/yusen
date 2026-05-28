@@ -654,11 +654,11 @@ function renderTables(){
 
     const table = document.createElement("table"); table.className="tbl-grid";
 
-    // 列削除ボタン行
+    // 列削除ボタン行（生成だけ。テーブル末尾に追加する）
     const colDelTr = document.createElement("tr"); colDelTr.className="tbl-coldel-row";
     tbl.columns.forEach((col, ci)=>{
       const td = document.createElement("td"); td.className="tbl-coldel-cell";
-      const cd = document.createElement("button"); cd.type="button"; cd.className="tbl-coldel"; cd.textContent="\u00d7"; cd.title="\u3053\u306e\u5217\u3092\u524a\u9664";
+      const cd = document.createElement("button"); cd.type="button"; cd.className="tbl-coldel"; cd.textContent="\u00d7 \u5217\u3092\u524a\u9664"; cd.title="\u3053\u306e\u5217\u3092\u524a\u9664";
       cd.onclick = ()=>{
         tbl.columns.splice(ci,1); tbl.header.splice(ci,1);
         tbl.rows.forEach(r=>r.cells.splice(ci,1));
@@ -668,7 +668,6 @@ function renderTables(){
       td.appendChild(cd); colDelTr.appendChild(td);
     });
     colDelTr.appendChild(document.createElement("td")); // 行削除列の分
-    table.appendChild(colDelTr);
 
     // タイトル行
     const headTr = document.createElement("tr"); headTr.className="tbl-title-row";
@@ -716,6 +715,9 @@ function renderTables(){
       tr.appendChild(tdDel);
       table.appendChild(tr);
     });
+
+    // 列削除行を一番下に追加
+    table.appendChild(colDelTr);
 
     card.appendChild(table);
     wrap.appendChild(card);
