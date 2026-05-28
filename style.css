@@ -15,6 +15,33 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .header-actions{margin-left:auto;display:flex;gap:8px}
 
 .container{max-width:none;margin:0;padding:20px 16px}
+
+/* カテゴリタブ */
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.cat-tab{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 14px;font:inherit;font-size:13px;color:var(--text);cursor:pointer;transition:all .15s}
+.cat-tab:hover{border-color:var(--accent);color:var(--accent)}
+.cat-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.cat-icon{font-size:14px}
+.cat-label{font-weight:500}
+.cat-count{font-size:11px;background:rgba(0,0,0,.08);padding:1px 7px;border-radius:999px;min-width:18px;text-align:center}
+.cat-tab.active .cat-count{background:rgba(255,255,255,.25)}
+.cat-tab.cat-manage{margin-left:auto;color:var(--muted);background:transparent;border-style:dashed}
+.cat-tab.cat-manage:hover{color:var(--accent);background:var(--surface)}
+
+/* カテゴリ管理モーダル */
+.cat-add-row{display:flex;gap:8px;margin-bottom:14px}
+.cat-add-row input{flex:1;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:inherit}
+.cat-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto;margin-bottom:8px}
+.cat-row{display:flex;align-items:center;gap:6px;padding:8px;background:var(--row-alt);border-radius:8px}
+.cat-icon-btn{background:#fff;border:1px solid var(--border);border-radius:8px;width:42px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0}
+.cat-icon-btn:hover{border-color:var(--accent)}
+.cat-label-input{flex:1;padding:7px 9px;border:1px solid var(--border);border-radius:8px;font:inherit}
+.cat-mv{background:#fff;border:1px solid var(--border);border-radius:6px;width:28px;height:32px;cursor:pointer;font-size:11px}
+.cat-mv:disabled{opacity:.3;cursor:not-allowed}
+.cat-del{background:#fff;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;cursor:pointer;font-size:13px}
+.cat-del:hover{border-color:var(--accent);color:var(--accent)}
+
+.modal select{width:100%;margin-top:5px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:inherit;color:var(--text);background:#fff}
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .status{margin-left:auto;font-size:13px;color:var(--muted)}
 
