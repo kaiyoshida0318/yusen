@@ -424,7 +424,7 @@ function renderRakumart(){
     tg.title = r.collapsed ? "展開" : "折りたたむ";
     tg.onclick = ()=>{ r.collapsed = !r.collapsed; renderRakumart(); };
 
-    const num = document.createElement("span"); num.className="rakumart-num"; num.textContent = `#${idx+1}`;
+    const num = document.createElement("span"); num.className="rakumart-num"; num.textContent = `#${entry.rakumart.length - idx}`;
 
     let bodyEl;
     if(r.collapsed){
@@ -514,11 +514,12 @@ function renderRakumart(){
 }
 
 function addRakumart(){
-  entry.rakumart.push({ text:"", url:"", collapsed:false });
+  // 先頭に追加（最新が上に来る、番号は配列長＝最大番号になる）
+  entry.rakumart.unshift({ text:"", url:"", collapsed:false });
   renderRakumart();
   const editors = document.querySelectorAll("#rakumartList .rakumart-paste");
-  const last = editors[editors.length-1];
-  if(last) last.focus();
+  const first = editors[0];
+  if(first) first.focus();
 }
 
 function toggleSectionRakumart(){
