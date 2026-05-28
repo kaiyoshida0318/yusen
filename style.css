@@ -300,25 +300,55 @@ tbody td{font-size:13px}
 [hidden]{display:none!important}
 
 /* ===================================================================
-   ▼▼▼ v1.12.0 追加：ブロック方式の項目追加 ▼▼▼
+   ▼▼▼ v1.12.0 追加：ブロック方式の項目追加（v1.15.0 視認性強化） ▼▼▼
    =================================================================== */
-/* ブロックを囲む枠 */
-.block-section{border:1px solid var(--border);border-radius:var(--radius);margin-top:14px;background:var(--surface);overflow:hidden}
-.block-section:first-child{margin-top:4px}
+/* 種別カラー（ラクマート=緑 / 仕入先=青 / 表=橙）。各ブロックで上書き */
+.block-section{
+  --blk:#94a3b8;            /* アクセント色（種別ごとに上書き） */
+  --blk-soft:#f1f5f9;       /* ヘッダー帯の薄い色 */
+  position:relative;
+  border:1.5px solid var(--border);
+  border-left:6px solid var(--blk);     /* 左に太いカラーバー */
+  border-radius:var(--radius);
+  margin-top:22px;                       /* ブロック間の余白を広げる */
+  background:var(--surface);
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+.block-section:first-child{margin-top:8px}
+
+/* 種別ごとの色分け */
+.block-section.block-rakumart{--blk:#3f9b6e;--blk-soft:#eef7f1}
+.block-section.block-supplier{--blk:#2f6fb0;--blk-soft:#eaf2fa}
+.block-section.block-table   {--blk:#d98324;--blk-soft:#fbf0e1}
+
 /* ブロックのヘッダー（種別タイトル＋項目追加＋×削除） */
-.block-head{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--row-alt);border-bottom:1px solid var(--border)}
-.block-ttl{font-size:13px;font-weight:700;color:var(--text);margin-right:auto}
+.block-head{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;
+  background:var(--blk-soft);
+  border-bottom:1.5px solid var(--border);
+}
+.block-ttl{
+  font-size:14px;font-weight:700;color:var(--text);margin-right:auto;
+  display:inline-flex;align-items:center;gap:7px;
+  padding-left:8px;position:relative;
+}
+.block-ttl::before{        /* タイトル左の縦バー（種別色） */
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:4px;height:16px;border-radius:2px;background:var(--blk);
+}
 .block-head .block-add-item{margin-left:auto}
-.block-del{flex:0 0 32px;width:32px;height:32px;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:18px;line-height:1;cursor:pointer}
-.block-del:hover{border-color:var(--accent);color:var(--accent);background:#fdf0ec}
+.block-del{flex:0 0 34px;width:34px;height:34px;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;transition:all .15s}
+.block-del:hover{border-color:#dc3545;color:#dc3545;background:#fdecec}
 /* ブロック本文 */
-.block-body{padding:14px 12px}
-.block-body .tbl-card{margin-bottom:0}
+.block-body{padding:16px 14px;background:var(--surface)}
+.block-body .tbl-card{margin-bottom:0;border:none;padding:0;background:transparent}
 .block-body > .rakumart-row:last-of-type{margin-bottom:0}
 
 /* 項目を追加ボタン＋3択メニュー */
-.add-block-wrap{position:relative;margin-top:14px}
-.btn-add-block{width:100%;padding:12px;background:#fff;border:2px dashed var(--border);border-radius:var(--radius);color:var(--muted);font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.add-block-wrap{position:relative;margin-top:22px}
+.btn-add-block{width:100%;padding:13px;background:#fff;border:2px dashed var(--border);border-radius:var(--radius);color:var(--muted);font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
 .btn-add-block:hover{border-color:var(--green);color:var(--green);background:#f1faf3}
 .add-block-menu{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;gap:4px}
 .add-block-opt{display:block;width:100%;text-align:left;padding:11px 14px;background:#fff;border:1px solid transparent;border-radius:8px;font:inherit;font-size:14px;color:var(--text);cursor:pointer;transition:all .12s}
