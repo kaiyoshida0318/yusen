@@ -119,6 +119,7 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .btn-apply{background:#f0a500;color:#fff;font-weight:600}
 .btn-apply:hover{filter:brightness(.94)}
 .col-statussel{width:140px}
+.col-catsel{width:140px}
 .status-select{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:12px;background:#fff;color:var(--text);cursor:pointer}
 .status-select:focus{border-color:var(--accent);outline:none}
 .status-select.status-pending{border-color:#f0a500;background:#fff8e8;font-weight:600}
