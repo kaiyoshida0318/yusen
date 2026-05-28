@@ -76,6 +76,14 @@
           <input type="text" id="fName" placeholder="商品名など">
         </label>
 
+        <div class="rival-col" style="margin-bottom:14px">
+          <div class="rival-col-head">
+            <span class="rival-col-ttl">ランキングURL</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnAddRanking">＋ 追加</button>
+          </div>
+          <div id="rankingList"></div>
+        </div>
+
         <div class="rival-cols">
           <div class="rival-col">
             <div class="rival-col-head">
@@ -126,6 +134,11 @@
             <div id="tablesList"></div>
             <p class="hint-inline">左に画像、右にテキスト（ハイパーリンク状態で貼り付け可）。「＋列」「＋行」で拡張できます。</p>
           </div>
+        </div>
+
+        <div class="freenote-section">
+          <div class="freenote-ttl">自由記入欄</div>
+          <div class="free-note-box" id="freeNoteBox" contenteditable="true" spellcheck="false" data-ph="メモや補足を自由に記入（リンクの貼り付けもできます）"></div>
         </div>
       </div>
     </div>
