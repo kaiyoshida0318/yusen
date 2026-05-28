@@ -91,6 +91,9 @@ tbody td{font-size:13px}
 .entry-body{display:flex;gap:24px;margin-bottom:8px}
 .entry-left{flex:0 0 320px}
 .entry-img-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px}
+.entry-left-meta{width:320px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.entry-left-meta label{margin-bottom:0;font-size:12px;font-weight:500;color:var(--muted);display:block}
+.entry-left-meta input,.entry-left-meta select{width:100%;margin-top:5px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:inherit;color:var(--text);background:#fff;box-sizing:border-box}
 .entry-right{flex:1}
 .entry-image{width:320px;height:320px;border:2px dashed var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .entry-image .img-drop{width:100%;height:100%;border:none;border-radius:0;font-size:13px}
