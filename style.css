@@ -32,6 +32,26 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .cat-tab.cat-quick{margin-left:auto;background:#fff;border-color:var(--green);color:var(--green);font-weight:600}
 .cat-tab.cat-quick:hover{background:#f1faf3;color:var(--green);border-color:var(--green)}
 .cat-tab.cat-quick + .cat-new{margin-left:6px}
+.cat-tab.cat-bulk{margin-left:auto;background:#fff;border-color:var(--border);color:var(--muted)}
+.cat-tab.cat-bulk:hover{border-color:#e2664a;color:#e2664a}
+.cat-tab.cat-bulk.active{background:#e2664a;border-color:#e2664a;color:#fff}
+.cat-tab.cat-bulk + .cat-quick{margin-left:6px}
+
+/* 選択モードの行 */
+.selectable-row{cursor:pointer}
+.selectable-row:hover{background:#fdf0ec!important}
+.row-selected{background:#fde8e2!important}
+.row-selected:hover{background:#fbddd3!important}
+
+/* 一括削除実行ボタン（ステータス行） */
+.status-bulkdel-btn{background:#dc3545;border:1px solid #dc3545;border-radius:8px;padding:6px 14px;font:inherit;font-size:12px;font-weight:600;color:#fff;cursor:pointer}
+.status-bulkdel-btn:hover{filter:brightness(.93)}
+.status-bulkdel-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* モーダルの削除ボタン */
+.btn-danger{background:#fff;border:1px solid #dc3545;color:#dc3545}
+.btn-danger:hover{background:#dc3545;color:#fff}
+.actions-spacer{flex:1}
 
 /* 下段：ステータスタブ */
 .status-tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:-6px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
