@@ -37,6 +37,8 @@ let currentCat = "all"; // 現在選択中のカテゴリID
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
 let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], category:"" };
+// セクション一括折りたたみ（モーダル開く度にリセット）
+let sectionCollapsed = { rakumart:false, suppliers:false };
 
 /* ---------- 初期化 ---------- */
 function init(){
@@ -269,13 +271,19 @@ function openEntry(editIndex){
   document.getElementById("fRival").value = row ? (row.rival||"") : "";
   entry.image = row ? (row.image||"") : "";
   entry.suppliers = row && Array.isArray(row.suppliers)
-    ? row.suppliers.map(s=>({ image:s.image||"", imageIsDataUrl:false, url:s.url||"", memo:s.memo||"" }))
+    ? row.suppliers.map(s=>({ image:s.image||"", imageIsDataUrl:false, url:s.url||"", memo:s.memo||"", collapsed:false }))
     : [];
   entry.rakumart = row && Array.isArray(row.rakumart)
-    ? row.rakumart.map(r=>({ text:r.text||"", url:r.url||"" }))
+    ? row.rakumart.map(r=>({ text:r.text||"", url:r.url||"", collapsed:false }))
     : [];
+  // 新規作成時は、すぐ入力できるようラクマート1件・仕入先1件を初期投入
+  if(!isEdit){
+    if(entry.rakumart.length===0) entry.rakumart.push({ text:"", url:"", collapsed:false });
+    if(entry.suppliers.length===0) entry.suppliers.push({ image:"", imageIsDataUrl:false, url:"", memo:"", collapsed:false });
+  }
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
   entry.category = row ? (row.category||"") : (currentCat==="all" ? "" : currentCat);
+  sectionCollapsed = { rakumart:false, suppliers:false };
   renderCatSelect();
 
   renderEntryImage();
@@ -316,161 +324,206 @@ function renderEntryImage(){
   }
 }
 
+
 // 仕入先セットの描画
 function renderSuppliers(){
+  // セクション一括折りたたみ
+  const sec = document.getElementById("suppliersSection");
+  if(sec) sec.classList.toggle("section-collapsed", sectionCollapsed.suppliers);
+  const stoggle = document.getElementById("suppliersSectionToggle");
+  if(stoggle) stoggle.textContent = sectionCollapsed.suppliers ? "▶" : "▼";
+
   const list = document.getElementById("supplierList");
   list.innerHTML = "";
   entry.suppliers.forEach((s, idx)=>{
-    const card = document.createElement("div"); card.className="supplier-card";
+    const card = document.createElement("div");
+    card.className = "supplier-card" + (s.collapsed ? " is-collapsed" : "");
 
     const head = document.createElement("div"); head.className="supplier-head";
+    // 折りたたみトグル
+    const tg = document.createElement("button");
+    tg.type="button"; tg.className="supplier-toggle";
+    tg.textContent = s.collapsed ? "▶" : "▼";
+    tg.title = s.collapsed ? "展開" : "折りたたむ";
+    tg.onclick = ()=>{ s.collapsed = !s.collapsed; renderSuppliers(); };
     const ttl = document.createElement("span"); ttl.className="supplier-ttl"; ttl.textContent=`仕入先 ${idx+1}`;
-    const rm = document.createElement("button"); rm.className="supplier-del"; rm.textContent="×"; rm.title="この仕入先を削除";
+    const summary = document.createElement("span"); summary.className="supplier-summary";
+    if(s.collapsed){
+      const parts=[];
+      if(s.url) parts.push(s.url.replace(/^https?:\/\//,"").slice(0,40));
+      if(s.memo) parts.push(s.memo);
+      summary.textContent = parts.join(" / ") || "（未入力）";
+    }
+    const rm = document.createElement("button"); rm.type="button"; rm.className="supplier-del"; rm.textContent="×"; rm.title="この仕入先を削除";
     rm.onclick = ()=>{ entry.suppliers.splice(idx,1); renderSuppliers(); };
-    head.appendChild(ttl); head.appendChild(rm);
+    head.append(tg, ttl, summary, rm);
     card.appendChild(head);
 
-    const bodyRow = document.createElement("div"); bodyRow.className="supplier-body";
+    if(!s.collapsed){
+      const bodyRow = document.createElement("div"); bodyRow.className="supplier-body";
 
-    // 左: 画像
-    const imgBox = document.createElement("div"); imgBox.className="supplier-image";
-    if(s.image){
-      const im=document.createElement("img"); im.src=s.imageIsDataUrl?s.image:imgUrl(s.image);
-      im.className="supplier-preview"; im.title="クリックで差し替え";
-      im.onclick=()=>pickImageInto(s,"image", renderSuppliers);
-      imgBox.appendChild(im);
-    }else{
-      const drop=document.createElement("div"); drop.className="img-drop"; drop.textContent="仕入先画像";
-      drop.onclick=()=>pickImageInto(s,"image", renderSuppliers);
-      imgBox.appendChild(drop);
+      const imgBox = document.createElement("div"); imgBox.className="supplier-image";
+      if(s.image){
+        const im=document.createElement("img"); im.src=s.imageIsDataUrl?s.image:imgUrl(s.image);
+        im.className="supplier-preview"; im.title="クリックで差し替え";
+        im.onclick=()=>pickImageInto(s,"image", renderSuppliers);
+        imgBox.appendChild(im);
+      }else{
+        const drop=document.createElement("div"); drop.className="img-drop"; drop.textContent="仕入先画像";
+        drop.onclick=()=>pickImageInto(s,"image", renderSuppliers);
+        imgBox.appendChild(drop);
+      }
+      bodyRow.appendChild(imgBox);
+
+      const fields = document.createElement("div"); fields.className="supplier-fields";
+      const lUrl=document.createElement("label"); lUrl.textContent="仕入先URL";
+      const iUrl=document.createElement("input"); iUrl.type="text"; iUrl.placeholder="https://..."; iUrl.value=s.url;
+      iUrl.oninput=e=>{ s.url=e.target.value; }; lUrl.appendChild(iUrl);
+      const lMemo=document.createElement("label"); lMemo.textContent="メモ";
+      const iMemo=document.createElement("input"); iMemo.type="text"; iMemo.placeholder="単価・MOQ・備考など"; iMemo.value=s.memo;
+      iMemo.oninput=e=>{ s.memo=e.target.value; }; lMemo.appendChild(iMemo);
+      fields.appendChild(lUrl); fields.appendChild(lMemo);
+      bodyRow.appendChild(fields);
+
+      card.appendChild(bodyRow);
     }
-    bodyRow.appendChild(imgBox);
-
-    // 右: URL + メモ
-    const fields = document.createElement("div"); fields.className="supplier-fields";
-    const lUrl=document.createElement("label"); lUrl.textContent="仕入先URL";
-    const iUrl=document.createElement("input"); iUrl.type="text"; iUrl.placeholder="https://..."; iUrl.value=s.url;
-    iUrl.oninput=e=>{ s.url=e.target.value; }; lUrl.appendChild(iUrl);
-    const lMemo=document.createElement("label"); lMemo.textContent="メモ";
-    const iMemo=document.createElement("input"); iMemo.type="text"; iMemo.placeholder="単価・MOQ・備考など"; iMemo.value=s.memo;
-    iMemo.oninput=e=>{ s.memo=e.target.value; }; lMemo.appendChild(iMemo);
-    fields.appendChild(lUrl); fields.appendChild(lMemo);
-    bodyRow.appendChild(fields);
-
-    card.appendChild(bodyRow);
     list.appendChild(card);
   });
 }
 
 function addSupplier(){
-  entry.suppliers.push({ image:"", imageIsDataUrl:false, url:"", memo:"" });
+  entry.suppliers.push({ image:"", imageIsDataUrl:false, url:"", memo:"", collapsed:false });
   renderSuppliers();
 }
 
+function toggleSectionSuppliers(){
+  sectionCollapsed.suppliers = !sectionCollapsed.suppliers;
+  renderSuppliers();
+}
+
+
+
 /* ---------- ラクマート ---------- */
 function renderRakumart(){
+  // セクション一括折りたたみ
+  const sec = document.getElementById("rakumartSection");
+  if(sec) sec.classList.toggle("section-collapsed", sectionCollapsed.rakumart);
+  const stoggle = document.getElementById("rakumartSectionToggle");
+  if(stoggle) stoggle.textContent = sectionCollapsed.rakumart ? "▶" : "▼";
+
   const list = document.getElementById("rakumartList");
   list.innerHTML = "";
   entry.rakumart.forEach((r, idx)=>{
-    const card = document.createElement("div"); card.className = "rakumart-row";
+    const card = document.createElement("div");
+    card.className = "rakumart-row" + (r.collapsed ? " is-collapsed" : "");
+
+    // 個別折りたたみトグル
+    const tg = document.createElement("button");
+    tg.type="button"; tg.className="rakumart-toggle";
+    tg.textContent = r.collapsed ? "▶" : "▼";
+    tg.title = r.collapsed ? "展開" : "折りたたむ";
+    tg.onclick = ()=>{ r.collapsed = !r.collapsed; renderRakumart(); };
 
     const num = document.createElement("span"); num.className="rakumart-num"; num.textContent = `#${idx+1}`;
 
-    // ブラウザ標準の貼り付け挙動に任せる contenteditable
-    const editor = document.createElement("div");
-    editor.className = "rakumart-paste";
-    editor.contentEditable = "true";
-    editor.setAttribute("role","textbox");
-    editor.setAttribute("spellcheck","false");
-
-    // 既存データの復元: <a>として中に入れる
-    if(r.text || r.url){
-      if(r.url){
+    let bodyEl;
+    if(r.collapsed){
+      bodyEl = document.createElement("div"); bodyEl.className="rakumart-summary";
+      if(r.text || r.url){
         const a = document.createElement("a");
-        a.href = r.url; a.target = "_blank"; a.rel="noopener";
+        a.href = r.url || "#"; a.target="_blank"; a.rel="noopener";
         a.textContent = r.text || r.url;
-        editor.appendChild(a);
+        bodyEl.appendChild(a);
       }else{
-        editor.textContent = r.text;
+        const sp = document.createElement("span"); sp.className="muted"; sp.textContent="（未入力）";
+        bodyEl.appendChild(sp);
       }
-    }
-
-    // 入力・貼り付け後に中身からtextとurlを抽出して保存
-    const sync = ()=>{
-      const a = editor.querySelector("a[href]");
-      if(a){
-        r.text = (a.textContent||"").trim();
-        r.url  = a.getAttribute("href") || "";
-      }else{
-        const t = editor.textContent.trim();
-        // プレーンテキストがURLそのものなら、URLとしても保持
-        if(/^https?:\/\/\S+$/i.test(t)){
-          r.text = t; r.url = t;
+    }else{
+      bodyEl = document.createElement("div");
+      bodyEl.className = "rakumart-paste";
+      bodyEl.contentEditable = "true";
+      bodyEl.setAttribute("role","textbox");
+      bodyEl.setAttribute("spellcheck","false");
+      if(r.text || r.url){
+        if(r.url){
+          const a = document.createElement("a");
+          a.href = r.url; a.target = "_blank"; a.rel="noopener";
+          a.textContent = r.text || r.url;
+          bodyEl.appendChild(a);
         }else{
-          r.text = t; r.url = "";
+          bodyEl.textContent = r.text;
         }
       }
-      togglePlaceholder();
-    };
-    const togglePlaceholder = ()=>{
-      const hasContent = editor.textContent.trim().length>0 || editor.querySelector("a,img");
-      editor.classList.toggle("is-empty", !hasContent);
-    };
-
-    editor.addEventListener("input", sync);
-    // paste: ブラウザのデフォルト挙動に任せる。
-    // ただし環境によってはHTMLが入らないことがあるため、aタグがあれば自前で安全に挿入するフォールバックも併用
-    editor.addEventListener("paste", e=>{
-      try{
-        const html  = e.clipboardData && e.clipboardData.getData("text/html");
-        const plain = e.clipboardData && e.clipboardData.getData("text/plain");
-        if(html){
-          const tmp = document.createElement("div"); tmp.innerHTML = html;
-          const a = tmp.querySelector("a[href]");
-          if(a){
+      const sync = ()=>{
+        const a = bodyEl.querySelector("a[href]");
+        if(a){
+          r.text = (a.textContent||"").trim();
+          r.url  = a.getAttribute("href") || "";
+        }else{
+          const t = bodyEl.textContent.trim();
+          if(/^https?:\/\/\S+$/i.test(t)){ r.text = t; r.url = t; }
+          else { r.text = t; r.url = ""; }
+        }
+        togglePlaceholder();
+      };
+      const togglePlaceholder = ()=>{
+        const hasContent = bodyEl.textContent.trim().length>0 || bodyEl.querySelector("a,img");
+        bodyEl.classList.toggle("is-empty", !hasContent);
+      };
+      bodyEl.addEventListener("input", sync);
+      bodyEl.addEventListener("paste", e=>{
+        try{
+          const html  = e.clipboardData && e.clipboardData.getData("text/html");
+          const plain = e.clipboardData && e.clipboardData.getData("text/plain");
+          if(html){
+            const tmp = document.createElement("div"); tmp.innerHTML = html;
+            const a = tmp.querySelector("a[href]");
+            if(a){
+              e.preventDefault();
+              bodyEl.innerHTML = "";
+              const link = document.createElement("a");
+              link.href = a.getAttribute("href"); link.target="_blank"; link.rel="noopener";
+              link.textContent = (a.textContent||"").trim() || a.getAttribute("href");
+              bodyEl.appendChild(link);
+              sync();
+              return;
+            }
+          }
+          if(plain && /^https?:\/\/\S+$/i.test(plain.trim())){
             e.preventDefault();
-            // 既存内容は置換（1行=1リンク想定）
-            editor.innerHTML = "";
+            bodyEl.innerHTML = "";
             const link = document.createElement("a");
-            link.href = a.getAttribute("href"); link.target="_blank"; link.rel="noopener";
-            link.textContent = (a.textContent||"").trim() || a.getAttribute("href");
-            editor.appendChild(link);
+            link.href = plain.trim(); link.target="_blank"; link.rel="noopener";
+            link.textContent = plain.trim();
+            bodyEl.appendChild(link);
             sync();
             return;
           }
-        }
-        if(plain && /^https?:\/\/\S+$/i.test(plain.trim())){
-          e.preventDefault();
-          editor.innerHTML = "";
-          const link = document.createElement("a");
-          link.href = plain.trim(); link.target="_blank"; link.rel="noopener";
-          link.textContent = plain.trim();
-          editor.appendChild(link);
-          sync();
-          return;
-        }
-      }catch(err){ /* 解析失敗時はデフォルト挙動に任せる */ }
-      // 上で処理しなかった場合はデフォルトのまま入る
-      setTimeout(sync, 0);
-    });
-
-    togglePlaceholder();
+        }catch(err){}
+        setTimeout(sync, 0);
+      });
+      togglePlaceholder();
+    }
 
     const rm = document.createElement("button"); rm.type="button"; rm.className="rakumart-del"; rm.textContent="×"; rm.title="削除";
     rm.onclick = ()=>{ entry.rakumart.splice(idx,1); renderRakumart(); };
 
-    card.append(num, editor, rm);
+    card.append(tg, num, bodyEl, rm);
     list.appendChild(card);
   });
 }
 
 function addRakumart(){
-  entry.rakumart.push({ text:"", url:"" });
+  entry.rakumart.push({ text:"", url:"", collapsed:false });
   renderRakumart();
-  // 追加した直後のエディタにフォーカス
   const editors = document.querySelectorAll("#rakumartList .rakumart-paste");
   const last = editors[editors.length-1];
   if(last) last.focus();
+}
+
+function toggleSectionRakumart(){
+  sectionCollapsed.rakumart = !sectionCollapsed.rakumart;
+  renderRakumart();
 }
 
 /* obj[key] に画像を取り込む（メインライバル/仕入先 共通）。cb で再描画 */
@@ -656,6 +709,8 @@ function bindUI(){
   document.getElementById("btnSaveEntry").onclick = saveEntry;
   document.getElementById("btnAddSupplier").onclick = addSupplier;
   document.getElementById("btnAddRakumart").onclick = addRakumart;
+  document.getElementById("rakumartSectionToggle").onclick = toggleSectionRakumart;
+  document.getElementById("suppliersSectionToggle").onclick = toggleSectionSuppliers;
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnCloseSettings").onclick = closeSettings;
