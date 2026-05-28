@@ -43,6 +43,16 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 
 .entry-left-meta label.meta-full{grid-column:1 / -1}
 
+/* ライバルURL 2カラム */
+.rival-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
+.rival-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.rival-col-ttl{font-size:12px;font-weight:700;color:var(--text)}
+.rival-row{display:flex;gap:6px;margin-bottom:6px}
+.rival-row input{flex:1;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:inherit;color:var(--text)}
+.rival-row input:focus{border-color:var(--accent);outline:none}
+.rival-del{flex:0 0 32px;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:15px;cursor:pointer}
+.rival-del:hover{border-color:var(--accent);color:var(--accent)}
+
 /* カテゴリ管理モーダル */
 .cat-add-row{display:flex;gap:8px;margin-bottom:14px}
 .cat-add-row input{flex:1;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:inherit}
