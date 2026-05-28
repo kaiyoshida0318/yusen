@@ -29,6 +29,9 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .cat-tab.cat-manage:hover{color:var(--accent);background:var(--surface)}
 .cat-tab.cat-new{margin-left:auto;background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
 .cat-tab.cat-new:hover{filter:brightness(.94);color:#fff;border-color:var(--green)}
+.cat-tab.cat-quick{margin-left:auto;background:#fff;border-color:var(--green);color:var(--green);font-weight:600}
+.cat-tab.cat-quick:hover{background:#f1faf3;color:var(--green);border-color:var(--green)}
+.cat-tab.cat-quick + .cat-new{margin-left:6px}
 
 /* カテゴリ管理モーダル */
 .cat-add-row{display:flex;gap:8px;margin-bottom:14px}
