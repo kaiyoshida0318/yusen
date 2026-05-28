@@ -5,7 +5,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.2.0";
+const VERSION = "1.3.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -19,12 +19,21 @@ const COLUMNS = [
   { key:"supply", label:"仕入先" },
 ];
 
-let state = { rows: [] };
+// デフォルトのカテゴリ（後から追加・編集・並べ替え・削除可能）
+const DEFAULT_CATEGORIES = [
+  { id:"new",    label:"新商品", icon:"✨" },
+  { id:"rakuten",label:"楽天",   icon:"🛒" },
+  { id:"yahoo",  label:"Yahoo",  icon:"🛍️" },
+];
+const ALL_CAT = { id:"all", label:"全体", icon:"📊" }; // 特別カテゴリ（全件表示）
+
+let state = { rows: [], categories: DEFAULT_CATEGORIES.slice() };
 let cfg = { pat:"", owner:"", repo:"", branch:"main" };
 let dataSha = null;
+let currentCat = "all"; // 現在選択中のカテゴリID
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
-let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[] };
+let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], category:"" };
 
 /* ---------- 初期化 ---------- */
 function init(){
@@ -45,15 +54,19 @@ function loadData(){
   let saved = null;
   try{ saved = JSON.parse(localStorage.getItem(LS_DATA)); }catch(e){}
   if(saved && Array.isArray(saved.rows)){ state = migrate(saved); return; }
-  state = { rows: [] };
+  state = { rows: [], categories: DEFAULT_CATEGORIES.slice() };
 }
-// 旧データ（supply文字列）を suppliers 配列に変換
+// 旧データ（supply文字列・categoriesなし）を新スキーマに変換
 function migrate(data){
+  if(!Array.isArray(data.categories) || data.categories.length===0){
+    data.categories = DEFAULT_CATEGORIES.slice();
+  }
   data.rows.forEach(r=>{
     if(!Array.isArray(r.suppliers)){
       r.suppliers = [];
       if(r.supply){ r.suppliers.push({ image:"", url:r.supply, memo:"" }); delete r.supply; }
     }
+    if(typeof r.category !== "string") r.category = "";
   });
   return data;
 }
@@ -61,8 +74,38 @@ function persistLocal(){ localStorage.setItem(LS_DATA, JSON.stringify(state)); }
 
 function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
 
+/* ---------- カテゴリタブ ---------- */
+function renderTabs(){
+  const wrap = document.getElementById("catTabs");
+  wrap.innerHTML = "";
+  const all = [ALL_CAT, ...state.categories];
+  all.forEach(c=>{
+    const tab = document.createElement("button");
+    tab.className = "cat-tab" + (c.id===currentCat ? " active" : "");
+    tab.innerHTML = `<span class="cat-icon">${c.icon||""}</span><span class="cat-label">${escapeHtml(c.label)}</span><span class="cat-count">${countForCat(c.id)}</span>`;
+    tab.onclick = ()=>{ currentCat = c.id; render(); };
+    wrap.appendChild(tab);
+  });
+  // 末尾にカテゴリ管理ボタン
+  const manage = document.createElement("button");
+  manage.className = "cat-tab cat-manage"; manage.title = "カテゴリ管理";
+  manage.innerHTML = `<span class="cat-icon">📂</span><span class="cat-label">管理</span>`;
+  manage.onclick = openCatManager;
+  wrap.appendChild(manage);
+}
+function countForCat(id){
+  if(id==="all") return state.rows.length;
+  return state.rows.filter(r=>r.category===id).length;
+}
+function filteredRows(){
+  if(currentCat==="all") return state.rows.map((r,i)=>({r,i}));
+  return state.rows.map((r,i)=>({r,i})).filter(x=>x.r.category===currentCat);
+}
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
 /* ---------- 一覧レンダリング ---------- */
 function render(){
+  renderTabs();
   const head = document.getElementById("gridHead");
   const body = document.getElementById("gridBody");
 
@@ -80,17 +123,22 @@ function render(){
   head.innerHTML=""; head.appendChild(tr);
 
   body.innerHTML="";
-  if(state.rows.length===0){
+  const list = filteredRows();
+  if(list.length===0){
     const trEmpty = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = COLUMNS.length+1;
     td.className = "empty-row";
-    td.textContent = "まだ登録がありません。「＋ 新規作成」から追加してください。";
+    if(state.rows.length===0){
+      td.textContent = "まだ登録がありません。「＋ 新規作成」から追加してください。";
+    }else{
+      td.textContent = "このカテゴリにはまだデータがありません。";
+    }
     trEmpty.appendChild(td); body.appendChild(trEmpty);
     return;
   }
 
-  state.rows.forEach((row, ri)=>{
+  list.forEach(({r:row, i:ri})=>{
     const trb = document.createElement("tr");
 
     const tdDate = document.createElement("td");
@@ -186,7 +234,7 @@ function imgUrl(filename){
 /* ---------- 登録モーダル ---------- */
 function openEntry(editIndex){
   const isEdit = (typeof editIndex==="number" && editIndex>=0);
-  entry = { editIndex: isEdit?editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[] };
+  entry = { editIndex: isEdit?editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], category:"" };
   document.getElementById("entryTitle").textContent = isEdit ? "編集" : "新規作成";
 
   let row = isEdit ? state.rows[editIndex] : null;
@@ -194,14 +242,30 @@ function openEntry(editIndex){
   document.getElementById("fName").value  = row ? (row.name||"") : "";
   document.getElementById("fRival").value = row ? (row.rival||"") : "";
   entry.image = row ? (row.image||"") : "";
-  // 仕入先はディープコピー（編集途中でキャンセルできるよう）
   entry.suppliers = row && Array.isArray(row.suppliers)
     ? row.suppliers.map(s=>({ image:s.image||"", imageIsDataUrl:false, url:s.url||"", memo:s.memo||"" }))
     : [];
+  // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
+  entry.category = row ? (row.category||"") : (currentCat==="all" ? "" : currentCat);
+  renderCatSelect();
 
   renderEntryImage();
   renderSuppliers();
   document.getElementById("entryModal").hidden = false;
+}
+
+function renderCatSelect(){
+  const sel = document.getElementById("fCategory");
+  sel.innerHTML = "";
+  const opt0 = document.createElement("option");
+  opt0.value = ""; opt0.textContent = "— 未分類 —";
+  sel.appendChild(opt0);
+  state.categories.forEach(c=>{
+    const o = document.createElement("option");
+    o.value = c.id; o.textContent = `${c.icon||""} ${c.label}`;
+    if(c.id===entry.category) o.selected = true;
+    sel.appendChild(o);
+  });
 }
 function closeEntry(){ document.getElementById("entryModal").hidden = true; }
 
@@ -306,6 +370,7 @@ function saveEntry(){
     image: entry.image || "",
     name:  document.getElementById("fName").value.trim(),
     rival: document.getElementById("fRival").value.trim(),
+    category: document.getElementById("fCategory").value || "",
     suppliers: entry.suppliers.map(s=>({ image:s.image||"", url:(s.url||"").trim(), memo:(s.memo||"").trim() })),
   };
   if(entry.editIndex>=0){ state.rows[entry.editIndex] = row; }
@@ -379,6 +444,64 @@ async function loadFromGitHub(){
 
 function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
 
+/* ---------- カテゴリ管理 ---------- */
+const CAT_ICONS = ["📦","✨","🛒","🛍️","📊","🎯","🔥","⭐","🏷️","💡","📸","🎨","📝","🆕","🇯🇵","🇨🇳"];
+
+function openCatManager(){
+  renderCatManager();
+  document.getElementById("catModal").hidden = false;
+}
+function closeCatManager(){ document.getElementById("catModal").hidden = true; }
+
+function renderCatManager(){
+  const list = document.getElementById("catList");
+  list.innerHTML = "";
+  state.categories.forEach((c, idx)=>{
+    const row = document.createElement("div"); row.className = "cat-row";
+    // 絵文字セレクター
+    const iconBtn = document.createElement("button");
+    iconBtn.className = "cat-icon-btn"; iconBtn.textContent = c.icon || "📦";
+    iconBtn.onclick = ()=>{
+      const cur = CAT_ICONS.indexOf(c.icon);
+      c.icon = CAT_ICONS[(cur+1) % CAT_ICONS.length];
+      persistLocal(); renderCatManager(); renderTabs();
+    };
+    iconBtn.title = "クリックで絵文字を切り替え";
+    // ラベル入力
+    const labelInp = document.createElement("input");
+    labelInp.type = "text"; labelInp.value = c.label; labelInp.className = "cat-label-input";
+    labelInp.onchange = ()=>{ c.label = labelInp.value.trim() || c.label; persistLocal(); renderTabs(); };
+    // 並べ替えボタン
+    const up = document.createElement("button"); up.className="cat-mv"; up.textContent="▲";
+    up.disabled = idx===0;
+    up.onclick = ()=>{ if(idx>0){ [state.categories[idx-1], state.categories[idx]] = [state.categories[idx], state.categories[idx-1]]; persistLocal(); renderCatManager(); renderTabs(); } };
+    const dn = document.createElement("button"); dn.className="cat-mv"; dn.textContent="▼";
+    dn.disabled = idx===state.categories.length-1;
+    dn.onclick = ()=>{ if(idx<state.categories.length-1){ [state.categories[idx+1], state.categories[idx]] = [state.categories[idx], state.categories[idx+1]]; persistLocal(); renderCatManager(); renderTabs(); } };
+    // 削除
+    const del = document.createElement("button"); del.className="cat-del"; del.textContent="🗑";
+    del.title = "このカテゴリを削除（中のデータは「未分類」になります）";
+    del.onclick = ()=>{
+      if(!confirm(`カテゴリ「${c.label}」を削除しますか？\n中のデータは「未分類」になります（データ自体は消えません）。`)) return;
+      state.rows.forEach(r=>{ if(r.category===c.id) r.category=""; });
+      state.categories.splice(idx,1);
+      if(currentCat===c.id) currentCat="all";
+      persistLocal(); renderCatManager(); render();
+    };
+    row.append(iconBtn, labelInp, up, dn, del);
+    list.appendChild(row);
+  });
+}
+
+function addCategory(){
+  const label = document.getElementById("newCatLabel").value.trim();
+  if(!label){ setStatus("⚠️ カテゴリ名を入力してください"); return; }
+  const id = "c_"+Date.now().toString(36);
+  state.categories.push({ id, label, icon:"📦" });
+  document.getElementById("newCatLabel").value = "";
+  persistLocal(); renderCatManager(); renderTabs();
+}
+
 /* ---------- 設定モーダル ---------- */
 function openSettings(){
   document.getElementById("cfgPat").value = cfg.pat;
@@ -398,6 +521,9 @@ function bindUI(){
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnCloseSettings").onclick = closeSettings;
+  document.getElementById("btnCloseCat").onclick = closeCatManager;
+  document.getElementById("btnAddCat").onclick = addCategory;
+  document.getElementById("newCatLabel").addEventListener("keydown", e=>{ if(e.key==="Enter") addCategory(); });
   document.getElementById("btnSaveSettings").onclick = ()=>{
     cfg.pat = document.getElementById("cfgPat").value.trim();
     cfg.owner = document.getElementById("cfgOwner").value.trim();
