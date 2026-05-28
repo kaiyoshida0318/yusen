@@ -25,6 +25,8 @@
 </header>
 
 <main class="container">
+  <nav class="cat-tabs" id="catTabs"></nav>
+
   <div class="toolbar">
     <button class="btn btn-add" id="btnNew">＋ 新規作成</button>
     <span class="status" id="status"></span>
@@ -58,6 +60,9 @@
         </label>
         <label>ライバルURL
           <input type="text" id="fRival" placeholder="https://...">
+        </label>
+        <label>カテゴリ
+          <select id="fCategory"></select>
         </label>
 
         <div class="supplier-section">
@@ -96,6 +101,22 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btnCloseSettings">閉じる</button>
       <button class="btn btn-primary" id="btnSaveSettings">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- カテゴリ管理モーダル -->
+<div class="modal-overlay" id="catModal" hidden>
+  <div class="modal">
+    <h2>カテゴリ管理</h2>
+    <p class="hint">タブとして表示されるカテゴリを管理します。並び替え・名前変更・絵文字変更・削除ができます。</p>
+    <div class="cat-add-row">
+      <input type="text" id="newCatLabel" placeholder="新しいカテゴリ名">
+      <button class="btn btn-primary" id="btnAddCat">追加</button>
+    </div>
+    <div id="catList" class="cat-list"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCloseCat">閉じる</button>
     </div>
   </div>
 </div>
