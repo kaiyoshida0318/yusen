@@ -34,6 +34,7 @@ let state = { rows: [], categories: DEFAULT_CATEGORIES.slice() };
 let cfg = { pat:"", owner:"", repo:"", branch:"main" };
 let dataSha = null;
 let currentCat = "all"; // 現在選択中のカテゴリID
+let dateSort = "none";   // 日付ソート: "none" | "asc" | "desc"
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
 let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], category:"" };
@@ -110,8 +111,21 @@ function countForCat(id){
   return state.rows.filter(r=>r.category===id).length;
 }
 function filteredRows(){
-  if(currentCat==="all") return state.rows.map((r,i)=>({r,i}));
-  return state.rows.map((r,i)=>({r,i})).filter(x=>x.r.category===currentCat);
+  let arr = (currentCat==="all")
+    ? state.rows.map((r,i)=>({r,i}))
+    : state.rows.map((r,i)=>({r,i})).filter(x=>x.r.category===currentCat);
+  if(dateSort!=="none"){
+    arr = arr.slice().sort((a,b)=>{
+      const da = a.r.date || "", db = b.r.date || "";
+      // 空の日付は常に末尾へ
+      if(!da && !db) return 0;
+      if(!da) return 1;
+      if(!db) return -1;
+      const cmp = da < db ? -1 : da > db ? 1 : 0;
+      return dateSort==="asc" ? cmp : -cmp;
+    });
+  }
+  return arr;
 }
 function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
@@ -139,9 +153,19 @@ function render(){
   const tr = document.createElement("tr");
   COLUMNS.forEach(c=>{
     const th = document.createElement("th");
-    if(c.key==="date") th.className="col-date";
-    if(c.key==="image") th.className="col-image";
-    th.textContent = c.label;
+    if(c.key==="date"){
+      th.className="col-date sortable";
+      const arrow = dateSort==="asc" ? " ▲" : dateSort==="desc" ? " ▼" : " ⇅";
+      th.innerHTML = `${c.label}<span class="sort-arrow">${arrow}</span>`;
+      th.title = "クリックで日付の昇順／降順を切り替え";
+      th.onclick = ()=>{
+        dateSort = dateSort==="none" ? "asc" : dateSort==="asc" ? "desc" : "none";
+        render();
+      };
+    }else{
+      if(c.key==="image") th.className="col-image";
+      th.textContent = c.label;
+    }
     tr.appendChild(th);
   });
   const thAct = document.createElement("th");
