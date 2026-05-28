@@ -366,15 +366,37 @@ function openEntry(editIndex){
   entry.rakumart = row && Array.isArray(row.rakumart)
     ? row.rakumart.map(r=>({ text:r.text||"", url:r.url||"", collapsed:false }))
     : [];
-  // 表（ディープコピー）
+  // 表（ディープコピー）。旧構造（rows[].image + rows[].cells）からの変換も対応
   entry.tables = row && Array.isArray(row.tables)
-    ? row.tables.map(t=>({
-        collapsed:false,
-        rows: (t.rows||[]).map(rr=>({
-          image: rr.image||"", imageIsDataUrl:false,
-          cells: (rr.cells||[]).map(c=>({ text:c.text||"", url:c.url||"" }))
-        }))
-      }))
+    ? row.tables.map(t=>{
+        if(Array.isArray(t.columns)){
+          // 新構造
+          return {
+            columns: t.columns.map(c=>({type:c.type})),
+            header: (t.header||[]).slice(),
+            rows: (t.rows||[]).map(rr=>({
+              cells: (rr.cells||[]).map((c,ci)=>{
+                const type = t.columns[ci] ? t.columns[ci].type : "text";
+                return type==="image"
+                  ? { image:c.image||"", imageIsDataUrl:false }
+                  : { text:c.text||"", url:c.url||"" };
+              })
+            }))
+          };
+        }else{
+          // 旧構造: 先頭=画像列 + テキスト列。columns/headerを生成
+          const textCount = (t.rows && t.rows[0] && t.rows[0].cells) ? t.rows[0].cells.length : 1;
+          const columns = [{type:"image"}, ...Array.from({length:textCount},()=>({type:"text"}))];
+          const header = ["画像", ...Array.from({length:textCount},()=>"")];
+          const rows = (t.rows||[]).map(rr=>({
+            cells: [
+              { image: rr.image||"", imageIsDataUrl:false },
+              ...(rr.cells||[]).map(c=>({ text:c.text||"", url:c.url||"" }))
+            ]
+          }));
+          return { columns, header, rows };
+        }
+      })
     : [];
   // 新規作成時は、すぐ入力できるようラクマート1件・仕入先1件を初期投入
   if(!isEdit){
@@ -524,11 +546,18 @@ function toggleSectionSuppliers(){
   renderSuppliers();
 }
 
-/* ---------- 表（画像＋テキスト列） ---------- */
-// テキストセルにリンク貼り付け対応のエディタを作る（ラクマートと同じ挙動）
-function makeLinkCell(cell){
+/* ---------- 表（画像列＋テキスト列、タイトル行つき） ----------
+   データ構造: table = {
+     columns: [{type:"image"|"text"}],   // 列定義（先頭が画像列とは限らない＝画像列も削除可能）
+     header:  ["タイトル", ...],           // 各列のタイトル（テキスト）
+     rows:    [{ cells:[ 値, ... ] }]      // 各セルは、画像列なら {image,imageIsDataUrl}、テキスト列なら {text,url}
+   }
+*/
+
+// テキストセルにリンク貼り付け対応のエディタを作る
+function makeLinkCell(cell, extraClass){
   const ed = document.createElement("div");
-  ed.className = "tbl-cell-edit";
+  ed.className = "tbl-cell-edit" + (extraClass?(" "+extraClass):"");
   ed.contentEditable = "true";
   ed.setAttribute("spellcheck","false");
   if(cell.text || cell.url){
@@ -581,11 +610,27 @@ function makeLinkCell(cell){
   return ed;
 }
 
+// ヘッダー（タイトル行）セル用：プレーンテキスト編集
+function makeHeaderCell(tbl, ci){
+  const ed = document.createElement("div");
+  ed.className = "tbl-head-edit";
+  ed.contentEditable = "true";
+  ed.setAttribute("spellcheck","false");
+  ed.textContent = tbl.header[ci] || "";
+  const sync = ()=>{
+    tbl.header[ci] = ed.textContent.trim();
+    ed.classList.toggle("is-empty", !ed.textContent.trim());
+  };
+  ed.addEventListener("input", sync);
+  ed.classList.toggle("is-empty", !ed.textContent.trim());
+  return ed;
+}
+
 function renderTables(){
   const sec = document.getElementById("tablesSection");
   if(sec) sec.classList.toggle("section-collapsed", sectionCollapsed.tables);
   const stoggle = document.getElementById("tablesSectionToggle");
-  if(stoggle) stoggle.textContent = sectionCollapsed.tables ? "▶" : "▼";
+  if(stoggle) stoggle.textContent = sectionCollapsed.tables ? "\u25b6" : "\u25bc";
 
   const wrap = document.getElementById("tablesList");
   if(!wrap) return;
@@ -593,61 +638,98 @@ function renderTables(){
   entry.tables.forEach((tbl, ti)=>{
     const card = document.createElement("div"); card.className="tbl-card";
 
-    // ヘッダー（タイトル + 列追加 + 行追加 + 表削除）
+    // ヘッダー操作行
     const head = document.createElement("div"); head.className="tbl-head";
-    const ttl = document.createElement("span"); ttl.className="tbl-ttl"; ttl.textContent=`表 ${ti+1}`;
-    const addCol = document.createElement("button"); addCol.type="button"; addCol.className="btn btn-ghost btn-sm"; addCol.textContent="＋列";
-    addCol.onclick = ()=>{ tbl.rows.forEach(r=>r.cells.push({text:"",url:""})); renderTables(); };
-    const addRow = document.createElement("button"); addRow.type="button"; addRow.className="btn btn-ghost btn-sm"; addRow.textContent="＋行";
-    addRow.onclick = ()=>{ const nc=(tbl.rows[0]?tbl.rows[0].cells.length:1); tbl.rows.push({image:"",imageIsDataUrl:false,cells:Array.from({length:nc},()=>({text:"",url:""}))}); renderTables(); };
-    const delTbl = document.createElement("button"); delTbl.type="button"; delTbl.className="tbl-del-btn"; delTbl.textContent="× 表を削除";
-    delTbl.onclick = ()=>{ if(confirm("この表を削除しますか？")){ entry.tables.splice(ti,1); renderTables(); } };
-    head.append(ttl, addCol, addRow, delTbl);
+    const ttl = document.createElement("span"); ttl.className="tbl-ttl"; ttl.textContent=`\u8868 ${ti+1}`;
+    const addTextCol = document.createElement("button"); addTextCol.type="button"; addTextCol.className="btn btn-ghost btn-sm"; addTextCol.textContent="\uff0b\u30c6\u30ad\u30b9\u30c8\u5217";
+    addTextCol.onclick = ()=>{ tbl.columns.push({type:"text"}); tbl.header.push(""); tbl.rows.forEach(r=>r.cells.push({text:"",url:""})); renderTables(); };
+    const addImgCol = document.createElement("button"); addImgCol.type="button"; addImgCol.className="btn btn-ghost btn-sm"; addImgCol.textContent="\uff0b\u753b\u50cf\u5217";
+    addImgCol.onclick = ()=>{ tbl.columns.push({type:"image"}); tbl.header.push(""); tbl.rows.forEach(r=>r.cells.push({image:"",imageIsDataUrl:false})); renderTables(); };
+    const addRow = document.createElement("button"); addRow.type="button"; addRow.className="btn btn-ghost btn-sm"; addRow.textContent="\uff0b\u884c";
+    addRow.onclick = ()=>{ tbl.rows.push({ cells: tbl.columns.map(c=> c.type==="image"?{image:"",imageIsDataUrl:false}:{text:"",url:""}) }); renderTables(); };
+    const delTbl = document.createElement("button"); delTbl.type="button"; delTbl.className="tbl-del-btn"; delTbl.textContent="\u00d7 \u8868\u3092\u524a\u9664";
+    delTbl.onclick = ()=>{ if(confirm("\u3053\u306e\u8868\u3092\u524a\u9664\u3057\u307e\u3059\u304b\uff1f")){ entry.tables.splice(ti,1); renderTables(); } };
+    head.append(ttl, addTextCol, addImgCol, addRow, delTbl);
     card.appendChild(head);
 
-    // テーブル本体
     const table = document.createElement("table"); table.className="tbl-grid";
+
+    // 列削除ボタン行
+    const colDelTr = document.createElement("tr"); colDelTr.className="tbl-coldel-row";
+    tbl.columns.forEach((col, ci)=>{
+      const td = document.createElement("td"); td.className="tbl-coldel-cell";
+      const cd = document.createElement("button"); cd.type="button"; cd.className="tbl-coldel"; cd.textContent="\u00d7"; cd.title="\u3053\u306e\u5217\u3092\u524a\u9664";
+      cd.onclick = ()=>{
+        tbl.columns.splice(ci,1); tbl.header.splice(ci,1);
+        tbl.rows.forEach(r=>r.cells.splice(ci,1));
+        if(tbl.columns.length===0){ entry.tables.splice(ti,1); }
+        renderTables();
+      };
+      td.appendChild(cd); colDelTr.appendChild(td);
+    });
+    colDelTr.appendChild(document.createElement("td")); // 行削除列の分
+    table.appendChild(colDelTr);
+
+    // タイトル行
+    const headTr = document.createElement("tr"); headTr.className="tbl-title-row";
+    tbl.columns.forEach((col, ci)=>{
+      const td = document.createElement("td");
+      td.appendChild(makeHeaderCell(tbl, ci));
+      headTr.appendChild(td);
+    });
+    headTr.appendChild(document.createElement("td"));
+    table.appendChild(headTr);
+
+    // データ行
     tbl.rows.forEach((r, ri)=>{
       const tr = document.createElement("tr");
-      // 画像セル
-      const tdImg = document.createElement("td"); tdImg.className="tbl-img-cell";
-      const imgBox = document.createElement("div"); imgBox.className="tbl-img-box";
-      if(r.image){
-        const im=document.createElement("img"); im.src=r.imageIsDataUrl?r.image:imgUrl(r.image);
-        im.className="tbl-img"; im.title="クリック／ドロップで差し替え";
-        im.onclick=()=>pickImageInto(r,"image",renderTables);
-        imgBox.appendChild(im);
-      }else{
-        const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="画像";
-        drop.onclick=()=>pickImageInto(r,"image",renderTables);
-        imgBox.appendChild(drop);
-      }
-      enableImageDrop(imgBox, r, "image", renderTables);
-      tdImg.appendChild(imgBox);
-      tr.appendChild(tdImg);
-      // テキストセル群
-      r.cells.forEach((cell, ci)=>{
-        const td = document.createElement("td"); td.className="tbl-txt-cell";
-        td.appendChild(makeLinkCell(cell));
+      tbl.columns.forEach((col, ci)=>{
+        const cell = r.cells[ci] || (col.type==="image"?{image:"",imageIsDataUrl:false}:{text:"",url:""});
+        r.cells[ci] = cell;
+        const td = document.createElement("td");
+        if(col.type==="image"){
+          td.className="tbl-img-cell";
+          const imgBox = document.createElement("div"); imgBox.className="tbl-img-box";
+          if(cell.image){
+            const im=document.createElement("img"); im.src=cell.imageIsDataUrl?cell.image:imgUrl(cell.image);
+            im.className="tbl-img"; im.title="\u30af\u30ea\u30c3\u30af\uff0f\u30c9\u30ed\u30c3\u30d7\u3067\u5dee\u3057\u66ff\u3048";
+            im.onclick=()=>pickImageInto(cell,"image",renderTables);
+            imgBox.appendChild(im);
+          }else{
+            const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="\u753b\u50cf";
+            drop.onclick=()=>pickImageInto(cell,"image",renderTables);
+            imgBox.appendChild(drop);
+          }
+          enableImageDrop(imgBox, cell, "image", renderTables);
+          td.appendChild(imgBox);
+        }else{
+          td.className="tbl-txt-cell";
+          td.appendChild(makeLinkCell(cell));
+        }
         tr.appendChild(td);
       });
       // 行削除
       const tdDel = document.createElement("td"); tdDel.className="tbl-rowdel-cell";
-      const rd = document.createElement("button"); rd.type="button"; rd.className="tbl-rowdel"; rd.textContent="×"; rd.title="この行を削除";
-      rd.onclick = ()=>{ tbl.rows.splice(ri,1); if(tbl.rows.length===0){ entry.tables.splice(ti,1); } renderTables(); };
+      const rd = document.createElement("button"); rd.type="button"; rd.className="tbl-rowdel"; rd.textContent="\u00d7"; rd.title="\u3053\u306e\u884c\u3092\u524a\u9664";
+      rd.onclick = ()=>{ tbl.rows.splice(ri,1); renderTables(); };
       tdDel.appendChild(rd);
       tr.appendChild(tdDel);
       table.appendChild(tr);
     });
+
     card.appendChild(table);
     wrap.appendChild(card);
   });
 }
 
 function addTable(){
-  // 初期3行・テキスト列1
-  const rows = Array.from({length:3}, ()=>({ image:"", imageIsDataUrl:false, cells:[{text:"",url:""}] }));
-  entry.tables.push({ collapsed:false, rows });
+  // 初期: 画像列1 + テキスト列2、タイトル行、データ3行
+  const columns = [{type:"image"}, {type:"text"}, {type:"text"}];
+  const header = ["\u753b\u50cf", "", ""];
+  const rows = Array.from({length:3}, ()=>({
+    cells: columns.map(c=> c.type==="image"?{image:"",imageIsDataUrl:false}:{text:"",url:""})
+  }));
+  entry.tables.push({ columns, header, rows });
   renderTables();
 }
 
@@ -655,8 +737,6 @@ function toggleSectionTables(){
   sectionCollapsed.tables = !sectionCollapsed.tables;
   renderTables();
 }
-
-
 
 /* ---------- ラクマート ---------- */
 function renderRakumart(){
@@ -839,9 +919,15 @@ function saveEntry(){
     rakumart: entry.rakumart.map(r=>({ text:(r.text||"").trim(), url:(r.url||"").trim() })).filter(r=>r.text||r.url),
     suppliers: entry.suppliers.map(s=>({ image:s.image||"", url:(s.url||"").trim(), memo:(s.memo||"").trim() })),
     tables: entry.tables.map(t=>({
+      columns: t.columns.map(c=>({ type:c.type })),
+      header: t.header.map(h=>(h||"").trim()),
       rows: t.rows.map(r=>({
-        image: r.image||"",
-        cells: r.cells.map(c=>({ text:(c.text||"").trim(), url:(c.url||"").trim() }))
+        cells: r.cells.map((c,ci)=>{
+          const type = t.columns[ci] ? t.columns[ci].type : "text";
+          return type==="image"
+            ? { image:c.image||"" }
+            : { text:(c.text||"").trim(), url:(c.url||"").trim() };
+        })
       }))
     })),
   };
