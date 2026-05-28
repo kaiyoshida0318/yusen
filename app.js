@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.8.0";
+const VERSION = "1.8.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -145,6 +145,20 @@ function renderTabs(){
       tab.onclick = ()=>{ currentStatus = s.id; render(); };
       swrap.appendChild(tab);
     });
+    // 保留中のステータス変更があるとき、右端にクリア・反映ボタン
+    const n = Object.keys(pendingStatus).length;
+    if(n>0){
+      const clearBtn = document.createElement("button");
+      clearBtn.className = "status-clear-btn";
+      clearBtn.textContent = "クリア";
+      clearBtn.title = "保留中の変更をすべて取り消す";
+      clearBtn.onclick = ()=>{ pendingStatus = {}; render(); };
+      const applyBtn = document.createElement("button");
+      applyBtn.className = "status-apply-btn";
+      applyBtn.textContent = `🔄 反映（${n}件）`;
+      applyBtn.onclick = applyPendingStatus;
+      swrap.append(clearBtn, applyBtn);
+    }
   }
 }
 // 上段カウント: 現在の下段ステータス絞り込みを反映
@@ -353,15 +367,14 @@ function render(){
       }else{
         pendingStatus[ri] = sel.value;
       }
-      renderApplyButton();
       sel.classList.toggle("status-pending", (ri in pendingStatus));
+      renderTabs(); // クリア・反映ボタンの出し分けを更新
     };
     tdStatus.appendChild(sel);
     trb.appendChild(tdStatus);
 
     body.appendChild(trb);
   });
-  renderApplyButton();
 }
 
 function urlCell(url){
@@ -1087,18 +1100,6 @@ function fileToBase64(file){
 }
 
 /* ---------- ステータス保留変更の反映 ---------- */
-function renderApplyButton(){
-  const btn = document.getElementById("btnApplyStatus");
-  if(!btn) return;
-  const n = Object.keys(pendingStatus).length;
-  if(n>0){
-    btn.hidden = false;
-    btn.textContent = `🔄 反映（${n}件）`;
-  }else{
-    btn.hidden = true;
-  }
-}
-
 async function applyPendingStatus(){
   const n = Object.keys(pendingStatus).length;
   if(n===0) return;
@@ -1294,7 +1295,6 @@ function bindUI(){
   document.getElementById("btnAddTable").onclick = addTable;
   document.getElementById("tablesSectionToggle").onclick = toggleSectionTables;
   document.getElementById("btnSave").onclick = saveToGitHub;
-  document.getElementById("btnApplyStatus").onclick = applyPendingStatus;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnManageCats").onclick = openCatManager;
   document.getElementById("btnManageStatus").onclick = openStatusManager;
