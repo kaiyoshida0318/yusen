@@ -22,6 +22,11 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .cat-tab:hover{border-color:var(--accent);color:var(--accent)}
 .cat-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .cat-icon{font-size:18px}
+/* ブランドロゴ（楽天R / YahooY）SVG */
+.cat-logo{width:18px;height:18px;display:inline-block;vertical-align:middle;border-radius:4px}
+.cat-icon .cat-logo{width:18px;height:18px}
+.cat-icon-btn .cat-logo{width:22px;height:22px}
+.cat-icon-opt .cat-logo{width:20px;height:20px}
 .cat-label{font-weight:500}
 .cat-count{font-size:11px;background:rgba(0,0,0,.08);padding:1px 7px;border-radius:999px;min-width:18px;text-align:center}
 .cat-tab.active .cat-count{background:rgba(255,255,255,.25)}
