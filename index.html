@@ -68,9 +68,23 @@
         <label>項目名
           <input type="text" id="fName" placeholder="商品名など">
         </label>
-        <label>ライバルURL
-          <input type="text" id="fRival" placeholder="https://...">
-        </label>
+
+        <div class="rival-cols">
+          <div class="rival-col">
+            <div class="rival-col-head">
+              <span class="rival-col-ttl">楽天ライバルURL</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnAddRivalR">＋ 追加</button>
+            </div>
+            <div id="rivalRakutenList"></div>
+          </div>
+          <div class="rival-col">
+            <div class="rival-col-head">
+              <span class="rival-col-ttl">AmazonライバルURL</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnAddRivalA">＋ 追加</button>
+            </div>
+            <div id="rivalAmazonList"></div>
+          </div>
+        </div>
 
         <div class="supplier-section rakumart-section" id="rakumartSection">
           <div class="supplier-section-head">
