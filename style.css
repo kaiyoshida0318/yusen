@@ -168,6 +168,28 @@ tbody td{font-size:13px}
 .rakumart-row.is-collapsed .rakumart-summary{flex:1;padding:6px 10px;background:var(--row-alt);border-radius:6px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rakumart-summary a{color:#2563eb;text-decoration:underline}
 
+/* 表（画像＋テキスト列） */
+.tbl-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px;background:var(--row-alt)}
+.tbl-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tbl-ttl{font-size:12px;font-weight:500;color:var(--muted);margin-right:auto}
+.tbl-del-btn{background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;padding:4px 10px;cursor:pointer}
+.tbl-del-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tbl-grid{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden}
+.tbl-grid td{border:1px solid var(--border);padding:6px;vertical-align:middle}
+.tbl-img-cell{width:110px}
+.tbl-img-box{width:96px;height:96px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;margin:0 auto}
+.tbl-img-box .img-drop{width:100%;height:100%;border:none;border-radius:0;font-size:11px}
+.tbl-img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.tbl-img-box.drag-over{border-color:var(--accent)!important;background:#fdf0ec}
+.tbl-txt-cell{min-width:140px}
+.tbl-cell-edit{min-height:40px;padding:8px;outline:none;font:inherit;color:var(--text);line-height:1.4;word-break:break-all;position:relative;cursor:text}
+.tbl-cell-edit:focus{box-shadow:inset 0 0 0 2px var(--accent);border-radius:4px}
+.tbl-cell-edit.is-empty::before{content:"入力／貼り付け";color:var(--border);pointer-events:none;position:absolute;left:8px;top:8px}
+.tbl-cell-edit a{color:#2563eb;text-decoration:underline;word-break:break-all}
+.tbl-rowdel-cell{width:34px;text-align:center}
+.tbl-rowdel{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer}
+.tbl-rowdel:hover{color:var(--accent)}
+
 /* ラクマート */
 .rakumart-section{margin-top:8px}
 .hint-inline{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
