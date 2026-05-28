@@ -45,7 +45,14 @@
 <!-- 登録モーダル -->
 <div class="modal-overlay" id="entryModal" hidden>
   <div class="modal modal-entry">
-    <h2 id="entryTitle">新規作成</h2>
+    <div class="entry-topbar">
+      <h2 id="entryTitle">新規作成</h2>
+      <div class="modal-actions modal-actions-top">
+        <button class="btn btn-ghost" data-act="cancel">キャンセル</button>
+        <button class="btn btn-ghost" data-act="save">保存</button>
+        <button class="btn btn-primary" data-act="saveclose">保存して閉じる</button>
+      </div>
+    </div>
     <div class="entry-body">
       <div class="entry-left">
         <div class="entry-img-label">メインライバル画像</div>
@@ -122,9 +129,10 @@
         </div>
       </div>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="btnCloseEntry">キャンセル</button>
-      <button class="btn btn-primary" id="btnSaveEntry">登録</button>
+    <div class="modal-actions modal-actions-bottom">
+      <button class="btn btn-ghost" data-act="cancel">キャンセル</button>
+      <button class="btn btn-ghost" data-act="save">保存</button>
+      <button class="btn btn-primary" data-act="saveclose">保存して閉じる</button>
     </div>
   </div>
 </div>
