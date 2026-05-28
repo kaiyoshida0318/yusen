@@ -91,7 +91,7 @@ tbody td input[type=text]{width:100%;border:none;background:transparent;font:inh
 tbody td input[type=text]:focus{background:#fff;box-shadow:inset 0 0 0 2px var(--accent);border-radius:6px}
 
 .col-date{width:130px}
-.col-image{width:120px}
+.col-image{width:150px}
 .col-actions{width:88px;text-align:center}
 
 .img-cell{display:flex;align-items:center;justify-content:center;min-height:64px}
@@ -138,16 +138,18 @@ tbody td{font-size:13px}
 .entry-image.drag-over .img-drop,.supplier-image.drag-over .img-drop{color:var(--accent)}
 
 /* 一覧の画像セル（複数並べ） */
-.img-cell-multi{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.img-cell-multi img{width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--border)}
+.img-cell-multi{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}
+.img-cell-multi img{width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
 .sup-line{font-size:12px;margin-bottom:3px}
 .sup-memo{color:var(--muted)}
 
 /* 仕入先セクション（モーダル右下） */
 .btn-sm{padding:5px 10px;font-size:12px}
 .supplier-section{margin-top:4px;border-top:1px solid var(--border);padding-top:14px}
-.supplier-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.supplier-section-ttl{font-size:13px;font-weight:700;color:var(--text)}
+.supplier-section-head{display:flex;align-items:center;margin-bottom:10px;position:relative}
+.supplier-section-head .section-toggle{position:absolute;left:0}
+.supplier-section-ttl{font-size:13px;font-weight:700;color:var(--text);flex:1;text-align:center}
+.supplier-section-head .btn-add{position:absolute;right:0}
 .supplier-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px;background:var(--row-alt)}
 .supplier-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .supplier-ttl{font-size:12px;font-weight:500;color:var(--muted)}
