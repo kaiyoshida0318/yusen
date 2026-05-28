@@ -30,10 +30,21 @@ const DEFAULT_CATEGORIES = [
 ];
 const ALL_CAT = { id:"all", label:"全体", icon:"📊" }; // 特別カテゴリ（全件表示）
 
+// 下段：進捗ステータス（固定）。id="all" は全件表示の特別タブ
+const STATUSES = [
+  { id:"all",       label:"全体" },
+  { id:"buy",       label:"買付前・済" },
+  { id:"arrived",   label:"到着分" },
+  { id:"prearrive", label:"到着前" },
+  { id:"working",   label:"着手中" },
+  { id:"done",      label:"完了分" },
+];
+
 let state = { rows: [], categories: DEFAULT_CATEGORIES.slice() };
 let cfg = { pat:"", owner:"", repo:"", branch:"main" };
 let dataSha = null;
-let currentCat = "all"; // 現在選択中のカテゴリID
+let currentCat = "all"; // 現在選択中のカテゴリID（上段）
+let currentStatus = "all"; // 現在選択中のステータスID（下段）
 let dateSort = "none";   // 日付ソート: "none" | "asc" | "desc"
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
@@ -74,6 +85,7 @@ function migrate(data){
     }
     if(!Array.isArray(r.rakumart)) r.rakumart = [];
     if(typeof r.category !== "string") r.category = "";
+    if(typeof r.status !== "string") r.status = "";
   });
   return data;
 }
@@ -83,6 +95,7 @@ function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
 
 /* ---------- カテゴリタブ ---------- */
 function renderTabs(){
+  // 上段：販路カテゴリ
   const wrap = document.getElementById("catTabs");
   wrap.innerHTML = "";
   const all = [ALL_CAT, ...state.categories];
@@ -105,15 +118,42 @@ function renderTabs(){
   newBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">新規作成</span>`;
   newBtn.onclick = ()=>openEntry(-1);
   wrap.appendChild(newBtn);
+
+  // 下段：進捗ステータス
+  const swrap = document.getElementById("statusTabs");
+  if(swrap){
+    swrap.innerHTML = "";
+    STATUSES.forEach(s=>{
+      const tab = document.createElement("button");
+      tab.className = "status-tab" + (s.id===currentStatus ? " active" : "");
+      tab.innerHTML = `<span class="cat-label">${escapeHtml(s.label)}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
+      tab.onclick = ()=>{ currentStatus = s.id; render(); };
+      swrap.appendChild(tab);
+    });
+  }
 }
+// 上段カウント: 現在の下段ステータス絞り込みを反映
 function countForCat(id){
-  if(id==="all") return state.rows.length;
-  return state.rows.filter(r=>r.category===id).length;
+  return state.rows.filter(r=>{
+    const catOk = (id==="all") || r.category===id;
+    const stOk = (currentStatus==="all") || r.status===currentStatus;
+    return catOk && stOk;
+  }).length;
+}
+// 下段カウント: 現在の上段カテゴリ絞り込みを反映
+function countForStatus(id){
+  return state.rows.filter(r=>{
+    const catOk = (currentCat==="all") || r.category===currentCat;
+    const stOk = (id==="all") || r.status===id;
+    return catOk && stOk;
+  }).length;
 }
 function filteredRows(){
-  let arr = (currentCat==="all")
-    ? state.rows.map((r,i)=>({r,i}))
-    : state.rows.map((r,i)=>({r,i})).filter(x=>x.r.category===currentCat);
+  let arr = state.rows.map((r,i)=>({r,i})).filter(x=>{
+    const catOk = (currentCat==="all") || x.r.category===currentCat;
+    const stOk  = (currentStatus==="all") || x.r.status===currentStatus;
+    return catOk && stOk;
+  });
   if(dateSort!=="none"){
     arr = arr.slice().sort((a,b)=>{
       const da = a.r.date || "", db = b.r.date || "";
@@ -137,6 +177,7 @@ function addQuickRow(){
     name: "",
     rival: "",
     category: (currentCat==="all" ? "" : currentCat),
+    status: (currentStatus==="all" ? "" : currentStatus),
     rakumart: [],
     suppliers: [],
   });
@@ -328,14 +369,32 @@ function openEntry(editIndex){
   }
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
   entry.category = row ? (row.category||"") : (currentCat==="all" ? "" : currentCat);
+  // ステータス: 編集時はその値、新規時は現在の下段タブ（"all"の場合は未設定）
+  entry.status = row ? (row.status||"") : (currentStatus==="all" ? "" : currentStatus);
   // 新規作成時はセクションを閉じておく（必要なものだけ開いて使う）。編集時は展開。
   sectionCollapsed = isEdit ? { rakumart:false, suppliers:false } : { rakumart:true, suppliers:true };
   renderCatSelect();
+  renderStatusSelect();
 
   renderEntryImage();
   renderRakumart();
   renderSuppliers();
   document.getElementById("entryModal").hidden = false;
+}
+
+function renderStatusSelect(){
+  const sel = document.getElementById("fStatus");
+  if(!sel) return;
+  sel.innerHTML = "";
+  const opt0 = document.createElement("option");
+  opt0.value = ""; opt0.textContent = "— 未設定 —";
+  sel.appendChild(opt0);
+  STATUSES.filter(s=>s.id!=="all").forEach(s=>{
+    const o = document.createElement("option");
+    o.value = s.id; o.textContent = s.label;
+    if(s.id===entry.status) o.selected = true;
+    sel.appendChild(o);
+  });
 }
 
 function renderCatSelect(){
@@ -607,6 +666,7 @@ function saveEntry(){
     name:  document.getElementById("fName").value.trim(),
     rival: document.getElementById("fRival").value.trim(),
     category: document.getElementById("fCategory").value || "",
+    status: document.getElementById("fStatus").value || "",
     rakumart: entry.rakumart.map(r=>({ text:(r.text||"").trim(), url:(r.url||"").trim() })).filter(r=>r.text||r.url),
     suppliers: entry.suppliers.map(s=>({ image:s.image||"", url:(s.url||"").trim(), memo:(s.memo||"").trim() })),
   };
