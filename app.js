@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.9.1";
+const VERSION = "1.10.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -17,6 +17,7 @@ const COLUMNS = [
   { key:"date",   label:"日付" },
   { key:"image",  label:"画像" },
   { key:"name",   label:"項目名" },
+  { key:"ranking", label:"ランキング" },
   { key:"rivalR", label:"楽天ライバル" },
   { key:"rivalA", label:"Amazonライバル" },
   { key:"rakumart", label:"ラクマート" },
@@ -55,7 +56,7 @@ let pendingStatus = {};  // 一覧でのステータス保留変更 { rowIndex: 
 let catIconOpen = -1;    // カテゴリ管理で絵文字パレットを開いているインデックス
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
-let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], category:"" };
+let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], rankingUrls:[], freeNote:"", category:"" };
 // セクション一括折りたたみ（モーダル開く度にリセット）
 let sectionCollapsed = { rakumart:false, suppliers:false, tables:false };
 
@@ -102,6 +103,8 @@ function migrate(data){
       delete r.rival;
     }
     if(!Array.isArray(r.rivalAmazon)) r.rivalAmazon = [];
+    if(!Array.isArray(r.rankingUrls)) r.rankingUrls = [];
+    if(typeof r.freeNote !== "string") r.freeNote = ""; // 自由記入欄（リンク含むHTMLを保持）
     if(typeof r.category !== "string") r.category = "";
     if(typeof r.status !== "string") r.status = "";
   });
@@ -294,6 +297,8 @@ function render(){
     tdName.textContent = row.name || "";
     trb.appendChild(tdName);
 
+    trb.appendChild(urlListCell(row.rankingUrls));
+
     trb.appendChild(urlListCell(row.rivalRakuten));
     trb.appendChild(urlListCell(row.rivalAmazon));
 
@@ -444,6 +449,11 @@ function openEntry(editIndex){
   entry.rivalAmazon  = row && Array.isArray(row.rivalAmazon)  ? row.rivalAmazon.slice()  : [];
   while(entry.rivalRakuten.length < 2) entry.rivalRakuten.push("");
   while(entry.rivalAmazon.length  < 2) entry.rivalAmazon.push("");
+  // ランキングURL（最低1行）
+  entry.rankingUrls = row && Array.isArray(row.rankingUrls) ? row.rankingUrls.slice() : [];
+  while(entry.rankingUrls.length < 1) entry.rankingUrls.push("");
+  // 自由記入欄
+  entry.freeNote = row ? (row.freeNote||"") : "";
   entry.image = row ? (row.image||"") : "";
   entry.suppliers = row && Array.isArray(row.suppliers)
     ? row.suppliers.map(s=>({ image:s.image||"", imageIsDataUrl:false, url:s.url||"", memo:s.memo||"", collapsed:false }))
@@ -499,9 +509,11 @@ function openEntry(editIndex){
 
   renderEntryImage();
   renderRivals();
+  renderRanking();
   renderRakumart();
   renderSuppliers();
   renderTables();
+  renderFreeNote();
   document.getElementById("entryModal").hidden = false;
 }
 
@@ -578,6 +590,69 @@ function renderRivalList(containerId, arr, key){
 function addRival(key){
   entry[key].push("");
   renderRivals();
+}
+
+// ランキングURL（複数）
+function renderRanking(){
+  const wrap = document.getElementById("rankingList");
+  if(!wrap) return;
+  wrap.innerHTML = "";
+  entry.rankingUrls.forEach((url, idx)=>{
+    const rowEl = document.createElement("div"); rowEl.className="rival-row";
+    const inp = document.createElement("input");
+    inp.type="text"; inp.placeholder="https://..."; inp.value=url;
+    inp.oninput = e=>{ entry.rankingUrls[idx] = e.target.value; };
+    const rm = document.createElement("button");
+    rm.type="button"; rm.className="rival-del"; rm.textContent="×"; rm.title="この欄を削除";
+    rm.onclick = ()=>{ entry.rankingUrls.splice(idx,1); if(entry.rankingUrls.length===0) entry.rankingUrls.push(""); renderRanking(); };
+    rowEl.append(inp, rm);
+    wrap.appendChild(rowEl);
+  });
+}
+function addRanking(){
+  entry.rankingUrls.push("");
+  renderRanking();
+}
+
+// 自由記入欄（リンク貼り付け対応のリッチテキスト、複数行OK）
+function renderFreeNote(){
+  const box = document.getElementById("freeNoteBox");
+  if(!box) return;
+  box.innerHTML = entry.freeNote || "";
+  box.classList.toggle("is-empty", !(box.textContent.trim() || box.querySelector("a,img")));
+}
+function bindFreeNote(){
+  const box = document.getElementById("freeNoteBox");
+  if(!box) return;
+  const sync = ()=>{
+    entry.freeNote = box.innerHTML;
+    box.classList.toggle("is-empty", !(box.textContent.trim() || box.querySelector("a,img")));
+  };
+  box.addEventListener("input", sync);
+  box.addEventListener("paste", e=>{
+    try{
+      const html = e.clipboardData && e.clipboardData.getData("text/html");
+      const plain = e.clipboardData && e.clipboardData.getData("text/plain");
+      if(html){
+        // リンクを含むHTMLはそのまま挿入（aタグのtarget整える）
+        const tmp = document.createElement("div"); tmp.innerHTML = html;
+        tmp.querySelectorAll("a").forEach(a=>{ a.target="_blank"; a.rel="noopener"; });
+        e.preventDefault();
+        document.execCommand("insertHTML", false, tmp.innerHTML);
+        sync(); return;
+      }
+      if(plain){
+        e.preventDefault();
+        if(/^https?:\/\/\S+$/i.test(plain.trim())){
+          document.execCommand("insertHTML", false, `<a href="${plain.trim()}" target="_blank" rel="noopener">${plain.trim()}</a>`);
+        }else{
+          document.execCommand("insertText", false, plain);
+        }
+        sync(); return;
+      }
+    }catch(err){}
+    setTimeout(sync,0);
+  });
 }
 
 
@@ -1053,6 +1128,8 @@ function saveEntry(keepOpen){
     name:  document.getElementById("fName").value.trim(),
     rivalRakuten: entry.rivalRakuten.map(u=>(u||"").trim()).filter(u=>u),
     rivalAmazon:  entry.rivalAmazon.map(u=>(u||"").trim()).filter(u=>u),
+    rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
+    freeNote:     entry.freeNote || "",
     category: document.getElementById("fCategory").value || "",
     status: document.getElementById("fStatus").value || "",
     rakumart: entry.rakumart.map(r=>({ text:(r.text||"").trim(), url:(r.url||"").trim() })).filter(r=>r.text||r.url),
@@ -1309,6 +1386,8 @@ function bindUI(){
   document.getElementById("btnAddRakumart").onclick = addRakumart;
   document.getElementById("btnAddRivalR").onclick = ()=>addRival("rivalRakuten");
   document.getElementById("btnAddRivalA").onclick = ()=>addRival("rivalAmazon");
+  document.getElementById("btnAddRanking").onclick = addRanking;
+  bindFreeNote();
   document.getElementById("rakumartSectionToggle").onclick = toggleSectionRakumart;
   document.getElementById("suppliersSectionToggle").onclick = toggleSectionSuppliers;
   document.getElementById("btnAddTable").onclick = addTable;
