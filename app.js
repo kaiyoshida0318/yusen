@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.7.1";
+const VERSION = "1.8.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -21,6 +21,8 @@ const COLUMNS = [
   { key:"rivalA", label:"Amazonライバル" },
   { key:"rakumart", label:"ラクマート" },
   { key:"supply", label:"仕入先" },
+  { key:"actions", label:"操作" },
+  { key:"statusSel", label:"ステータス" },
 ];
 
 // デフォルトのカテゴリ（後から追加・編集・並べ替え・削除可能）
@@ -47,6 +49,7 @@ let dataSha = null;
 let currentCat = "all"; // 現在選択中のカテゴリID（上段）
 let currentStatus = "all"; // 現在選択中のステータスID（下段）
 let dateSort = "none";   // 日付ソート: "none" | "asc" | "desc"
+let pendingStatus = {};  // 一覧でのステータス保留変更 { rowIndex: newStatusId }
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
 let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], category:"" };
@@ -217,13 +220,12 @@ function render(){
       };
     }else{
       if(c.key==="image") th.className="col-image";
+      if(c.key==="actions") th.className="col-actions";
+      if(c.key==="statusSel") th.className="col-statussel";
       th.textContent = c.label;
     }
     tr.appendChild(th);
   });
-  const thAct = document.createElement("th");
-  thAct.className="col-actions"; thAct.textContent="操作";
-  tr.appendChild(thAct);
   head.innerHTML=""; head.appendChild(tr);
 
   body.innerHTML="";
@@ -231,7 +233,7 @@ function render(){
   if(list.length===0){
     const trEmpty = document.createElement("tr");
     const td = document.createElement("td");
-    td.colSpan = COLUMNS.length+1;
+    td.colSpan = COLUMNS.length;
     td.className = "empty-row";
     if(state.rows.length===0){
       td.textContent = "まだ登録がありません。「＋ 新規作成」から追加してください。";
@@ -328,8 +330,38 @@ function render(){
     tdAct.appendChild(edit); tdAct.appendChild(del);
     trb.appendChild(tdAct);
 
+    // ステータス変更ドロップダウン
+    const tdStatus = document.createElement("td");
+    tdStatus.className="col-statussel";
+    const sel = document.createElement("select");
+    sel.className="status-select";
+    const opt0 = document.createElement("option");
+    opt0.value=""; opt0.textContent="— 未設定 —";
+    sel.appendChild(opt0);
+    state.statuses.forEach(st=>{
+      const o=document.createElement("option");
+      o.value=st.id; o.textContent=st.label;
+      sel.appendChild(o);
+    });
+    // 保留中があればそれを、なければ現在値を選択
+    const pending = (ri in pendingStatus) ? pendingStatus[ri] : row.status;
+    sel.value = pending || "";
+    if(pending !== row.status && (ri in pendingStatus)) sel.classList.add("status-pending");
+    sel.onchange = ()=>{
+      if(sel.value === (row.status||"")){
+        delete pendingStatus[ri]; // 元に戻したら保留解除
+      }else{
+        pendingStatus[ri] = sel.value;
+      }
+      renderApplyButton();
+      sel.classList.toggle("status-pending", (ri in pendingStatus));
+    };
+    tdStatus.appendChild(sel);
+    trb.appendChild(tdStatus);
+
     body.appendChild(trb);
   });
+  renderApplyButton();
 }
 
 function urlCell(url){
@@ -1054,6 +1086,39 @@ function fileToBase64(file){
   });
 }
 
+/* ---------- ステータス保留変更の反映 ---------- */
+function renderApplyButton(){
+  const btn = document.getElementById("btnApplyStatus");
+  if(!btn) return;
+  const n = Object.keys(pendingStatus).length;
+  if(n>0){
+    btn.hidden = false;
+    btn.textContent = `🔄 反映（${n}件）`;
+  }else{
+    btn.hidden = true;
+  }
+}
+
+async function applyPendingStatus(){
+  const n = Object.keys(pendingStatus).length;
+  if(n===0) return;
+  // 保留中の変更をデータに適用
+  Object.keys(pendingStatus).forEach(ri=>{
+    const idx = parseInt(ri,10);
+    if(state.rows[idx]) state.rows[idx].status = pendingStatus[ri];
+  });
+  pendingStatus = {};
+  persistLocal();
+  render();
+  // GitHubにも保存
+  if(cfg.pat && cfg.owner && cfg.repo){
+    await saveToGitHub();
+    setStatus(`✅ ${n}件のステータスを反映し、GitHubに保存しました`);
+  }else{
+    setStatus(`✅ ${n}件のステータスを反映しました（GitHub未設定のため保存は未実行）`);
+  }
+}
+
 /* ---------- GitHub データ保存 ---------- */
 async function saveToGitHub(){
   if(!cfg.pat||!cfg.owner||!cfg.repo){ openSettings(); setStatus("⚠️ 先にGitHub設定を入力してください"); return; }
@@ -1229,6 +1294,7 @@ function bindUI(){
   document.getElementById("btnAddTable").onclick = addTable;
   document.getElementById("tablesSectionToggle").onclick = toggleSectionTables;
   document.getElementById("btnSave").onclick = saveToGitHub;
+  document.getElementById("btnApplyStatus").onclick = applyPendingStatus;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnManageCats").onclick = openCatManager;
   document.getElementById("btnManageStatus").onclick = openStatusManager;
