@@ -1,11 +1,13 @@
 /* 優先順位決定くん app.js
-   - データ構造: { rows:[ {date, image, name, rival, suppliers:[{image,url,memo}]} ] }
+   - データ構造: { rows:[ {date, image, name, rival, category, rakumart:[{text,url}], suppliers:[{image,url,memo}]} ],
+                   categories:[{id,label,icon}] }
      image = メインライバル画像 / rival = ライバルURL
+     rakumart = ラクマートの商品リンク配列（貼り付けで表示テキスト+URLを自動取得）
      suppliers = 仕入先（中国輸入元）の配列。各 {image, url, memo}
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.3.0";
+const VERSION = "1.4.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -16,6 +18,7 @@ const COLUMNS = [
   { key:"image",  label:"画像" },
   { key:"name",   label:"項目名" },
   { key:"rival",  label:"ライバルURL" },
+  { key:"rakumart", label:"ラクマート" },
   { key:"supply", label:"仕入先" },
 ];
 
@@ -33,7 +36,7 @@ let dataSha = null;
 let currentCat = "all"; // 現在選択中のカテゴリID
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
-let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], category:"" };
+let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], category:"" };
 
 /* ---------- 初期化 ---------- */
 function init(){
@@ -66,6 +69,7 @@ function migrate(data){
       r.suppliers = [];
       if(r.supply){ r.suppliers.push({ image:"", url:r.supply, memo:"" }); delete r.supply; }
     }
+    if(!Array.isArray(r.rakumart)) r.rakumart = [];
     if(typeof r.category !== "string") r.category = "";
   });
   return data;
@@ -168,6 +172,28 @@ function render(){
 
     trb.appendChild(urlCell(row.rival));
 
+    // ラクマート列
+    const tdRak = document.createElement("td");
+    const raks = row.rakumart||[];
+    if(raks.length===0){
+      const sp=document.createElement("span"); sp.className="muted"; sp.textContent="—";
+      tdRak.appendChild(sp);
+    }else{
+      raks.forEach(r=>{
+        const line=document.createElement("div"); line.className="sup-line";
+        if(r.url){
+          const a=document.createElement("a"); a.href=r.url; a.target="_blank"; a.rel="noopener";
+          a.className="url-link"; a.textContent = r.text || r.url; a.title = r.url;
+          line.appendChild(a);
+        }else{
+          const sp=document.createElement("span"); sp.textContent = r.text || "";
+          line.appendChild(sp);
+        }
+        tdRak.appendChild(line);
+      });
+    }
+    trb.appendChild(tdRak);
+
     // 仕入先列: 件数 + 各URLリンク
     const tdSup = document.createElement("td");
     const sups = row.suppliers||[];
@@ -245,11 +271,15 @@ function openEntry(editIndex){
   entry.suppliers = row && Array.isArray(row.suppliers)
     ? row.suppliers.map(s=>({ image:s.image||"", imageIsDataUrl:false, url:s.url||"", memo:s.memo||"" }))
     : [];
+  entry.rakumart = row && Array.isArray(row.rakumart)
+    ? row.rakumart.map(r=>({ text:r.text||"", url:r.url||"" }))
+    : [];
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
   entry.category = row ? (row.category||"") : (currentCat==="all" ? "" : currentCat);
   renderCatSelect();
 
   renderEntryImage();
+  renderRakumart();
   renderSuppliers();
   document.getElementById("entryModal").hidden = false;
 }
@@ -337,6 +367,82 @@ function addSupplier(){
   renderSuppliers();
 }
 
+/* ---------- ラクマート ---------- */
+function renderRakumart(){
+  const list = document.getElementById("rakumartList");
+  list.innerHTML = "";
+  entry.rakumart.forEach((r, idx)=>{
+    const card = document.createElement("div"); card.className = "rakumart-row";
+
+    const num = document.createElement("span"); num.className="rakumart-num"; num.textContent = `#${idx+1}`;
+
+    // 貼り付け対象: contenteditable で <a> をHTMLごと受け取る
+    const editor = document.createElement("div");
+    editor.className = "rakumart-paste";
+    editor.contentEditable = "true";
+    editor.dataset.placeholder = "ここにハイパーリンク状態でコピーしたテキストを貼り付け（例：2026010815054728-2147）";
+    // 既存表示
+    if(r.text || r.url){
+      const a = document.createElement("a");
+      a.href = r.url || "#"; a.target = "_blank"; a.rel="noopener";
+      a.textContent = r.text || r.url;
+      editor.appendChild(a);
+    }
+    editor.addEventListener("paste", e=>{
+      e.preventDefault();
+      const html = e.clipboardData.getData("text/html");
+      const plain = e.clipboardData.getData("text/plain");
+      const parsed = parsePastedLink(html, plain);
+      r.text = parsed.text; r.url = parsed.url;
+      // 再描画して<a>として表示
+      editor.innerHTML = "";
+      const a = document.createElement("a");
+      a.href = parsed.url || "#"; a.target="_blank"; a.rel="noopener";
+      a.textContent = parsed.text || parsed.url || "";
+      editor.appendChild(a);
+    });
+    // 直接編集（テキストだけ書き換えたい場合）
+    editor.addEventListener("input", ()=>{
+      // 中の<a>のtextContentを優先
+      const a = editor.querySelector("a");
+      if(a){ r.text = a.textContent; r.url = a.getAttribute("href")||r.url; }
+      else { r.text = editor.textContent.trim(); /* URLは空でない限り維持 */ }
+    });
+
+    const rm = document.createElement("button"); rm.className="rakumart-del"; rm.textContent="×"; rm.title="削除";
+    rm.onclick = ()=>{ entry.rakumart.splice(idx,1); renderRakumart(); };
+
+    card.append(num, editor, rm);
+    list.appendChild(card);
+  });
+}
+
+function parsePastedLink(html, plain){
+  // HTMLからaタグを優先抽出
+  if(html){
+    try{
+      const tmp = document.createElement("div");
+      tmp.innerHTML = html;
+      const a = tmp.querySelector("a[href]");
+      if(a){
+        return { text: (a.textContent||"").trim() || a.getAttribute("href"), url: a.getAttribute("href") };
+      }
+      // aが無くてもhrefっぽいURLがhtmlにあるかは諦めてplain処理へ
+    }catch(e){}
+  }
+  const t = (plain||"").trim();
+  // plainがURLそのものならテキスト=URLとする
+  if(/^https?:\/\/\S+$/i.test(t)){
+    return { text: t, url: t };
+  }
+  return { text: t, url: "" };
+}
+
+function addRakumart(){
+  entry.rakumart.push({ text:"", url:"" });
+  renderRakumart();
+}
+
 /* obj[key] に画像を取り込む（メインライバル/仕入先 共通）。cb で再描画 */
 function pickImageInto(obj, key, cb){
   const input = document.createElement("input");
@@ -371,6 +477,7 @@ function saveEntry(){
     name:  document.getElementById("fName").value.trim(),
     rival: document.getElementById("fRival").value.trim(),
     category: document.getElementById("fCategory").value || "",
+    rakumart: entry.rakumart.map(r=>({ text:(r.text||"").trim(), url:(r.url||"").trim() })).filter(r=>r.text||r.url),
     suppliers: entry.suppliers.map(s=>({ image:s.image||"", url:(s.url||"").trim(), memo:(s.memo||"").trim() })),
   };
   if(entry.editIndex>=0){ state.rows[entry.editIndex] = row; }
@@ -518,6 +625,7 @@ function bindUI(){
   document.getElementById("btnCloseEntry").onclick = closeEntry;
   document.getElementById("btnSaveEntry").onclick = saveEntry;
   document.getElementById("btnAddSupplier").onclick = addSupplier;
+  document.getElementById("btnAddRakumart").onclick = addRakumart;
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnCloseSettings").onclick = closeSettings;
