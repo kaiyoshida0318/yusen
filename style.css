@@ -168,14 +168,23 @@ tbody td{font-size:13px}
 .rakumart-row.is-collapsed .rakumart-summary{flex:1;padding:6px 10px;background:var(--row-alt);border-radius:6px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rakumart-summary a{color:#2563eb;text-decoration:underline}
 
-/* 表（画像＋テキスト列） */
+/* 表（画像列＋テキスト列） */
 .tbl-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px;background:var(--row-alt)}
-.tbl-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tbl-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
 .tbl-ttl{font-size:12px;font-weight:500;color:var(--muted);margin-right:auto}
 .tbl-del-btn{background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;padding:4px 10px;cursor:pointer}
 .tbl-del-btn:hover{border-color:var(--accent);color:var(--accent)}
 .tbl-grid{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden}
 .tbl-grid td{border:1px solid var(--border);padding:6px;vertical-align:middle}
+/* 列削除ボタン行 */
+.tbl-coldel-row td{border:none;padding:0 6px 2px;text-align:center;background:transparent}
+.tbl-coldel{background:none;border:none;color:var(--border);font-size:13px;cursor:pointer;line-height:1}
+.tbl-coldel:hover{color:var(--accent)}
+/* タイトル行（色違い） */
+.tbl-title-row td{background:#fdebcf}
+.tbl-head-edit{min-height:34px;padding:7px 8px;outline:none;font:inherit;font-weight:700;color:var(--text);position:relative;cursor:text}
+.tbl-head-edit:focus{box-shadow:inset 0 0 0 2px var(--accent);border-radius:4px}
+.tbl-head-edit.is-empty::before{content:"見出し";color:#c9a978;pointer-events:none;position:absolute;left:8px;top:7px;font-weight:400}
 .tbl-img-cell{width:110px}
 .tbl-img-box{width:96px;height:96px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;margin:0 auto}
 .tbl-img-box .img-drop{width:100%;height:100%;border:none;border-radius:0;font-size:11px}
@@ -186,7 +195,7 @@ tbody td{font-size:13px}
 .tbl-cell-edit:focus{box-shadow:inset 0 0 0 2px var(--accent);border-radius:4px}
 .tbl-cell-edit.is-empty::before{content:"入力／貼り付け";color:var(--border);pointer-events:none;position:absolute;left:8px;top:8px}
 .tbl-cell-edit a{color:#2563eb;text-decoration:underline;word-break:break-all}
-.tbl-rowdel-cell{width:34px;text-align:center}
+.tbl-rowdel-cell{width:34px;text-align:center;border:none!important;background:transparent}
 .tbl-rowdel{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer}
 .tbl-rowdel:hover{color:var(--accent)}
 
