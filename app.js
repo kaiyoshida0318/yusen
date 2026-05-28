@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.8.2";
+const VERSION = "1.9.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -32,6 +32,7 @@ const DEFAULT_CATEGORIES = [
   { id:"yahoo",  label:"Yahoo",  icon:"🛍️" },
 ];
 const ALL_CAT = { id:"all", label:"全体", icon:"📊" }; // 特別カテゴリ（全件表示）
+const NONE_CAT = { id:"none", label:"未設定", icon:"❓" }; // 未分類の行を表示
 
 // 下段：進捗ステータス（state.statuses で管理、追加・編集・削除可能）
 const DEFAULT_STATUSES = [
@@ -42,6 +43,7 @@ const DEFAULT_STATUSES = [
   { id:"done",      label:"完了分" },
 ];
 const ALL_STATUS = { id:"all", label:"全体" }; // 全件表示の特別タブ
+const NONE_STATUS = { id:"none", label:"未設定" }; // 未設定の行を表示
 
 let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice() };
 let cfg = { pat:"", owner:"", repo:"", branch:"main" };
@@ -50,6 +52,7 @@ let currentCat = "all"; // 現在選択中のカテゴリID（上段）
 let currentStatus = "all"; // 現在選択中のステータスID（下段）
 let dateSort = "none";   // 日付ソート: "none" | "asc" | "desc"
 let pendingStatus = {};  // 一覧でのステータス保留変更 { rowIndex: newStatusId }
+let catIconOpen = -1;    // カテゴリ管理で絵文字パレットを開いているインデックス
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
 let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], category:"" };
@@ -121,6 +124,12 @@ function renderTabs(){
     tab.onclick = ()=>{ currentCat = c.id; render(); };
     wrap.appendChild(tab);
   });
+  // 未設定タブ（一番右寄り）
+  const noneTab = document.createElement("button");
+  noneTab.className = "cat-tab cat-none" + (currentCat===NONE_CAT.id ? " active" : "");
+  noneTab.innerHTML = `<span class="cat-icon">${NONE_CAT.icon}</span><span class="cat-label">${NONE_CAT.label}</span><span class="cat-count">${countForCat(NONE_CAT.id)}</span>`;
+  noneTab.onclick = ()=>{ currentCat = NONE_CAT.id; render(); };
+  wrap.appendChild(noneTab);
   // 末尾に＋行だけ＋新規作成ボタン
   const quickBtn = document.createElement("button");
   quickBtn.className = "cat-tab cat-quick"; quickBtn.title = "行だけ追加（後で編集）";
@@ -138,9 +147,9 @@ function renderTabs(){
   const swrap = document.getElementById("statusTabs");
   if(swrap){
     swrap.innerHTML = "";
-    [ALL_STATUS, ...state.statuses].forEach(s=>{
+    [ALL_STATUS, ...state.statuses, NONE_STATUS].forEach(s=>{
       const tab = document.createElement("button");
-      tab.className = "status-tab" + (s.id===currentStatus ? " active" : "");
+      tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===currentStatus ? " active" : "");
       tab.innerHTML = `<span class="cat-label">${escapeHtml(s.label)}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
       tab.onclick = ()=>{ currentStatus = s.id; render(); };
       swrap.appendChild(tab);
@@ -162,27 +171,26 @@ function renderTabs(){
   }
 }
 // 上段カウント: 現在の下段ステータス絞り込みを反映
+// カテゴリ/ステータスのマッチ判定: all=全部, none=未設定(空), それ以外=id一致
+function catMatch(rowCat, sel){
+  if(sel==="all") return true;
+  if(sel==="none") return !rowCat;
+  return rowCat===sel;
+}
+function statusMatch(rowStatus, sel){
+  if(sel==="all") return true;
+  if(sel==="none") return !rowStatus;
+  return rowStatus===sel;
+}
 function countForCat(id){
-  return state.rows.filter(r=>{
-    const catOk = (id==="all") || r.category===id;
-    const stOk = (currentStatus==="all") || r.status===currentStatus;
-    return catOk && stOk;
-  }).length;
+  return state.rows.filter(r=> catMatch(r.category, id) && statusMatch(r.status, currentStatus)).length;
 }
 // 下段カウント: 現在の上段カテゴリ絞り込みを反映
 function countForStatus(id){
-  return state.rows.filter(r=>{
-    const catOk = (currentCat==="all") || r.category===currentCat;
-    const stOk = (id==="all") || r.status===id;
-    return catOk && stOk;
-  }).length;
+  return state.rows.filter(r=> catMatch(r.category, currentCat) && statusMatch(r.status, id)).length;
 }
 function filteredRows(){
-  let arr = state.rows.map((r,i)=>({r,i})).filter(x=>{
-    const catOk = (currentCat==="all") || x.r.category===currentCat;
-    const stOk  = (currentStatus==="all") || x.r.status===currentStatus;
-    return catOk && stOk;
-  });
+  let arr = state.rows.map((r,i)=>({r,i})).filter(x=> catMatch(x.r.category, currentCat) && statusMatch(x.r.status, currentStatus));
   if(dateSort!=="none"){
     arr = arr.slice().sort((a,b)=>{
       const da = a.r.date || "", db = b.r.date || "";
@@ -205,8 +213,8 @@ function addQuickRow(){
     image: "",
     name: "",
     rival: "",
-    category: (currentCat==="all" ? "" : currentCat),
-    status: (currentStatus==="all" ? "" : currentStatus),
+    category: ((currentCat==="all"||currentCat==="none") ? "" : currentCat),
+    status: ((currentStatus==="all"||currentStatus==="none") ? "" : currentStatus),
     rakumart: [],
     suppliers: [],
   });
@@ -481,9 +489,9 @@ function openEntry(editIndex){
     if(entry.suppliers.length===0) entry.suppliers.push({ image:"", imageIsDataUrl:false, url:"", memo:"", collapsed:false });
   }
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
-  entry.category = row ? (row.category||"") : (currentCat==="all" ? "" : currentCat);
+  entry.category = row ? (row.category||"") : ((currentCat==="all"||currentCat==="none") ? "" : currentCat);
   // ステータス: 編集時はその値、新規時は現在の下段タブ（"all"の場合は未設定）
-  entry.status = row ? (row.status||"") : (currentStatus==="all" ? "" : currentStatus);
+  entry.status = row ? (row.status||"") : ((currentStatus==="all"||currentStatus==="none") ? "" : currentStatus);
   // 新規作成時はセクションを閉じておく（必要なものだけ開いて使う）。編集時は展開。
   sectionCollapsed = isEdit ? { rakumart:false, suppliers:false, tables:false } : { rakumart:true, suppliers:true, tables:true };
   renderCatSelect();
@@ -1164,9 +1172,10 @@ async function loadFromGitHub(){
 function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
 
 /* ---------- カテゴリ管理 ---------- */
-const CAT_ICONS = ["📦","✨","🛒","🛍️","📊","🎯","🔥","⭐","🏷️","💡","📸","🎨","📝","🆕","🇯🇵","🇨🇳"];
+const CAT_ICONS = ["📦","✨","🛒","🛍️","📊","🎯","🔥","⭐","🏷️","💡","📸","🎨","📝","🆕","🇯🇵","🇨🇳","💰","🎁","👕","👟","🧸","🍳","🏠","🚗","⚽","🎮","💄","📱","💻","🔧","🌸","🐾"];
 
 function openCatManager(){
+  catIconOpen = -1;
   renderCatManager();
   document.getElementById("catModal").hidden = false;
 }
@@ -1177,15 +1186,11 @@ function renderCatManager(){
   list.innerHTML = "";
   state.categories.forEach((c, idx)=>{
     const row = document.createElement("div"); row.className = "cat-row";
-    // 絵文字セレクター
+    // 絵文字ボタン（クリックでパレット開閉）
     const iconBtn = document.createElement("button");
     iconBtn.className = "cat-icon-btn"; iconBtn.textContent = c.icon || "📦";
-    iconBtn.onclick = ()=>{
-      const cur = CAT_ICONS.indexOf(c.icon);
-      c.icon = CAT_ICONS[(cur+1) % CAT_ICONS.length];
-      persistLocal(); renderCatManager(); renderTabs();
-    };
-    iconBtn.title = "クリックで絵文字を切り替え";
+    iconBtn.title = "クリックで絵文字を選ぶ";
+    iconBtn.onclick = ()=>{ catIconOpen = (catIconOpen===idx ? -1 : idx); renderCatManager(); };
     // ラベル入力
     const labelInp = document.createElement("input");
     labelInp.type = "text"; labelInp.value = c.label; labelInp.className = "cat-label-input";
@@ -1205,10 +1210,24 @@ function renderCatManager(){
       state.rows.forEach(r=>{ if(r.category===c.id) r.category=""; });
       state.categories.splice(idx,1);
       if(currentCat===c.id) currentCat="all";
+      catIconOpen = -1;
       persistLocal(); renderCatManager(); render();
     };
     row.append(iconBtn, labelInp, up, dn, del);
     list.appendChild(row);
+
+    // 絵文字パレット（このカテゴリで開いているとき）
+    if(catIconOpen===idx){
+      const palette = document.createElement("div"); palette.className="cat-icon-palette";
+      CAT_ICONS.forEach(ic=>{
+        const b = document.createElement("button");
+        b.className = "cat-icon-opt" + (ic===c.icon ? " selected" : "");
+        b.textContent = ic;
+        b.onclick = ()=>{ c.icon = ic; catIconOpen = -1; persistLocal(); renderCatManager(); renderTabs(); };
+        palette.appendChild(b);
+      });
+      list.appendChild(palette);
+    }
   });
 }
 
