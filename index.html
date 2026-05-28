@@ -67,21 +67,27 @@
           <input type="text" id="fRival" placeholder="https://...">
         </label>
 
-        <div class="supplier-section rakumart-section">
+        <div class="supplier-section rakumart-section" id="rakumartSection">
           <div class="supplier-section-head">
+            <button type="button" class="section-toggle" id="rakumartSectionToggle" title="セクション一括折りたたみ">▼</button>
             <span class="supplier-section-ttl">ラクマート</span>
             <button type="button" class="btn btn-add btn-sm" id="btnAddRakumart">＋ ラクマートを追加</button>
           </div>
-          <div id="rakumartList"></div>
-          <p class="hint-inline">ラクマート商品ページのリンクをハイパーリンク状態でコピーして欄に貼り付け（例：2026010815054728-2147）</p>
+          <div class="section-body">
+            <div id="rakumartList"></div>
+            <p class="hint-inline">ラクマート商品ページのリンクをハイパーリンク状態でコピーして欄に貼り付け（例：2026010815054728-2147）</p>
+          </div>
         </div>
 
-        <div class="supplier-section">
+        <div class="supplier-section" id="suppliersSection">
           <div class="supplier-section-head">
+            <button type="button" class="section-toggle" id="suppliersSectionToggle" title="セクション一括折りたたみ">▼</button>
             <span class="supplier-section-ttl">仕入先（中国輸入元）</span>
             <button type="button" class="btn btn-add btn-sm" id="btnAddSupplier">＋ 仕入先を追加</button>
           </div>
-          <div id="supplierList"></div>
+          <div class="section-body">
+            <div id="supplierList"></div>
+          </div>
         </div>
       </div>
     </div>
