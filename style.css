@@ -69,6 +69,12 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .status-tab.active{background:var(--green);border-color:var(--green);color:#fff}
 .status-tab.active .cat-count{background:rgba(255,255,255,.3);color:#fff}
 .status-tab .cat-count{font-size:11px;font-weight:600;background:var(--bg);color:var(--muted);padding:2px 8px;border-radius:999px;min-width:20px;text-align:center}
+/* サイコロ目ロゴを含むカウントは、丸背景を消してロゴだけ見せる */
+.status-tab .cat-count:has(.dice-badge){background:transparent!important;padding:0;min-width:0}
+.dice-badge{width:18px;height:18px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
+/* アクティブタブ（緑背景）では白い座布団を敷いてサイコロを見やすく */
+.status-tab.active .cat-count:has(.dice-badge){background:#fff!important;padding:2px;border-radius:6px;display:inline-flex}
+.status-tab.active .cat-count .dice-badge{width:16px;height:16px;filter:none}
 
 .cat-tab.cat-none{border-style:dashed;color:var(--muted)}
 .cat-tab.cat-none.active{background:var(--muted);border-color:var(--muted);color:#fff}
