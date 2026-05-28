@@ -18,6 +18,7 @@
     <img class="logo-img" src="logo.png" alt="優先順位決定くん" height="40">
     <span class="version" id="version">v1.0.0</span>
     <div class="header-actions">
+      <button class="btn btn-ghost" id="btnManageStatus">📋 ステータス管理</button>
       <button class="btn btn-ghost" id="btnManageCats">📂 カテゴリ管理</button>
       <button class="btn btn-ghost" id="btnSettings">⚙️ 設定</button>
       <button class="btn btn-primary" id="btnSave">💾 GitHubに保存</button>
@@ -138,6 +139,22 @@
     <div id="catList" class="cat-list"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btnCloseCat">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ステータス管理モーダル -->
+<div class="modal-overlay" id="statusModal" hidden>
+  <div class="modal">
+    <h2>ステータス管理</h2>
+    <p class="hint">進捗ステータス（下段タブ）を管理します。並び替え・名前変更・追加・削除ができます。</p>
+    <div class="cat-add-row">
+      <input type="text" id="newStatusLabel" placeholder="新しいステータス名">
+      <button class="btn btn-primary" id="btnAddStatus">追加</button>
+    </div>
+    <div id="statusList" class="cat-list"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCloseStatus">閉じる</button>
     </div>
   </div>
 </div>
