@@ -124,6 +124,8 @@ tbody td{font-size:13px}
 .entry-image{width:320px;height:320px;border:2px dashed var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .entry-image .img-drop{width:100%;height:100%;border:none;border-radius:0;font-size:13px}
 .entry-preview{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.entry-image.drag-over,.supplier-image.drag-over{border-color:var(--accent)!important;background:#fdf0ec}
+.entry-image.drag-over .img-drop,.supplier-image.drag-over .img-drop{color:var(--accent)}
 
 /* 一覧の画像セル（複数並べ） */
 .img-cell-multi{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
