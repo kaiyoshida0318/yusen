@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.11.2";
+const VERSION = "1.12.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -58,9 +58,12 @@ let selectMode = false;  // 一括削除の選択モード
 let selectedRows = {};   // 選択中の行 { rowIndex: true }
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
-let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], rankingUrls:[], freeNote:"", category:"" };
+let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], rankingUrls:[], freeNote:"", category:"", blocks:[] };
 // セクション一括折りたたみ（モーダル開く度にリセット）
 let sectionCollapsed = { rakumart:false, suppliers:false, tables:false };
+// ブロックID採番用
+let blockSeq = 0;
+function nextBlockId(){ return "b_" + (Date.now().toString(36)) + "_" + (blockSeq++); }
 
 /* ---------- 初期化 ---------- */
 function init(){
@@ -485,7 +488,7 @@ function imgUrl(filename){
 /* ---------- 登録モーダル ---------- */
 function openEntry(editIndex){
   const isEdit = (typeof editIndex==="number" && editIndex>=0);
-  entry = { editIndex: isEdit?editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], category:"" };
+  entry = { editIndex: isEdit?editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], category:"", blocks:[] };
   document.getElementById("entryTitle").textContent = isEdit ? "編集" : "新規作成";
 
   let row = isEdit ? state.rows[editIndex] : null;
@@ -540,10 +543,21 @@ function openEntry(editIndex){
         }
       })
     : [];
-  // 新規作成時は、すぐ入力できるようラクマート1件・仕入先1件を初期投入
-  if(!isEdit){
-    if(entry.rakumart.length===0) entry.rakumart.push({ text:"", url:"", collapsed:false });
-    if(entry.suppliers.length===0) entry.suppliers.push({ image:"", imageIsDataUrl:false, url:"", memo:"", collapsed:false });
+  // ===== ブロック構築 =====
+  // 編集時: 既存の rakumart / suppliers / tables から種類ごとにブロックを構築。
+  //         （従来は連結された配列なので、種類ごとに1ブロックへまとめる）
+  // 新規時: ブロックは空（スッキリ表示）。
+  entry.blocks = [];
+  if(isEdit){
+    if(entry.rakumart.length > 0){
+      entry.blocks.push({ type:"rakumart", id:nextBlockId(), items: entry.rakumart });
+    }
+    if(entry.suppliers.length > 0){
+      entry.blocks.push({ type:"supplier", id:nextBlockId(), items: entry.suppliers });
+    }
+    entry.tables.forEach(t=>{
+      entry.blocks.push({ type:"table", id:nextBlockId(), data: t });
+    });
   }
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
   entry.category = row ? (row.category||"") : ((currentCat==="all"||currentCat==="none") ? "" : currentCat);
@@ -557,10 +571,11 @@ function openEntry(editIndex){
   renderEntryImage();
   renderRivals();
   renderRanking();
-  renderRakumart();
-  renderSuppliers();
-  renderTables();
+  renderBlocks();
   renderFreeNote();
+  // 追加メニューは閉じておく
+  const menu = document.getElementById("addBlockMenu");
+  if(menu) menu.hidden = true;
   // 削除ボタンは編集時のみ表示
   const delBtn = document.getElementById("btnDeleteEntry");
   if(delBtn) delBtn.style.display = isEdit ? "" : "none";
@@ -1182,6 +1197,8 @@ function enableImageDrop(el, obj, key, cb){
 }
 
 function saveEntry(keepOpen){
+  // ブロックから従来形式へ集約
+  collectBlocksIntoEntry();
   const row = {
     date:  document.getElementById("fDate").value || today(),
     image: entry.image || "",
@@ -1443,16 +1460,36 @@ function bindUI(){
     else if(act==="saveclose") saveEntry(false);
     else if(act==="delete") deleteCurrentEntry();
   });
-  document.getElementById("btnAddSupplier").onclick = addSupplier;
-  document.getElementById("btnAddRakumart").onclick = addRakumart;
   document.getElementById("btnAddRivalR").onclick = ()=>addRival("rivalRakuten");
   document.getElementById("btnAddRivalA").onclick = ()=>addRival("rivalAmazon");
   document.getElementById("btnAddRanking").onclick = addRanking;
   bindFreeNote();
-  document.getElementById("rakumartSectionToggle").onclick = toggleSectionRakumart;
-  document.getElementById("suppliersSectionToggle").onclick = toggleSectionSuppliers;
-  document.getElementById("btnAddTable").onclick = addTable;
-  document.getElementById("tablesSectionToggle").onclick = toggleSectionTables;
+  // 項目追加メニュー
+  const btnAddBlock = document.getElementById("btnAddBlock");
+  if(btnAddBlock){
+    btnAddBlock.onclick = (e)=>{
+      e.stopPropagation();
+      const menu = document.getElementById("addBlockMenu");
+      if(menu) menu.hidden = !menu.hidden;
+    };
+  }
+  const addMenu = document.getElementById("addBlockMenu");
+  if(addMenu){
+    addMenu.addEventListener("click", e=>{
+      const opt = e.target.closest("[data-block]");
+      if(!opt) return;
+      addBlock(opt.dataset.block);
+      addMenu.hidden = true;
+    });
+  }
+  // モーダル内の他の場所をクリックしたらメニューを閉じる
+  const blocksArea = document.getElementById("blocksArea");
+  document.addEventListener("click", e=>{
+    const menu = document.getElementById("addBlockMenu");
+    if(!menu || menu.hidden) return;
+    const wrap = e.target.closest(".add-block-wrap");
+    if(!wrap) menu.hidden = true;
+  });
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnManageCats").onclick = openCatManager;
@@ -1480,5 +1517,384 @@ function setStatus(msg){
   el.textContent = msg;
   if(msg && msg.startsWith("✅")) setTimeout(()=>{ if(el.textContent===msg) el.textContent=""; }, 3500);
 }
+
+/* ===================================================================
+   ▼▼▼ v1.12.0 追加：ブロック方式の項目追加（既存関数は未変更） ▼▼▼
+   - entry.blocks = [{ type:"rakumart"|"supplier"|"table", id, items[] / data{} }]
+   - 表示順 = blocks配列の順。同種を何個でも追加できる。
+   =================================================================== */
+
+// blocks → 従来形式（entry.rakumart / entry.suppliers / entry.tables）へ集約
+// 一覧表示・保存・既存データ互換のため、保存直前に呼ぶ。
+function collectBlocksIntoEntry(){
+  const rak = [];
+  const sup = [];
+  const tbls = [];
+  (entry.blocks || []).forEach(b=>{
+    if(b.type==="rakumart"){ (b.items||[]).forEach(it=> rak.push(it)); }
+    else if(b.type==="supplier"){ (b.items||[]).forEach(it=> sup.push(it)); }
+    else if(b.type==="table"){ if(b.data) tbls.push(b.data); }
+  });
+  entry.rakumart = rak;
+  entry.suppliers = sup;
+  entry.tables = tbls;
+}
+
+// ブロックを順に描画
+function renderBlocks(){
+  const area = document.getElementById("blocksArea");
+  if(!area) return;
+  area.innerHTML = "";
+  (entry.blocks || []).forEach((block, bi)=>{
+    const sec = document.createElement("div");
+    sec.className = "block-section block-" + block.type;
+
+    // ヘッダー
+    const head = document.createElement("div"); head.className = "block-head";
+    const ttl = document.createElement("span"); ttl.className = "block-ttl";
+    ttl.textContent = blockTitle(block.type);
+    head.appendChild(ttl);
+
+    // 種別ごとの「項目を追加」ボタン（rakumart / supplier のみ。表は1ブロック=1表）
+    if(block.type==="rakumart"){
+      const addItem = document.createElement("button");
+      addItem.type="button"; addItem.className="btn btn-add btn-sm block-add-item";
+      addItem.textContent = "＋ ラクマートを追加";
+      addItem.onclick = ()=>{
+        if(!Array.isArray(block.items)) block.items = [];
+        block.items.unshift({ text:"", url:"", collapsed:false });
+        renderBlocks();
+        const editors = sec.querySelectorAll(".rakumart-paste");
+        if(editors[0]) editors[0].focus();
+      };
+      head.appendChild(addItem);
+    }else if(block.type==="supplier"){
+      const addItem = document.createElement("button");
+      addItem.type="button"; addItem.className="btn btn-add btn-sm block-add-item";
+      addItem.textContent = "＋ 仕入先を追加";
+      addItem.onclick = ()=>{
+        if(!Array.isArray(block.items)) block.items = [];
+        block.items.push({ image:"", imageIsDataUrl:false, url:"", memo:"", collapsed:false });
+        renderBlocks();
+      };
+      head.appendChild(addItem);
+    }
+
+    // ブロック削除「×」
+    const del = document.createElement("button");
+    del.type="button"; del.className="block-del"; del.textContent="×";
+    del.title = "このセクションを削除";
+    del.onclick = ()=>{
+      entry.blocks.splice(bi, 1);
+      renderBlocks();
+    };
+    head.appendChild(del);
+
+    sec.appendChild(head);
+
+    // 本文
+    const body = document.createElement("div"); body.className = "block-body";
+    if(block.type==="rakumart"){
+      if(!Array.isArray(block.items)) block.items = [];
+      renderRakumartInto(body, block.items);
+      const hint = document.createElement("p"); hint.className="hint-inline";
+      hint.textContent = "ラクマート商品ページのリンクをハイパーリンク状態でコピーして欄に貼り付け（例：2026010815054728-2147）";
+      body.appendChild(hint);
+    }else if(block.type==="supplier"){
+      if(!Array.isArray(block.items)) block.items = [];
+      renderSuppliersInto(body, block.items);
+    }else if(block.type==="table"){
+      if(!block.data) block.data = newTableData();
+      renderTableInto(body, block);
+    }
+    sec.appendChild(body);
+
+    area.appendChild(sec);
+  });
+}
+
+function blockTitle(type){
+  if(type==="rakumart") return "🛒 ラクマート";
+  if(type==="supplier") return "🏭 仕入先（中国輸入元）";
+  if(type==="table") return "📋 表";
+  return "";
+}
+
+// 空テーブルデータを作る（addTable と同じ初期構造）
+function newTableData(){
+  const columns = [{type:"image"}, {type:"text"}, {type:"text"}];
+  const header = ["\u753b\u50cf", "", ""];
+  const rows = Array.from({length:3}, ()=>({
+    cells: columns.map(c=> c.type==="image"?{image:"",imageIsDataUrl:false}:{text:"",url:""})
+  }));
+  return { columns, header, rows };
+}
+
+// 指定タイプの空ブロックを追加
+function addBlock(type){
+  if(!Array.isArray(entry.blocks)) entry.blocks = [];
+  if(type==="rakumart"){
+    entry.blocks.push({ type:"rakumart", id:nextBlockId(), items:[{ text:"", url:"", collapsed:false }] });
+  }else if(type==="supplier"){
+    entry.blocks.push({ type:"supplier", id:nextBlockId(), items:[{ image:"", imageIsDataUrl:false, url:"", memo:"", collapsed:false }] });
+  }else if(type==="table"){
+    entry.blocks.push({ type:"table", id:nextBlockId(), data:newTableData() });
+  }else{
+    return;
+  }
+  renderBlocks();
+}
+
+/* ----- renderRakumartInto: 既存 renderRakumart のロジックを container / items に適用 ----- */
+function renderRakumartInto(container, items){
+  container.innerHTML = "";
+  items.forEach((r, idx)=>{
+    const card = document.createElement("div");
+    card.className = "rakumart-row" + (r.collapsed ? " is-collapsed" : "");
+
+    const tg = document.createElement("button");
+    tg.type="button"; tg.className="rakumart-toggle";
+    tg.textContent = r.collapsed ? "▶" : "▼";
+    tg.title = r.collapsed ? "展開" : "折りたたむ";
+    tg.onclick = ()=>{ r.collapsed = !r.collapsed; renderRakumartInto(container, items); };
+    const mv = makeMoveButtons(idx, items.length, (dir)=>{ moveItem(items, idx, dir); renderRakumartInto(container, items); }, "rakumart-mv");
+
+    const num = document.createElement("span"); num.className="rakumart-num"; num.textContent = `#${items.length - idx}`;
+
+    let bodyEl;
+    if(r.collapsed){
+      bodyEl = document.createElement("div"); bodyEl.className="rakumart-summary";
+      if(r.text || r.url){
+        const a = document.createElement("a");
+        a.href = r.url || "#"; a.target="_blank"; a.rel="noopener";
+        a.textContent = r.text || r.url;
+        bodyEl.appendChild(a);
+      }else{
+        const sp = document.createElement("span"); sp.className="muted"; sp.textContent="（未入力）";
+        bodyEl.appendChild(sp);
+      }
+    }else{
+      bodyEl = document.createElement("div");
+      bodyEl.className = "rakumart-paste";
+      bodyEl.contentEditable = "true";
+      bodyEl.setAttribute("role","textbox");
+      bodyEl.setAttribute("spellcheck","false");
+      if(r.text || r.url){
+        if(r.url){
+          const a = document.createElement("a");
+          a.href = r.url; a.target = "_blank"; a.rel="noopener";
+          a.textContent = r.text || r.url;
+          bodyEl.appendChild(a);
+        }else{
+          bodyEl.textContent = r.text;
+        }
+      }
+      const sync = ()=>{
+        const a = bodyEl.querySelector("a[href]");
+        if(a){
+          r.text = (a.textContent||"").trim();
+          r.url  = a.getAttribute("href") || "";
+        }else{
+          const t = bodyEl.textContent.trim();
+          if(/^https?:\/\/\S+$/i.test(t)){ r.text = t; r.url = t; }
+          else { r.text = t; r.url = ""; }
+        }
+        togglePlaceholder();
+      };
+      const togglePlaceholder = ()=>{
+        const hasContent = bodyEl.textContent.trim().length>0 || bodyEl.querySelector("a,img");
+        bodyEl.classList.toggle("is-empty", !hasContent);
+      };
+      bodyEl.addEventListener("input", sync);
+      bodyEl.addEventListener("paste", e=>{
+        try{
+          const html  = e.clipboardData && e.clipboardData.getData("text/html");
+          const plain = e.clipboardData && e.clipboardData.getData("text/plain");
+          if(html){
+            const tmp = document.createElement("div"); tmp.innerHTML = html;
+            const a = tmp.querySelector("a[href]");
+            if(a){
+              e.preventDefault();
+              bodyEl.innerHTML = "";
+              const link = document.createElement("a");
+              link.href = a.getAttribute("href"); link.target="_blank"; link.rel="noopener";
+              link.textContent = (a.textContent||"").trim() || a.getAttribute("href");
+              bodyEl.appendChild(link);
+              sync();
+              return;
+            }
+          }
+          if(plain && /^https?:\/\/\S+$/i.test(plain.trim())){
+            e.preventDefault();
+            bodyEl.innerHTML = "";
+            const link = document.createElement("a");
+            link.href = plain.trim(); link.target="_blank"; link.rel="noopener";
+            link.textContent = plain.trim();
+            bodyEl.appendChild(link);
+            sync();
+            return;
+          }
+        }catch(err){}
+        setTimeout(sync, 0);
+      });
+      togglePlaceholder();
+    }
+
+    const rm = document.createElement("button"); rm.type="button"; rm.className="rakumart-del"; rm.textContent="×"; rm.title="削除";
+    rm.onclick = ()=>{ items.splice(idx,1); renderRakumartInto(container, items); };
+
+    card.append(tg, mv, num, bodyEl, rm);
+    container.appendChild(card);
+  });
+}
+
+/* ----- renderSuppliersInto: 既存 renderSuppliers のロジックを container / items に適用 ----- */
+function renderSuppliersInto(container, items){
+  container.innerHTML = "";
+  items.forEach((s, idx)=>{
+    const card = document.createElement("div");
+    card.className = "supplier-card" + (s.collapsed ? " is-collapsed" : "");
+
+    const head = document.createElement("div"); head.className="supplier-head";
+    const tg = document.createElement("button");
+    tg.type="button"; tg.className="supplier-toggle";
+    tg.textContent = s.collapsed ? "▶" : "▼";
+    tg.title = s.collapsed ? "展開" : "折りたたむ";
+    tg.onclick = ()=>{ s.collapsed = !s.collapsed; renderSuppliersInto(container, items); };
+    const mv = makeMoveButtons(idx, items.length, (dir)=>{ moveItem(items, idx, dir); renderSuppliersInto(container, items); }, "supplier-mv");
+    const ttl = document.createElement("span"); ttl.className="supplier-ttl"; ttl.textContent=`仕入先 ${idx+1}`;
+    const summary = document.createElement("span"); summary.className="supplier-summary";
+    if(s.collapsed){
+      const parts=[];
+      if(s.url) parts.push(s.url.replace(/^https?:\/\//,"").slice(0,40));
+      if(s.memo) parts.push(s.memo);
+      summary.textContent = parts.join(" / ") || "（未入力）";
+    }
+    const rm = document.createElement("button"); rm.type="button"; rm.className="supplier-del"; rm.textContent="×"; rm.title="この仕入先を削除";
+    rm.onclick = ()=>{ items.splice(idx,1); renderSuppliersInto(container, items); };
+    head.append(tg, mv, ttl, summary, rm);
+    card.appendChild(head);
+
+    if(!s.collapsed){
+      const bodyRow = document.createElement("div"); bodyRow.className="supplier-body";
+
+      const imgBox = document.createElement("div"); imgBox.className="supplier-image";
+      if(s.image){
+        const im=document.createElement("img"); im.src=s.imageIsDataUrl?s.image:imgUrl(s.image);
+        im.className="supplier-preview"; im.title="クリック／ドロップで差し替え";
+        im.onclick=()=>pickImageInto(s,"image", ()=>renderSuppliersInto(container, items));
+        imgBox.appendChild(im);
+      }else{
+        const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="仕入先画像<br>クリック／ドロップ";
+        drop.onclick=()=>pickImageInto(s,"image", ()=>renderSuppliersInto(container, items));
+        imgBox.appendChild(drop);
+      }
+      enableImageDrop(imgBox, s, "image", ()=>renderSuppliersInto(container, items));
+      bodyRow.appendChild(imgBox);
+
+      const fields = document.createElement("div"); fields.className="supplier-fields";
+      const lUrl=document.createElement("label"); lUrl.textContent="仕入先URL";
+      const iUrl=document.createElement("input"); iUrl.type="text"; iUrl.placeholder="https://..."; iUrl.value=s.url;
+      iUrl.oninput=e=>{ s.url=e.target.value; }; lUrl.appendChild(iUrl);
+      const lMemo=document.createElement("label"); lMemo.textContent="メモ";
+      const iMemo=document.createElement("input"); iMemo.type="text"; iMemo.placeholder="単価・MOQ・備考など"; iMemo.value=s.memo;
+      iMemo.oninput=e=>{ s.memo=e.target.value; }; lMemo.appendChild(iMemo);
+      fields.appendChild(lUrl); fields.appendChild(lMemo);
+      bodyRow.appendChild(fields);
+
+      card.appendChild(bodyRow);
+    }
+    container.appendChild(card);
+  });
+}
+
+/* ----- renderTableInto: 既存 renderTables のロジックを 1ブロック=1表 に適用 ----- */
+function renderTableInto(container, block){
+  container.innerHTML = "";
+  const tbl = block.data;
+  const rerender = ()=>renderTableInto(container, block);
+
+  const card = document.createElement("div"); card.className="tbl-card";
+
+  // ヘッダー操作行（表自体の削除ボタンは廃止。ブロックの×で消す）
+  const head = document.createElement("div"); head.className="tbl-head";
+  const ttl = document.createElement("span"); ttl.className="tbl-ttl"; ttl.textContent="表の内容";
+  const addTextCol = document.createElement("button"); addTextCol.type="button"; addTextCol.className="btn btn-ghost btn-sm"; addTextCol.textContent="\uff0b\u30c6\u30ad\u30b9\u30c8\u5217";
+  addTextCol.onclick = ()=>{ tbl.columns.push({type:"text"}); tbl.header.push(""); tbl.rows.forEach(r=>r.cells.push({text:"",url:""})); rerender(); };
+  const addImgCol = document.createElement("button"); addImgCol.type="button"; addImgCol.className="btn btn-ghost btn-sm"; addImgCol.textContent="\uff0b\u753b\u50cf\u5217";
+  addImgCol.onclick = ()=>{ tbl.columns.push({type:"image"}); tbl.header.push(""); tbl.rows.forEach(r=>r.cells.push({image:"",imageIsDataUrl:false})); rerender(); };
+  const addRow = document.createElement("button"); addRow.type="button"; addRow.className="btn btn-ghost btn-sm"; addRow.textContent="\uff0b\u884c";
+  addRow.onclick = ()=>{ tbl.rows.push({ cells: tbl.columns.map(c=> c.type==="image"?{image:"",imageIsDataUrl:false}:{text:"",url:""}) }); rerender(); };
+  head.append(ttl, addTextCol, addImgCol, addRow);
+  card.appendChild(head);
+
+  const table = document.createElement("table"); table.className="tbl-grid";
+
+  // 列削除ボタン行
+  const colDelTr = document.createElement("tr"); colDelTr.className="tbl-coldel-row";
+  tbl.columns.forEach((col, ci)=>{
+    const td = document.createElement("td"); td.className="tbl-coldel-cell";
+    const cd = document.createElement("button"); cd.type="button"; cd.className="tbl-coldel"; cd.textContent="\u00d7 \u5217\u3092\u524a\u9664"; cd.title="\u3053\u306e\u5217\u3092\u524a\u9664";
+    cd.onclick = ()=>{
+      tbl.columns.splice(ci,1); tbl.header.splice(ci,1);
+      tbl.rows.forEach(r=>r.cells.splice(ci,1));
+      rerender();
+    };
+    td.appendChild(cd); colDelTr.appendChild(td);
+  });
+  colDelTr.appendChild(document.createElement("td"));
+
+  // タイトル行
+  const headTr = document.createElement("tr"); headTr.className="tbl-title-row";
+  tbl.columns.forEach((col, ci)=>{
+    const td = document.createElement("td");
+    td.appendChild(makeHeaderCell(tbl, ci));
+    headTr.appendChild(td);
+  });
+  headTr.appendChild(document.createElement("td"));
+  table.appendChild(headTr);
+
+  // データ行
+  tbl.rows.forEach((r, ri)=>{
+    const tr = document.createElement("tr");
+    tbl.columns.forEach((col, ci)=>{
+      const cell = r.cells[ci] || (col.type==="image"?{image:"",imageIsDataUrl:false}:{text:"",url:""});
+      r.cells[ci] = cell;
+      const td = document.createElement("td");
+      if(col.type==="image"){
+        td.className="tbl-img-cell";
+        const imgBox = document.createElement("div"); imgBox.className="tbl-img-box";
+        if(cell.image){
+          const im=document.createElement("img"); im.src=cell.imageIsDataUrl?cell.image:imgUrl(cell.image);
+          im.className="tbl-img"; im.title="\u30af\u30ea\u30c3\u30af\uff0f\u30c9\u30ed\u30c3\u30d7\u3067\u5dee\u3057\u66ff\u3048";
+          im.onclick=()=>pickImageInto(cell,"image",rerender);
+          imgBox.appendChild(im);
+        }else{
+          const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="\u753b\u50cf";
+          drop.onclick=()=>pickImageInto(cell,"image",rerender);
+          imgBox.appendChild(drop);
+        }
+        enableImageDrop(imgBox, cell, "image", rerender);
+        td.appendChild(imgBox);
+      }else{
+        td.className="tbl-txt-cell";
+        td.appendChild(makeLinkCell(cell));
+      }
+      tr.appendChild(td);
+    });
+    const tdDel = document.createElement("td"); tdDel.className="tbl-rowdel-cell";
+    const rd = document.createElement("button"); rd.type="button"; rd.className="tbl-rowdel"; rd.textContent="\u00d7"; rd.title="\u3053\u306e\u884c\u3092\u524a\u9664";
+    rd.onclick = ()=>{ tbl.rows.splice(ri,1); rerender(); };
+    tdDel.appendChild(rd);
+    tr.appendChild(tdDel);
+    table.appendChild(tr);
+  });
+
+  table.appendChild(colDelTr);
+  card.appendChild(table);
+  container.appendChild(card);
+}
+
+/* ▲▲▲ v1.12.0 追加ここまで ▲▲▲ */
 
 document.addEventListener("DOMContentLoaded", init);
