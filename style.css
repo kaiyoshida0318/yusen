@@ -111,7 +111,7 @@ tbody td{font-size:13px}
 .supplier-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .supplier-section-ttl{font-size:13px;font-weight:700;color:var(--text)}
 .supplier-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px;background:var(--row-alt)}
-.supplier-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.supplier-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .supplier-ttl{font-size:12px;font-weight:500;color:var(--muted)}
 .supplier-del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
 .supplier-del:hover{color:var(--accent)}
@@ -121,6 +121,23 @@ tbody td{font-size:13px}
 .supplier-preview{width:100%;height:100%;object-fit:cover;cursor:pointer}
 .supplier-fields{flex:1;display:flex;flex-direction:column;gap:0}
 .supplier-fields label{margin-bottom:8px}
+
+/* 折りたたみ共通 */
+.section-toggle{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0 6px;line-height:1}
+.section-toggle:hover{color:var(--accent)}
+.section-collapsed .section-body{display:none}
+
+.rakumart-toggle, .supplier-toggle{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0 6px;line-height:1;align-self:center}
+.rakumart-toggle:hover, .supplier-toggle:hover{color:var(--accent)}
+
+/* 折りたたみ時の仕入先カード */
+.supplier-card.is-collapsed{padding:8px 12px}
+.supplier-card.is-collapsed .supplier-head{margin-bottom:0}
+.supplier-summary{flex:1;font-size:12px;color:var(--muted);margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 折りたたみ時のラクマート行 */
+.rakumart-row.is-collapsed .rakumart-summary{flex:1;padding:6px 10px;background:var(--row-alt);border-radius:6px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rakumart-summary a{color:#2563eb;text-decoration:underline}
 
 /* ラクマート */
 .rakumart-section{margin-top:8px}
