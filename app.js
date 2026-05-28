@@ -92,7 +92,13 @@ function renderTabs(){
     tab.onclick = ()=>{ currentCat = c.id; render(); };
     wrap.appendChild(tab);
   });
-  // 末尾に＋新規作成ボタン
+  // 末尾に＋行だけ＋新規作成ボタン
+  const quickBtn = document.createElement("button");
+  quickBtn.className = "cat-tab cat-quick"; quickBtn.title = "行だけ追加（後で編集）";
+  quickBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">行だけ</span>`;
+  quickBtn.onclick = addQuickRow;
+  wrap.appendChild(quickBtn);
+
   const newBtn = document.createElement("button");
   newBtn.className = "cat-tab cat-new"; newBtn.title = "新規作成";
   newBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">新規作成</span>`;
@@ -108,6 +114,21 @@ function filteredRows(){
   return state.rows.map((r,i)=>({r,i})).filter(x=>x.r.category===currentCat);
 }
 function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+// 行だけ追加（モーダルを開かず空の行を1つだけ）
+function addQuickRow(){
+  state.rows.push({
+    date: today(),
+    image: "",
+    name: "",
+    rival: "",
+    category: (currentCat==="all" ? "" : currentCat),
+    rakumart: [],
+    suppliers: [],
+  });
+  persistLocal(); render();
+  setStatus("✅ 行を追加しました（後で✏️から編集）");
+}
 
 /* ---------- 一覧レンダリング ---------- */
 function render(){
