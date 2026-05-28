@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.6.0";
+const VERSION = "1.7.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -529,6 +529,27 @@ function addRival(key){
 
 
 // 仕入先セットの描画
+// 配列内の要素を上/下へ移動
+function moveItem(arr, idx, dir){
+  const ni = idx + dir;
+  if(ni<0 || ni>=arr.length) return;
+  [arr[idx], arr[ni]] = [arr[ni], arr[idx]];
+}
+// 上↑下↓ボタンのペアを作る。move(dir) を呼ぶ
+function makeMoveButtons(idx, len, onMove, cls){
+  const frag = document.createDocumentFragment();
+  const up = document.createElement("button");
+  up.type="button"; up.className=cls; up.textContent="↑"; up.title="上へ";
+  up.disabled = idx===0;
+  up.onclick = (e)=>{ e.stopPropagation(); onMove(-1); };
+  const dn = document.createElement("button");
+  dn.type="button"; dn.className=cls; dn.textContent="↓"; dn.title="下へ";
+  dn.disabled = idx===len-1;
+  dn.onclick = (e)=>{ e.stopPropagation(); onMove(1); };
+  frag.append(up, dn);
+  return frag;
+}
+
 function renderSuppliers(){
   // セクション一括折りたたみ
   const sec = document.getElementById("suppliersSection");
@@ -549,6 +570,7 @@ function renderSuppliers(){
     tg.textContent = s.collapsed ? "▶" : "▼";
     tg.title = s.collapsed ? "展開" : "折りたたむ";
     tg.onclick = ()=>{ s.collapsed = !s.collapsed; renderSuppliers(); };
+    const mv = makeMoveButtons(idx, entry.suppliers.length, (dir)=>{ moveItem(entry.suppliers, idx, dir); renderSuppliers(); }, "supplier-mv");
     const ttl = document.createElement("span"); ttl.className="supplier-ttl"; ttl.textContent=`仕入先 ${idx+1}`;
     const summary = document.createElement("span"); summary.className="supplier-summary";
     if(s.collapsed){
@@ -559,7 +581,7 @@ function renderSuppliers(){
     }
     const rm = document.createElement("button"); rm.type="button"; rm.className="supplier-del"; rm.textContent="×"; rm.title="この仕入先を削除";
     rm.onclick = ()=>{ entry.suppliers.splice(idx,1); renderSuppliers(); };
-    head.append(tg, ttl, summary, rm);
+    head.append(tg, mv, ttl, summary, rm);
     card.appendChild(head);
 
     if(!s.collapsed){
@@ -700,6 +722,7 @@ function renderTables(){
     // ヘッダー操作行
     const head = document.createElement("div"); head.className="tbl-head";
     const ttl = document.createElement("span"); ttl.className="tbl-ttl"; ttl.textContent=`\u8868 ${ti+1}`;
+    const mv = makeMoveButtons(ti, entry.tables.length, (dir)=>{ moveItem(entry.tables, ti, dir); renderTables(); }, "tbl-mv");
     const addTextCol = document.createElement("button"); addTextCol.type="button"; addTextCol.className="btn btn-ghost btn-sm"; addTextCol.textContent="\uff0b\u30c6\u30ad\u30b9\u30c8\u5217";
     addTextCol.onclick = ()=>{ tbl.columns.push({type:"text"}); tbl.header.push(""); tbl.rows.forEach(r=>r.cells.push({text:"",url:""})); renderTables(); };
     const addImgCol = document.createElement("button"); addImgCol.type="button"; addImgCol.className="btn btn-ghost btn-sm"; addImgCol.textContent="\uff0b\u753b\u50cf\u5217";
@@ -708,7 +731,7 @@ function renderTables(){
     addRow.onclick = ()=>{ tbl.rows.push({ cells: tbl.columns.map(c=> c.type==="image"?{image:"",imageIsDataUrl:false}:{text:"",url:""}) }); renderTables(); };
     const delTbl = document.createElement("button"); delTbl.type="button"; delTbl.className="tbl-del-btn"; delTbl.textContent="\u00d7 \u8868\u3092\u524a\u9664";
     delTbl.onclick = ()=>{ if(confirm("\u3053\u306e\u8868\u3092\u524a\u9664\u3057\u307e\u3059\u304b\uff1f")){ entry.tables.splice(ti,1); renderTables(); } };
-    head.append(ttl, addTextCol, addImgCol, addRow, delTbl);
+    head.append(ttl, mv, addTextCol, addImgCol, addRow, delTbl);
     card.appendChild(head);
 
     const table = document.createElement("table"); table.className="tbl-grid";
@@ -819,6 +842,7 @@ function renderRakumart(){
     tg.textContent = r.collapsed ? "▶" : "▼";
     tg.title = r.collapsed ? "展開" : "折りたたむ";
     tg.onclick = ()=>{ r.collapsed = !r.collapsed; renderRakumart(); };
+    const mv = makeMoveButtons(idx, entry.rakumart.length, (dir)=>{ moveItem(entry.rakumart, idx, dir); renderRakumart(); }, "rakumart-mv");
 
     const num = document.createElement("span"); num.className="rakumart-num"; num.textContent = `#${entry.rakumart.length - idx}`;
 
@@ -904,7 +928,7 @@ function renderRakumart(){
     const rm = document.createElement("button"); rm.type="button"; rm.className="rakumart-del"; rm.textContent="×"; rm.title="削除";
     rm.onclick = ()=>{ entry.rakumart.splice(idx,1); renderRakumart(); };
 
-    card.append(tg, num, bodyEl, rm);
+    card.append(tg, mv, num, bodyEl, rm);
     list.appendChild(card);
   });
 }
