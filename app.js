@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.13.0";
+const VERSION = "1.14.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -30,8 +30,8 @@ const COLUMNS = [
 // デフォルトのカテゴリ（後から追加・編集・並べ替え・削除可能）
 const DEFAULT_CATEGORIES = [
   { id:"new",    label:"新商品", icon:"✨" },
-  { id:"rakuten",label:"楽天",   icon:"🛒" },
-  { id:"yahoo",  label:"Yahoo",  icon:"🛍️" },
+  { id:"rakuten",label:"楽天",   icon:"logo:rakuten" },
+  { id:"yahoo",  label:"Yahoo",  icon:"logo:yahoo" },
 ];
 const ALL_CAT = { id:"all", label:"全体", icon:"📊" }; // 特別カテゴリ（全件表示）
 const NONE_CAT = { id:"none", label:"未設定", icon:"❓" }; // 未分類の行を表示
@@ -85,7 +85,7 @@ function saveCfg(){ localStorage.setItem(LS_CFG, JSON.stringify(cfg)); }
 function loadData(){
   let saved = null;
   try{ saved = JSON.parse(localStorage.getItem(LS_DATA)); }catch(e){}
-  if(saved && Array.isArray(saved.rows)){ state = migrate(saved); return; }
+  if(saved && Array.isArray(saved.rows)){ state = migrate(saved); persistLocal(); return; }
   state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice() };
 }
 // 旧データ（supply文字列・categoriesなし）を新スキーマに変換
@@ -93,6 +93,12 @@ function migrate(data){
   if(!Array.isArray(data.categories) || data.categories.length===0){
     data.categories = DEFAULT_CATEGORIES.slice();
   }
+  // 既定の 楽天/Yahoo カテゴリが旧デフォルト絵文字のままなら、ブランドロゴへ更新
+  // （ユーザーが別の絵文字に変更している場合はそのまま尊重）
+  data.categories.forEach(c=>{
+    if(c.id==="rakuten" && (c.icon==="🛒" || !c.icon)) c.icon = "logo:rakuten";
+    if(c.id==="yahoo"   && (c.icon==="🛍️" || c.icon==="🛍" || !c.icon)) c.icon = "logo:yahoo";
+  });
   if(!Array.isArray(data.statuses) || data.statuses.length===0){
     data.statuses = DEFAULT_STATUSES.slice();
   }
@@ -130,7 +136,7 @@ function renderTabs(){
   all.forEach(c=>{
     const tab = document.createElement("button");
     tab.className = "cat-tab" + (c.id===currentCat ? " active" : "");
-    tab.innerHTML = `<span class="cat-icon">${c.icon||""}</span><span class="cat-label">${escapeHtml(c.label)}</span><span class="cat-count">${countForCat(c.id)}</span>`;
+    tab.innerHTML = `<span class="cat-icon">${iconHtml(c.icon)}</span><span class="cat-label">${escapeHtml(c.label)}</span><span class="cat-count">${countForCat(c.id)}</span>`;
     tab.onclick = ()=>{ currentCat = c.id; render(); };
     wrap.appendChild(tab);
   });
@@ -242,6 +248,42 @@ function filteredRows(){
   return arr;
 }
 function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ---------- カテゴリアイコン（絵文字 or ブランドロゴ） ----------
+   icon 値が "logo:rakuten" / "logo:yahoo" のときはSVGロゴを返す。
+   それ以外は絵文字としてそのまま表示。 */
+const LOGO_KEYS = { "logo:rakuten":"楽天", "logo:yahoo":"Yahoo" };
+function isLogoIcon(icon){ return typeof icon==="string" && icon.indexOf("logo:")===0; }
+function logoSvg(icon){
+  if(icon==="logo:rakuten"){
+    // 楽天：赤地に白の R
+    return `<svg class="cat-logo" viewBox="0 0 20 20" aria-label="楽天" role="img">`
+      + `<rect width="20" height="20" rx="4" fill="#bf0000"/>`
+      + `<text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="14" fill="#fff">R</text>`
+      + `</svg>`;
+  }
+  if(icon==="logo:yahoo"){
+    // Yahoo：赤〜オレンジのグラデ地に白の Y
+    return `<svg class="cat-logo" viewBox="0 0 20 20" aria-label="Yahoo" role="img">`
+      + `<defs><linearGradient id="yahooGrad" x1="0" y1="0" x2="1" y2="1">`
+      + `<stop offset="0" stop-color="#ff0033"/><stop offset="1" stop-color="#ff7a00"/>`
+      + `</linearGradient></defs>`
+      + `<rect width="20" height="20" rx="4" fill="url(#yahooGrad)"/>`
+      + `<text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="14" fill="#fff">Y</text>`
+      + `</svg>`;
+  }
+  return "";
+}
+// アイコンのHTML（タブ・セレクトのテキスト用ではなくHTML描画用）
+function iconHtml(icon){
+  if(isLogoIcon(icon)) return logoSvg(icon);
+  return escapeHtml(icon||"");
+}
+// セレクトの <option> 用テキスト（SVG不可なので、ロゴは空にしてラベルだけ見せる）
+function iconText(icon){
+  if(isLogoIcon(icon)) return "";
+  return icon || "";
+}
 
 // 行だけ追加（モーダルを開かず空の行を1つだけ）
 function addQuickRow(){
@@ -447,7 +489,7 @@ function render(){
     csel.appendChild(copt0);
     state.categories.forEach(c=>{
       const o=document.createElement("option");
-      o.value=c.id; o.textContent=`${c.icon||""} ${c.label}`;
+      o.value=c.id; o.textContent=`${iconText(c.icon)} ${c.label}`.trim();
       csel.appendChild(o);
     });
     // 保留中があればそれを、なければ現在値を選択
@@ -639,7 +681,7 @@ function renderCatSelect(){
   sel.appendChild(opt0);
   state.categories.forEach(c=>{
     const o = document.createElement("option");
-    o.value = c.id; o.textContent = `${c.icon||""} ${c.label}`;
+    o.value = c.id; o.textContent = `${iconText(c.icon)} ${c.label}`.trim();
     if(c.id===entry.category) o.selected = true;
     sel.appendChild(o);
   });
@@ -1383,7 +1425,9 @@ function renderCatManager(){
     const row = document.createElement("div"); row.className = "cat-row";
     // 絵文字ボタン（クリックでパレット開閉）
     const iconBtn = document.createElement("button");
-    iconBtn.className = "cat-icon-btn"; iconBtn.textContent = c.icon || "📦";
+    iconBtn.className = "cat-icon-btn";
+    if(isLogoIcon(c.icon)){ iconBtn.innerHTML = logoSvg(c.icon); }
+    else { iconBtn.textContent = c.icon || "📦"; }
     iconBtn.title = "クリックで絵文字を選ぶ";
     iconBtn.onclick = ()=>{ catIconOpen = (catIconOpen===idx ? -1 : idx); renderCatManager(); };
     // ラベル入力
@@ -1414,6 +1458,15 @@ function renderCatManager(){
     // 絵文字パレット（このカテゴリで開いているとき）
     if(catIconOpen===idx){
       const palette = document.createElement("div"); palette.className="cat-icon-palette";
+      // ブランドロゴ（楽天 / Yahoo）を先頭に
+      Object.keys(LOGO_KEYS).forEach(lk=>{
+        const b = document.createElement("button");
+        b.className = "cat-icon-opt" + (lk===c.icon ? " selected" : "");
+        b.innerHTML = logoSvg(lk);
+        b.title = LOGO_KEYS[lk] + "ロゴ";
+        b.onclick = ()=>{ c.icon = lk; catIconOpen = -1; persistLocal(); renderCatManager(); renderTabs(); };
+        palette.appendChild(b);
+      });
       CAT_ICONS.forEach(ic=>{
         const b = document.createElement("button");
         b.className = "cat-icon-opt" + (ic===c.icon ? " selected" : "");
