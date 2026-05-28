@@ -283,7 +283,8 @@ function openEntry(editIndex){
   }
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
   entry.category = row ? (row.category||"") : (currentCat==="all" ? "" : currentCat);
-  sectionCollapsed = { rakumart:false, suppliers:false };
+  // 新規作成時はセクションを閉じておく（必要なものだけ開いて使う）。編集時は展開。
+  sectionCollapsed = isEdit ? { rakumart:false, suppliers:false } : { rakumart:true, suppliers:true };
   renderCatSelect();
 
   renderEntryImage();
