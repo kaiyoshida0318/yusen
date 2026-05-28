@@ -176,10 +176,10 @@ tbody td{font-size:13px}
 .tbl-del-btn:hover{border-color:var(--accent);color:var(--accent)}
 .tbl-grid{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden}
 .tbl-grid td{border:1px solid var(--border);padding:6px;vertical-align:middle}
-/* 列削除ボタン行 */
-.tbl-coldel-row td{border:none;padding:0 6px 2px;text-align:center;background:transparent}
-.tbl-coldel{background:none;border:none;color:var(--border);font-size:13px;cursor:pointer;line-height:1}
-.tbl-coldel:hover{color:var(--accent)}
+/* 列削除ボタン行（テーブル一番下） */
+.tbl-coldel-row td{border:none;padding:6px 6px 2px;text-align:center;background:transparent}
+.tbl-coldel{background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;font-weight:500;padding:7px 4px;cursor:pointer;line-height:1.2;width:100%;white-space:nowrap}
+.tbl-coldel:hover{background:var(--accent);border-color:var(--accent);color:#fff}
 /* タイトル行（色違い） */
 .tbl-title-row td{background:#fdebcf}
 .tbl-head-edit{min-height:34px;padding:7px 8px;outline:none;font:inherit;font-weight:700;color:var(--text);position:relative;cursor:text}
