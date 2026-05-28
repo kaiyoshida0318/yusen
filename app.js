@@ -266,10 +266,10 @@ function render(){
     const tdAct = document.createElement("td");
     tdAct.className="col-actions";
     const edit = document.createElement("button");
-    edit.className="row-btn"; edit.textContent="✏️"; edit.title="編集";
+    edit.className="act-btn act-edit"; edit.textContent="編集";
     edit.onclick = ()=>openEntry(ri);
     const del = document.createElement("button");
-    del.className="row-btn"; del.textContent="🗑"; del.title="削除";
+    del.className="act-btn act-del"; del.textContent="削除";
     del.onclick = ()=>{ if(confirm("この行を削除しますか？")){ state.rows.splice(ri,1); persistLocal(); render(); } };
     tdAct.appendChild(edit); tdAct.appendChild(del);
     trb.appendChild(tdAct);
