@@ -421,15 +421,17 @@ function renderEntryImage(){
   if(entry.image){
     const img = document.createElement("img");
     img.src = entry.imageIsDataUrl ? entry.image : imgUrl(entry.image);
-    img.className = "entry-preview"; img.title = "クリックで差し替え";
+    img.className = "entry-preview"; img.title = "クリック／ドロップで差し替え";
     img.onclick = ()=>pickImageInto(entry, "image");
     box.appendChild(img);
   }else{
     const drop = document.createElement("div");
-    drop.className="img-drop"; drop.textContent="画像を選択";
+    drop.className="img-drop"; drop.innerHTML="クリック<br>またはドロップ";
     drop.onclick = ()=>pickImageInto(entry, "image");
     box.appendChild(drop);
   }
+  // 画像エリア全体をドロップ対象に（差し替えも可）
+  enableImageDrop(box, entry, "image");
 }
 
 
@@ -473,14 +475,15 @@ function renderSuppliers(){
       const imgBox = document.createElement("div"); imgBox.className="supplier-image";
       if(s.image){
         const im=document.createElement("img"); im.src=s.imageIsDataUrl?s.image:imgUrl(s.image);
-        im.className="supplier-preview"; im.title="クリックで差し替え";
+        im.className="supplier-preview"; im.title="クリック／ドロップで差し替え";
         im.onclick=()=>pickImageInto(s,"image", renderSuppliers);
         imgBox.appendChild(im);
       }else{
-        const drop=document.createElement("div"); drop.className="img-drop"; drop.textContent="仕入先画像";
+        const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="仕入先画像<br>クリック／ドロップ";
         drop.onclick=()=>pickImageInto(s,"image", renderSuppliers);
         imgBox.appendChild(drop);
       }
+      enableImageDrop(imgBox, s, "image", renderSuppliers);
       bodyRow.appendChild(imgBox);
 
       const fields = document.createElement("div"); fields.className="supplier-fields";
@@ -639,27 +642,46 @@ function toggleSectionRakumart(){
 function pickImageInto(obj, key, cb){
   const input = document.createElement("input");
   input.type="file"; input.accept="image/*";
-  input.onchange = async ()=>{
+  input.onchange = ()=>{
     const file = input.files[0]; if(!file) return;
-    if(!cfg.pat){
-      const reader = new FileReader();
-      reader.onload = e=>{
-        obj[key]=e.target.result; obj.imageIsDataUrl=true;
-        if(cb) cb(); else renderEntryImage();
-      };
-      reader.readAsDataURL(file);
-      setStatus("⚠️ GitHub未設定のためローカルプレビュー（保存時はアップロードされません）");
-      return;
-    }
-    setStatus("画像アップロード中…");
-    try{
-      const filename = await uploadImage(file);
-      obj[key]=filename; obj.imageIsDataUrl=false;
-      if(cb) cb(); else renderEntryImage();
-      setStatus("✅ 画像アップロード完了");
-    }catch(e){ setStatus("❌ 画像アップロード失敗: "+e.message); }
+    handleImageFile(file, obj, key, cb);
   };
   input.click();
+}
+
+// ファイルを受け取って obj[key] に登録（アップロード or プレビュー）
+async function handleImageFile(file, obj, key, cb){
+  if(!file || !file.type || !file.type.startsWith("image/")){
+    setStatus("⚠️ 画像ファイルをドロップしてください"); return;
+  }
+  if(!cfg.pat){
+    const reader = new FileReader();
+    reader.onload = e=>{
+      obj[key]=e.target.result; obj.imageIsDataUrl=true;
+      if(cb) cb(); else renderEntryImage();
+    };
+    reader.readAsDataURL(file);
+    setStatus("⚠️ GitHub未設定のためローカルプレビュー（保存時はアップロードされません）");
+    return;
+  }
+  setStatus("画像アップロード中…");
+  try{
+    const filename = await uploadImage(file);
+    obj[key]=filename; obj.imageIsDataUrl=false;
+    if(cb) cb(); else renderEntryImage();
+    setStatus("✅ 画像アップロード完了");
+  }catch(e){ setStatus("❌ 画像アップロード失敗: "+e.message); }
+}
+
+// 要素にドラッグ&ドロップで画像登録できるようにする
+function enableImageDrop(el, obj, key, cb){
+  el.addEventListener("dragover", e=>{ e.preventDefault(); e.stopPropagation(); el.classList.add("drag-over"); });
+  el.addEventListener("dragleave", e=>{ e.preventDefault(); e.stopPropagation(); el.classList.remove("drag-over"); });
+  el.addEventListener("drop", e=>{
+    e.preventDefault(); e.stopPropagation(); el.classList.remove("drag-over");
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if(file) handleImageFile(file, obj, key, cb);
+  });
 }
 
 function saveEntry(){
