@@ -101,38 +101,13 @@
           </div>
         </div>
 
-        <div class="supplier-section rakumart-section" id="rakumartSection">
-          <div class="supplier-section-head">
-            <button type="button" class="section-toggle" id="rakumartSectionToggle" title="セクション一括折りたたみ">▼</button>
-            <span class="supplier-section-ttl">ラクマート</span>
-            <button type="button" class="btn btn-add btn-sm" id="btnAddRakumart">＋ ラクマートを追加</button>
-          </div>
-          <div class="section-body">
-            <div id="rakumartList"></div>
-            <p class="hint-inline">ラクマート商品ページのリンクをハイパーリンク状態でコピーして欄に貼り付け（例：2026010815054728-2147）</p>
-          </div>
-        </div>
-
-        <div class="supplier-section" id="suppliersSection">
-          <div class="supplier-section-head">
-            <button type="button" class="section-toggle" id="suppliersSectionToggle" title="セクション一括折りたたみ">▼</button>
-            <span class="supplier-section-ttl">仕入先（中国輸入元）</span>
-            <button type="button" class="btn btn-add btn-sm" id="btnAddSupplier">＋ 仕入先を追加</button>
-          </div>
-          <div class="section-body">
-            <div id="supplierList"></div>
-          </div>
-        </div>
-
-        <div class="supplier-section" id="tablesSection">
-          <div class="supplier-section-head">
-            <button type="button" class="section-toggle" id="tablesSectionToggle" title="セクション一括折りたたみ">▼</button>
-            <span class="supplier-section-ttl">表</span>
-            <button type="button" class="btn btn-add btn-sm" id="btnAddTable">＋ 表を追加</button>
-          </div>
-          <div class="section-body">
-            <div id="tablesList"></div>
-            <p class="hint-inline">左に画像、右にテキスト（ハイパーリンク状態で貼り付け可）。「＋列」「＋行」で拡張できます。</p>
+        <div id="blocksArea"></div>
+        <div class="add-block-wrap">
+          <button type="button" class="btn-add-block" id="btnAddBlock">＋ 項目を追加</button>
+          <div class="add-block-menu" id="addBlockMenu" hidden>
+            <button type="button" class="add-block-opt" data-block="rakumart">🛒 ラクマート</button>
+            <button type="button" class="add-block-opt" data-block="supplier">🏭 仕入先（中国輸入元）</button>
+            <button type="button" class="add-block-opt" data-block="table">📋 表</button>
           </div>
         </div>
 
