@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.12.0";
+const VERSION = "1.13.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -22,6 +22,7 @@ const COLUMNS = [
   { key:"rivalA", label:"Amazonライバル" },
   { key:"rakumart", label:"ラクマート" },
   { key:"supply", label:"仕入先" },
+  { key:"catSel", label:"カテゴリ" },
   { key:"statusSel", label:"ステータス" },
   { key:"actions", label:"操作" },
 ];
@@ -53,6 +54,7 @@ let currentCat = "all"; // 現在選択中のカテゴリID（上段）
 let currentStatus = "all"; // 現在選択中のステータスID（下段）
 let dateSort = "none";   // 日付ソート: "none" | "asc" | "desc"
 let pendingStatus = {};  // 一覧でのステータス保留変更 { rowIndex: newStatusId }
+let pendingCat = {};     // 一覧でのカテゴリ保留変更 { rowIndex: newCatId }
 let catIconOpen = -1;    // カテゴリ管理で絵文字パレットを開いているインデックス
 let selectMode = false;  // 一括削除の選択モード
 let selectedRows = {};   // 選択中の行 { rowIndex: true }
@@ -175,18 +177,20 @@ function renderTabs(){
       tab.onclick = ()=>{ currentStatus = s.id; render(); };
       swrap.appendChild(tab);
     });
-    // 保留中のステータス変更があるとき、右端にクリア・反映ボタン
-    const n = Object.keys(pendingStatus).length;
+    // 保留中のステータス／カテゴリ変更があるとき、右端にクリア・反映ボタン
+    const nS = Object.keys(pendingStatus).length;
+    const nC = Object.keys(pendingCat).length;
+    const n = nS + nC;
     if(n>0){
       const clearBtn = document.createElement("button");
       clearBtn.className = "status-clear-btn";
       clearBtn.textContent = "クリア";
       clearBtn.title = "保留中の変更をすべて取り消す";
-      clearBtn.onclick = ()=>{ pendingStatus = {}; render(); };
+      clearBtn.onclick = ()=>{ pendingStatus = {}; pendingCat = {}; render(); };
       const applyBtn = document.createElement("button");
       applyBtn.className = "status-apply-btn";
       applyBtn.textContent = `🔄 反映（${n}件）`;
-      applyBtn.onclick = applyPendingStatus;
+      applyBtn.onclick = applyPendingChanges;
       swrap.append(clearBtn, applyBtn);
     }
     // 選択モードで1件以上選択中なら、一括削除実行ボタン
@@ -198,7 +202,7 @@ function renderTabs(){
       delBtn.disabled = cnt===0;
       delBtn.onclick = deleteSelectedRows;
       // クリア・反映が無いときは左マージンautoで右寄せ
-      if(Object.keys(pendingStatus).length===0) delBtn.style.marginLeft = "auto";
+      if(n===0) delBtn.style.marginLeft = "auto";
       swrap.append(delBtn);
     }
   }
@@ -288,6 +292,7 @@ function render(){
     }else{
       if(c.key==="image") th.className="col-image";
       if(c.key==="actions") th.className="col-actions";
+      if(c.key==="catSel") th.className="col-catsel";
       if(c.key==="statusSel") th.className="col-statussel";
       th.textContent = c.label;
     }
@@ -432,7 +437,36 @@ function render(){
     };
     tdStatus.appendChild(sel);
 
-    // 左にステータス・右に操作
+    // カテゴリ変更ドロップダウン
+    const tdCat = document.createElement("td");
+    tdCat.className="col-catsel";
+    const csel = document.createElement("select");
+    csel.className="status-select cat-select";
+    const copt0 = document.createElement("option");
+    copt0.value=""; copt0.textContent="— 未分類 —";
+    csel.appendChild(copt0);
+    state.categories.forEach(c=>{
+      const o=document.createElement("option");
+      o.value=c.id; o.textContent=`${c.icon||""} ${c.label}`;
+      csel.appendChild(o);
+    });
+    // 保留中があればそれを、なければ現在値を選択
+    const pendingC = (ri in pendingCat) ? pendingCat[ri] : row.category;
+    csel.value = pendingC || "";
+    if(pendingC !== row.category && (ri in pendingCat)) csel.classList.add("status-pending");
+    csel.onchange = ()=>{
+      if(csel.value === (row.category||"")){
+        delete pendingCat[ri]; // 元に戻したら保留解除
+      }else{
+        pendingCat[ri] = csel.value;
+      }
+      csel.classList.toggle("status-pending", (ri in pendingCat));
+      renderTabs(); // クリア・反映ボタンの出し分けを更新
+    };
+    tdCat.appendChild(csel);
+
+    // 左からカテゴリ・ステータス・操作
+    trb.appendChild(tdCat);
     trb.appendChild(tdStatus);
     trb.appendChild(tdAct);
 
@@ -1261,24 +1295,31 @@ function fileToBase64(file){
   });
 }
 
-/* ---------- ステータス保留変更の反映 ---------- */
-async function applyPendingStatus(){
-  const n = Object.keys(pendingStatus).length;
+/* ---------- ステータス／カテゴリ保留変更の反映 ---------- */
+async function applyPendingChanges(){
+  const nS = Object.keys(pendingStatus).length;
+  const nC = Object.keys(pendingCat).length;
+  const n = nS + nC;
   if(n===0) return;
   // 保留中の変更をデータに適用
   Object.keys(pendingStatus).forEach(ri=>{
     const idx = parseInt(ri,10);
     if(state.rows[idx]) state.rows[idx].status = pendingStatus[ri];
   });
+  Object.keys(pendingCat).forEach(ri=>{
+    const idx = parseInt(ri,10);
+    if(state.rows[idx]) state.rows[idx].category = pendingCat[ri];
+  });
   pendingStatus = {};
+  pendingCat = {};
   persistLocal();
   render();
   // GitHubにも保存
   if(cfg.pat && cfg.owner && cfg.repo){
     await saveToGitHub();
-    setStatus(`✅ ${n}件のステータスを反映し、GitHubに保存しました`);
+    setStatus(`✅ ${n}件の変更を反映し、GitHubに保存しました`);
   }else{
-    setStatus(`✅ ${n}件のステータスを反映しました（GitHub未設定のため保存は未実行）`);
+    setStatus(`✅ ${n}件の変更を反映しました（GitHub未設定のため保存は未実行）`);
   }
 }
 
