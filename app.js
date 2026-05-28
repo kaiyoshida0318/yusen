@@ -376,40 +376,87 @@ function renderRakumart(){
 
     const num = document.createElement("span"); num.className="rakumart-num"; num.textContent = `#${idx+1}`;
 
-    // 貼り付け対象: contenteditable で <a> をHTMLごと受け取る
+    // ブラウザ標準の貼り付け挙動に任せる contenteditable
     const editor = document.createElement("div");
     editor.className = "rakumart-paste";
     editor.contentEditable = "true";
-    editor.dataset.placeholder = "ここにハイパーリンク状態でコピーしたテキストを貼り付け（例：2026010815054728-2147）";
-    // 既存表示
+    editor.setAttribute("role","textbox");
+    editor.setAttribute("spellcheck","false");
+
+    // 既存データの復元: <a>として中に入れる
     if(r.text || r.url){
-      const a = document.createElement("a");
-      a.href = r.url || "#"; a.target = "_blank"; a.rel="noopener";
-      a.textContent = r.text || r.url;
-      editor.appendChild(a);
+      if(r.url){
+        const a = document.createElement("a");
+        a.href = r.url; a.target = "_blank"; a.rel="noopener";
+        a.textContent = r.text || r.url;
+        editor.appendChild(a);
+      }else{
+        editor.textContent = r.text;
+      }
     }
+
+    // 入力・貼り付け後に中身からtextとurlを抽出して保存
+    const sync = ()=>{
+      const a = editor.querySelector("a[href]");
+      if(a){
+        r.text = (a.textContent||"").trim();
+        r.url  = a.getAttribute("href") || "";
+      }else{
+        const t = editor.textContent.trim();
+        // プレーンテキストがURLそのものなら、URLとしても保持
+        if(/^https?:\/\/\S+$/i.test(t)){
+          r.text = t; r.url = t;
+        }else{
+          r.text = t; r.url = "";
+        }
+      }
+      togglePlaceholder();
+    };
+    const togglePlaceholder = ()=>{
+      const hasContent = editor.textContent.trim().length>0 || editor.querySelector("a,img");
+      editor.classList.toggle("is-empty", !hasContent);
+    };
+
+    editor.addEventListener("input", sync);
+    // paste: ブラウザのデフォルト挙動に任せる。
+    // ただし環境によってはHTMLが入らないことがあるため、aタグがあれば自前で安全に挿入するフォールバックも併用
     editor.addEventListener("paste", e=>{
-      e.preventDefault();
-      const html = e.clipboardData.getData("text/html");
-      const plain = e.clipboardData.getData("text/plain");
-      const parsed = parsePastedLink(html, plain);
-      r.text = parsed.text; r.url = parsed.url;
-      // 再描画して<a>として表示
-      editor.innerHTML = "";
-      const a = document.createElement("a");
-      a.href = parsed.url || "#"; a.target="_blank"; a.rel="noopener";
-      a.textContent = parsed.text || parsed.url || "";
-      editor.appendChild(a);
-    });
-    // 直接編集（テキストだけ書き換えたい場合）
-    editor.addEventListener("input", ()=>{
-      // 中の<a>のtextContentを優先
-      const a = editor.querySelector("a");
-      if(a){ r.text = a.textContent; r.url = a.getAttribute("href")||r.url; }
-      else { r.text = editor.textContent.trim(); /* URLは空でない限り維持 */ }
+      try{
+        const html  = e.clipboardData && e.clipboardData.getData("text/html");
+        const plain = e.clipboardData && e.clipboardData.getData("text/plain");
+        if(html){
+          const tmp = document.createElement("div"); tmp.innerHTML = html;
+          const a = tmp.querySelector("a[href]");
+          if(a){
+            e.preventDefault();
+            // 既存内容は置換（1行=1リンク想定）
+            editor.innerHTML = "";
+            const link = document.createElement("a");
+            link.href = a.getAttribute("href"); link.target="_blank"; link.rel="noopener";
+            link.textContent = (a.textContent||"").trim() || a.getAttribute("href");
+            editor.appendChild(link);
+            sync();
+            return;
+          }
+        }
+        if(plain && /^https?:\/\/\S+$/i.test(plain.trim())){
+          e.preventDefault();
+          editor.innerHTML = "";
+          const link = document.createElement("a");
+          link.href = plain.trim(); link.target="_blank"; link.rel="noopener";
+          link.textContent = plain.trim();
+          editor.appendChild(link);
+          sync();
+          return;
+        }
+      }catch(err){ /* 解析失敗時はデフォルト挙動に任せる */ }
+      // 上で処理しなかった場合はデフォルトのまま入る
+      setTimeout(sync, 0);
     });
 
-    const rm = document.createElement("button"); rm.className="rakumart-del"; rm.textContent="×"; rm.title="削除";
+    togglePlaceholder();
+
+    const rm = document.createElement("button"); rm.type="button"; rm.className="rakumart-del"; rm.textContent="×"; rm.title="削除";
     rm.onclick = ()=>{ entry.rakumart.splice(idx,1); renderRakumart(); };
 
     card.append(num, editor, rm);
@@ -417,30 +464,13 @@ function renderRakumart(){
   });
 }
 
-function parsePastedLink(html, plain){
-  // HTMLからaタグを優先抽出
-  if(html){
-    try{
-      const tmp = document.createElement("div");
-      tmp.innerHTML = html;
-      const a = tmp.querySelector("a[href]");
-      if(a){
-        return { text: (a.textContent||"").trim() || a.getAttribute("href"), url: a.getAttribute("href") };
-      }
-      // aが無くてもhrefっぽいURLがhtmlにあるかは諦めてplain処理へ
-    }catch(e){}
-  }
-  const t = (plain||"").trim();
-  // plainがURLそのものならテキスト=URLとする
-  if(/^https?:\/\/\S+$/i.test(t)){
-    return { text: t, url: t };
-  }
-  return { text: t, url: "" };
-}
-
 function addRakumart(){
   entry.rakumart.push({ text:"", url:"" });
   renderRakumart();
+  // 追加した直後のエディタにフォーカス
+  const editors = document.querySelectorAll("#rakumartList .rakumart-paste");
+  const last = editors[editors.length-1];
+  if(last) last.focus();
 }
 
 /* obj[key] に画像を取り込む（メインライバル/仕入先 共通）。cb で再描画 */
