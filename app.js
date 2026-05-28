@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.10.1";
+const VERSION = "1.11.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -54,6 +54,8 @@ let currentStatus = "all"; // 現在選択中のステータスID（下段）
 let dateSort = "none";   // 日付ソート: "none" | "asc" | "desc"
 let pendingStatus = {};  // 一覧でのステータス保留変更 { rowIndex: newStatusId }
 let catIconOpen = -1;    // カテゴリ管理で絵文字パレットを開いているインデックス
+let selectMode = false;  // 一括削除の選択モード
+let selectedRows = {};   // 選択中の行 { rowIndex: true }
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
 let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], rankingUrls:[], freeNote:"", category:"" };
@@ -133,7 +135,20 @@ function renderTabs(){
   noneTab.innerHTML = `<span class="cat-icon">${NONE_CAT.icon}</span><span class="cat-label">${NONE_CAT.label}</span><span class="cat-count">${countForCat(NONE_CAT.id)}</span>`;
   noneTab.onclick = ()=>{ currentCat = NONE_CAT.id; render(); };
   wrap.appendChild(noneTab);
-  // 末尾に＋行だけ＋新規作成ボタン
+  // 末尾に 一括削除 ＋行だけ ＋新規作成ボタン
+  const bulkBtn = document.createElement("button");
+  bulkBtn.className = "cat-tab cat-bulk" + (selectMode ? " active" : "");
+  bulkBtn.title = "複数選んで一括削除";
+  bulkBtn.innerHTML = selectMode
+    ? `<span class="cat-icon">✖</span><span class="cat-label">選択をやめる</span>`
+    : `<span class="cat-icon">🗑</span><span class="cat-label">一括削除</span>`;
+  bulkBtn.onclick = ()=>{
+    selectMode = !selectMode;
+    selectedRows = {};
+    render();
+  };
+  wrap.appendChild(bulkBtn);
+
   const quickBtn = document.createElement("button");
   quickBtn.className = "cat-tab cat-quick"; quickBtn.title = "行だけ追加（後で編集）";
   quickBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">行だけ</span>`;
@@ -170,6 +185,18 @@ function renderTabs(){
       applyBtn.textContent = `🔄 反映（${n}件）`;
       applyBtn.onclick = applyPendingStatus;
       swrap.append(clearBtn, applyBtn);
+    }
+    // 選択モードで1件以上選択中なら、一括削除実行ボタン
+    if(selectMode){
+      const cnt = Object.keys(selectedRows).length;
+      const delBtn = document.createElement("button");
+      delBtn.className = "status-bulkdel-btn";
+      delBtn.textContent = `🗑 選択した行を削除（${cnt}件）`;
+      delBtn.disabled = cnt===0;
+      delBtn.onclick = deleteSelectedRows;
+      // クリア・反映が無いときは左マージンautoで右寄せ
+      if(Object.keys(pendingStatus).length===0) delBtn.style.marginLeft = "auto";
+      swrap.append(delBtn);
     }
   }
 }
@@ -215,14 +242,26 @@ function addQuickRow(){
     date: today(),
     image: "",
     name: "",
-    rival: "",
+    rivalRakuten: [], rivalAmazon: [], rankingUrls: [], freeNote: "",
     category: ((currentCat==="all"||currentCat==="none") ? "" : currentCat),
     status: ((currentStatus==="all"||currentStatus==="none") ? "" : currentStatus),
-    rakumart: [],
-    suppliers: [],
+    rakumart: [], tables: [], suppliers: [],
   });
   persistLocal(); render();
-  setStatus("✅ 行を追加しました（後で✏️から編集）");
+  setStatus("✅ 行を追加しました（後で編集ボタンから編集）");
+}
+
+// 選択した行を一括削除
+function deleteSelectedRows(){
+  const idxs = Object.keys(selectedRows).map(n=>parseInt(n,10));
+  if(idxs.length===0) return;
+  if(!confirm(`${idxs.length}件削除しますか？\nこの操作は取り消せません（GitHub反映は「💾 GitHubに保存」）。`)) return;
+  // インデックスの大きい順に削除（ずれ防止）
+  idxs.sort((a,b)=>b-a).forEach(i=>{ state.rows.splice(i,1); });
+  selectedRows = {};
+  selectMode = false;
+  persistLocal(); render();
+  setStatus(`✅ ${idxs.length}件を削除しました（GitHubに反映するには「💾 GitHubに保存」）`);
 }
 
 /* ---------- 一覧レンダリング ---------- */
@@ -271,6 +310,15 @@ function render(){
 
   list.forEach(({r:row, i:ri})=>{
     const trb = document.createElement("tr");
+    if(selectMode){
+      trb.classList.add("selectable-row");
+      if(selectedRows[ri]) trb.classList.add("row-selected");
+      trb.onclick = ()=>{
+        if(selectedRows[ri]) delete selectedRows[ri];
+        else selectedRows[ri] = true;
+        render();
+      };
+    }
 
     const tdDate = document.createElement("td");
     tdDate.className="col-date"; tdDate.textContent = row.date || "";
@@ -350,11 +398,8 @@ function render(){
     tdAct.className="col-actions";
     const edit = document.createElement("button");
     edit.className="act-btn act-edit"; edit.textContent="編集";
-    edit.onclick = ()=>openEntry(ri);
-    const del = document.createElement("button");
-    del.className="act-btn act-del"; del.textContent="削除";
-    del.onclick = ()=>{ if(confirm("この行を削除しますか？")){ state.rows.splice(ri,1); persistLocal(); render(); } };
-    tdAct.appendChild(edit); tdAct.appendChild(del);
+    edit.onclick = (e)=>{ e.stopPropagation(); openEntry(ri); };
+    tdAct.appendChild(edit);
 
     // ステータス変更ドロップダウン
     const tdStatus = document.createElement("td");
@@ -516,6 +561,9 @@ function openEntry(editIndex){
   renderSuppliers();
   renderTables();
   renderFreeNote();
+  // 削除ボタンは編集時のみ表示
+  const delBtn = document.getElementById("btnDeleteEntry");
+  if(delBtn) delBtn.style.display = isEdit ? "" : "none";
   document.getElementById("entryModal").hidden = false;
 }
 
@@ -548,6 +596,16 @@ function renderCatSelect(){
   });
 }
 function closeEntry(){ document.getElementById("entryModal").hidden = true; }
+
+// 編集中の項目を削除
+function deleteCurrentEntry(){
+  if(entry.editIndex<0){ closeEntry(); return; }
+  const name = state.rows[entry.editIndex] ? (state.rows[entry.editIndex].name || "この項目") : "この項目";
+  if(!confirm(`「${name}」を削除しますか？\nこの操作は取り消せません（GitHub反映は「💾 GitHubに保存」）。`)) return;
+  state.rows.splice(entry.editIndex, 1);
+  persistLocal(); render(); closeEntry();
+  setStatus("✅ 削除しました（GitHubに反映するには「💾 GitHubに保存」）");
+}
 
 function renderEntryImage(){
   const box = document.getElementById("entryImageBox");
@@ -1383,6 +1441,7 @@ function bindUI(){
     if(act==="cancel") closeEntry();
     else if(act==="save") saveEntry(true);
     else if(act==="saveclose") saveEntry(false);
+    else if(act==="delete") deleteCurrentEntry();
   });
   document.getElementById("btnAddSupplier").onclick = addSupplier;
   document.getElementById("btnAddRakumart").onclick = addRakumart;
