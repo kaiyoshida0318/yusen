@@ -69,12 +69,18 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .status-tab.active{background:var(--green);border-color:var(--green);color:#fff}
 .status-tab.active .cat-count{background:rgba(255,255,255,.3);color:#fff}
 .status-tab .cat-count{font-size:11px;font-weight:600;background:var(--bg);color:var(--muted);padding:2px 8px;border-radius:999px;min-width:20px;text-align:center}
-/* サイコロ目ロゴを含むカウントは、丸背景を消してロゴだけ見せる */
-.status-tab .cat-count:has(.dice-badge){background:transparent!important;padding:0;min-width:0}
-.dice-badge{width:18px;height:18px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
-/* アクティブタブ（緑背景）では白い座布団を敷いてサイコロを見やすく */
-.status-tab.active .cat-count:has(.dice-badge){background:#fff!important;padding:2px;border-radius:6px;display:inline-flex}
-.status-tab.active .cat-count .dice-badge{width:16px;height:16px;filter:none}
+/* ステータスタブ左の番号ロゴ */
+.status-ico{display:inline-flex;align-items:center}
+.status-ico:empty{display:none}
+.status-num{width:18px;height:18px;display:block}
+.status-tab.active .status-num circle{stroke:#fff;stroke-width:1.5}
+/* ステータス管理：番号ロゴのピッカー */
+.status-num-picker{display:inline-flex;gap:3px;align-items:center;flex-shrink:0}
+.status-num-opt{width:30px;height:32px;display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--border);border-radius:7px;cursor:pointer;padding:3px}
+.status-num-opt:hover{border-color:var(--accent)}
+.status-num-opt.selected{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
+.status-num-opt .status-num{width:20px;height:20px}
+.status-num-opt.status-num-none{color:var(--muted);font-size:13px}
 
 .cat-tab.cat-none{border-style:dashed;color:var(--muted)}
 .cat-tab.cat-none.active{background:var(--muted);border-color:var(--muted);color:#fff}
@@ -312,9 +318,11 @@ tbody td{font-size:13px}
 .block-section{
   --blk:#94a3b8;            /* アクセント色（種別ごとに上書き） */
   --blk-soft:#f1f5f9;       /* ヘッダー帯の薄い色 */
+  --blk-bar:#cbd5e1;        /* 左右のバー色（薄め。種別ごとに上書き） */
   position:relative;
   border:1.5px solid var(--border);
-  border-left:6px solid var(--blk);     /* 左に太いカラーバー */
+  border-left:6px solid var(--blk-bar);   /* 左の薄いカラーバー */
+  border-right:6px solid var(--blk-bar);  /* 右にも同じ薄いカラーバー */
   border-radius:var(--radius);
   margin-top:22px;                       /* ブロック間の余白を広げる */
   background:var(--surface);
@@ -323,11 +331,11 @@ tbody td{font-size:13px}
 }
 .block-section:first-child{margin-top:8px}
 
-/* 種別ごとの色分け */
-.block-section.block-rakumart{--blk:#3f9b6e;--blk-soft:#eef7f1}
-.block-section.block-supplier{--blk:#2f6fb0;--blk-soft:#eaf2fa}
-.block-section.block-table   {--blk:#d98324;--blk-soft:#fbf0e1}
-.block-section.block-freenote{--blk:#8257c9;--blk-soft:#f2ecfb}
+/* 種別ごとの色分け（barは薄い版） */
+.block-section.block-rakumart{--blk:#3f9b6e;--blk-soft:#eef7f1;--blk-bar:#bfe0cf}
+.block-section.block-supplier{--blk:#2f6fb0;--blk-soft:#eaf2fa;--blk-bar:#c2d8ee}
+.block-section.block-table   {--blk:#d98324;--blk-soft:#fbf0e1;--blk-bar:#f2d6b0}
+.block-section.block-freenote{--blk:#8257c9;--blk-soft:#f2ecfb;--blk-bar:#d8c7f0}
 
 /* ブロック並び替え 上↑下↓ボタン */
 .block-mv{background:#fff;border:1.5px solid var(--border);border-radius:6px;width:28px;height:30px;cursor:pointer;font-size:12px;color:var(--muted);line-height:1;padding:0;margin-left:2px}
