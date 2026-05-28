@@ -48,9 +48,9 @@ let currentStatus = "all"; // 現在選択中のステータスID（下段）
 let dateSort = "none";   // 日付ソート: "none" | "asc" | "desc"
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
-let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], category:"" };
+let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], category:"" };
 // セクション一括折りたたみ（モーダル開く度にリセット）
-let sectionCollapsed = { rakumart:false, suppliers:false };
+let sectionCollapsed = { rakumart:false, suppliers:false, tables:false };
 
 /* ---------- 初期化 ---------- */
 function init(){
@@ -87,6 +87,7 @@ function migrate(data){
       if(r.supply){ r.suppliers.push({ image:"", url:r.supply, memo:"" }); delete r.supply; }
     }
     if(!Array.isArray(r.rakumart)) r.rakumart = [];
+    if(!Array.isArray(r.tables)) r.tables = [];
     if(typeof r.category !== "string") r.category = "";
     if(typeof r.status !== "string") r.status = "";
   });
@@ -365,6 +366,16 @@ function openEntry(editIndex){
   entry.rakumart = row && Array.isArray(row.rakumart)
     ? row.rakumart.map(r=>({ text:r.text||"", url:r.url||"", collapsed:false }))
     : [];
+  // 表（ディープコピー）
+  entry.tables = row && Array.isArray(row.tables)
+    ? row.tables.map(t=>({
+        collapsed:false,
+        rows: (t.rows||[]).map(rr=>({
+          image: rr.image||"", imageIsDataUrl:false,
+          cells: (rr.cells||[]).map(c=>({ text:c.text||"", url:c.url||"" }))
+        }))
+      }))
+    : [];
   // 新規作成時は、すぐ入力できるようラクマート1件・仕入先1件を初期投入
   if(!isEdit){
     if(entry.rakumart.length===0) entry.rakumart.push({ text:"", url:"", collapsed:false });
@@ -375,13 +386,14 @@ function openEntry(editIndex){
   // ステータス: 編集時はその値、新規時は現在の下段タブ（"all"の場合は未設定）
   entry.status = row ? (row.status||"") : (currentStatus==="all" ? "" : currentStatus);
   // 新規作成時はセクションを閉じておく（必要なものだけ開いて使う）。編集時は展開。
-  sectionCollapsed = isEdit ? { rakumart:false, suppliers:false } : { rakumart:true, suppliers:true };
+  sectionCollapsed = isEdit ? { rakumart:false, suppliers:false, tables:false } : { rakumart:true, suppliers:true, tables:true };
   renderCatSelect();
   renderStatusSelect();
 
   renderEntryImage();
   renderRakumart();
   renderSuppliers();
+  renderTables();
   document.getElementById("entryModal").hidden = false;
 }
 
@@ -510,6 +522,138 @@ function addSupplier(){
 function toggleSectionSuppliers(){
   sectionCollapsed.suppliers = !sectionCollapsed.suppliers;
   renderSuppliers();
+}
+
+/* ---------- 表（画像＋テキスト列） ---------- */
+// テキストセルにリンク貼り付け対応のエディタを作る（ラクマートと同じ挙動）
+function makeLinkCell(cell){
+  const ed = document.createElement("div");
+  ed.className = "tbl-cell-edit";
+  ed.contentEditable = "true";
+  ed.setAttribute("spellcheck","false");
+  if(cell.text || cell.url){
+    if(cell.url){
+      const a = document.createElement("a");
+      a.href = cell.url; a.target="_blank"; a.rel="noopener";
+      a.textContent = cell.text || cell.url;
+      ed.appendChild(a);
+    }else{
+      ed.textContent = cell.text;
+    }
+  }
+  const sync = ()=>{
+    const a = ed.querySelector("a[href]");
+    if(a){ cell.text=(a.textContent||"").trim(); cell.url=a.getAttribute("href")||""; }
+    else{
+      const t = ed.textContent.trim();
+      if(/^https?:\/\/\S+$/i.test(t)){ cell.text=t; cell.url=t; }
+      else { cell.text=t; cell.url=""; }
+    }
+    ed.classList.toggle("is-empty", !(ed.textContent.trim() || ed.querySelector("a")));
+  };
+  ed.addEventListener("input", sync);
+  ed.addEventListener("paste", e=>{
+    try{
+      const html  = e.clipboardData && e.clipboardData.getData("text/html");
+      const plain = e.clipboardData && e.clipboardData.getData("text/plain");
+      if(html){
+        const tmp=document.createElement("div"); tmp.innerHTML=html;
+        const a=tmp.querySelector("a[href]");
+        if(a){
+          e.preventDefault(); ed.innerHTML="";
+          const link=document.createElement("a");
+          link.href=a.getAttribute("href"); link.target="_blank"; link.rel="noopener";
+          link.textContent=(a.textContent||"").trim()||a.getAttribute("href");
+          ed.appendChild(link); sync(); return;
+        }
+      }
+      if(plain && /^https?:\/\/\S+$/i.test(plain.trim())){
+        e.preventDefault(); ed.innerHTML="";
+        const link=document.createElement("a");
+        link.href=plain.trim(); link.target="_blank"; link.rel="noopener";
+        link.textContent=plain.trim();
+        ed.appendChild(link); sync(); return;
+      }
+    }catch(err){}
+    setTimeout(sync,0);
+  });
+  ed.classList.toggle("is-empty", !(ed.textContent.trim() || ed.querySelector("a")));
+  return ed;
+}
+
+function renderTables(){
+  const sec = document.getElementById("tablesSection");
+  if(sec) sec.classList.toggle("section-collapsed", sectionCollapsed.tables);
+  const stoggle = document.getElementById("tablesSectionToggle");
+  if(stoggle) stoggle.textContent = sectionCollapsed.tables ? "▶" : "▼";
+
+  const wrap = document.getElementById("tablesList");
+  if(!wrap) return;
+  wrap.innerHTML = "";
+  entry.tables.forEach((tbl, ti)=>{
+    const card = document.createElement("div"); card.className="tbl-card";
+
+    // ヘッダー（タイトル + 列追加 + 行追加 + 表削除）
+    const head = document.createElement("div"); head.className="tbl-head";
+    const ttl = document.createElement("span"); ttl.className="tbl-ttl"; ttl.textContent=`表 ${ti+1}`;
+    const addCol = document.createElement("button"); addCol.type="button"; addCol.className="btn btn-ghost btn-sm"; addCol.textContent="＋列";
+    addCol.onclick = ()=>{ tbl.rows.forEach(r=>r.cells.push({text:"",url:""})); renderTables(); };
+    const addRow = document.createElement("button"); addRow.type="button"; addRow.className="btn btn-ghost btn-sm"; addRow.textContent="＋行";
+    addRow.onclick = ()=>{ const nc=(tbl.rows[0]?tbl.rows[0].cells.length:1); tbl.rows.push({image:"",imageIsDataUrl:false,cells:Array.from({length:nc},()=>({text:"",url:""}))}); renderTables(); };
+    const delTbl = document.createElement("button"); delTbl.type="button"; delTbl.className="tbl-del-btn"; delTbl.textContent="× 表を削除";
+    delTbl.onclick = ()=>{ if(confirm("この表を削除しますか？")){ entry.tables.splice(ti,1); renderTables(); } };
+    head.append(ttl, addCol, addRow, delTbl);
+    card.appendChild(head);
+
+    // テーブル本体
+    const table = document.createElement("table"); table.className="tbl-grid";
+    tbl.rows.forEach((r, ri)=>{
+      const tr = document.createElement("tr");
+      // 画像セル
+      const tdImg = document.createElement("td"); tdImg.className="tbl-img-cell";
+      const imgBox = document.createElement("div"); imgBox.className="tbl-img-box";
+      if(r.image){
+        const im=document.createElement("img"); im.src=r.imageIsDataUrl?r.image:imgUrl(r.image);
+        im.className="tbl-img"; im.title="クリック／ドロップで差し替え";
+        im.onclick=()=>pickImageInto(r,"image",renderTables);
+        imgBox.appendChild(im);
+      }else{
+        const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="画像";
+        drop.onclick=()=>pickImageInto(r,"image",renderTables);
+        imgBox.appendChild(drop);
+      }
+      enableImageDrop(imgBox, r, "image", renderTables);
+      tdImg.appendChild(imgBox);
+      tr.appendChild(tdImg);
+      // テキストセル群
+      r.cells.forEach((cell, ci)=>{
+        const td = document.createElement("td"); td.className="tbl-txt-cell";
+        td.appendChild(makeLinkCell(cell));
+        tr.appendChild(td);
+      });
+      // 行削除
+      const tdDel = document.createElement("td"); tdDel.className="tbl-rowdel-cell";
+      const rd = document.createElement("button"); rd.type="button"; rd.className="tbl-rowdel"; rd.textContent="×"; rd.title="この行を削除";
+      rd.onclick = ()=>{ tbl.rows.splice(ri,1); if(tbl.rows.length===0){ entry.tables.splice(ti,1); } renderTables(); };
+      tdDel.appendChild(rd);
+      tr.appendChild(tdDel);
+      table.appendChild(tr);
+    });
+    card.appendChild(table);
+    wrap.appendChild(card);
+  });
+}
+
+function addTable(){
+  // 初期3行・テキスト列1
+  const rows = Array.from({length:3}, ()=>({ image:"", imageIsDataUrl:false, cells:[{text:"",url:""}] }));
+  entry.tables.push({ collapsed:false, rows });
+  renderTables();
+}
+
+function toggleSectionTables(){
+  sectionCollapsed.tables = !sectionCollapsed.tables;
+  renderTables();
 }
 
 
@@ -694,6 +838,12 @@ function saveEntry(){
     status: document.getElementById("fStatus").value || "",
     rakumart: entry.rakumart.map(r=>({ text:(r.text||"").trim(), url:(r.url||"").trim() })).filter(r=>r.text||r.url),
     suppliers: entry.suppliers.map(s=>({ image:s.image||"", url:(s.url||"").trim(), memo:(s.memo||"").trim() })),
+    tables: entry.tables.map(t=>({
+      rows: t.rows.map(r=>({
+        image: r.image||"",
+        cells: r.cells.map(c=>({ text:(c.text||"").trim(), url:(c.url||"").trim() }))
+      }))
+    })),
   };
   if(entry.editIndex>=0){ state.rows[entry.editIndex] = row; }
   else { state.rows.push(row); }
@@ -886,6 +1036,8 @@ function bindUI(){
   document.getElementById("btnAddRakumart").onclick = addRakumart;
   document.getElementById("rakumartSectionToggle").onclick = toggleSectionRakumart;
   document.getElementById("suppliersSectionToggle").onclick = toggleSectionSuppliers;
+  document.getElementById("btnAddTable").onclick = addTable;
+  document.getElementById("tablesSectionToggle").onclick = toggleSectionTables;
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnManageCats").onclick = openCatManager;
