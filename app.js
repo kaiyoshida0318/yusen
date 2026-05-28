@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.5.0";
+const VERSION = "1.6.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -969,7 +969,7 @@ function enableImageDrop(el, obj, key, cb){
   });
 }
 
-function saveEntry(){
+function saveEntry(keepOpen){
   const row = {
     date:  document.getElementById("fDate").value || today(),
     image: entry.image || "",
@@ -994,9 +994,18 @@ function saveEntry(){
     })),
   };
   if(entry.editIndex>=0){ state.rows[entry.editIndex] = row; }
-  else { state.rows.push(row); }
-  persistLocal(); render(); closeEntry();
-  setStatus("✅ 登録しました（GitHubに反映するには「💾 GitHubに保存」）");
+  else {
+    state.rows.push(row);
+    // 開いたまま保存した場合、以降は今追加した行を編集対象にする
+    if(keepOpen) entry.editIndex = state.rows.length - 1;
+  }
+  persistLocal(); render();
+  if(keepOpen){
+    setStatus("✅ 保存しました（編集を続けられます。GitHub反映は「💾 GitHubに保存」）");
+  }else{
+    closeEntry();
+    setStatus("✅ 登録しました（GitHubに反映するには「💾 GitHubに保存」）");
+  }
 }
 
 /* ---------- 画像アップロード ---------- */
@@ -1178,8 +1187,15 @@ function closeSettings(){ document.getElementById("settingsModal").hidden = true
 
 /* ---------- UI バインド ---------- */
 function bindUI(){
-  document.getElementById("btnCloseEntry").onclick = closeEntry;
-  document.getElementById("btnSaveEntry").onclick = saveEntry;
+  // 編集モーダルの上下ボタン（data-act で委譲）
+  document.getElementById("entryModal").addEventListener("click", e=>{
+    const btn = e.target.closest("[data-act]");
+    if(!btn) return;
+    const act = btn.dataset.act;
+    if(act==="cancel") closeEntry();
+    else if(act==="save") saveEntry(true);
+    else if(act==="saveclose") saveEntry(false);
+  });
   document.getElementById("btnAddSupplier").onclick = addSupplier;
   document.getElementById("btnAddRakumart").onclick = addRakumart;
   document.getElementById("btnAddRivalR").onclick = ()=>addRival("rivalRakuten");
