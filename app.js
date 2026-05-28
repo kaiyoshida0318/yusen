@@ -17,7 +17,8 @@ const COLUMNS = [
   { key:"date",   label:"日付" },
   { key:"image",  label:"画像" },
   { key:"name",   label:"項目名" },
-  { key:"rival",  label:"ライバルURL" },
+  { key:"rivalR", label:"楽天ライバル" },
+  { key:"rivalA", label:"Amazonライバル" },
   { key:"rakumart", label:"ラクマート" },
   { key:"supply", label:"仕入先" },
 ];
@@ -48,7 +49,7 @@ let currentStatus = "all"; // 現在選択中のステータスID（下段）
 let dateSort = "none";   // 日付ソート: "none" | "asc" | "desc"
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
-let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], category:"" };
+let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], category:"" };
 // セクション一括折りたたみ（モーダル開く度にリセット）
 let sectionCollapsed = { rakumart:false, suppliers:false, tables:false };
 
@@ -88,6 +89,13 @@ function migrate(data){
     }
     if(!Array.isArray(r.rakumart)) r.rakumart = [];
     if(!Array.isArray(r.tables)) r.tables = [];
+    // ライバルURL: 旧 rival(文字列) → rivalRakuten 配列へ移行
+    if(!Array.isArray(r.rivalRakuten)){
+      r.rivalRakuten = [];
+      if(r.rival){ r.rivalRakuten.push(r.rival); }
+      delete r.rival;
+    }
+    if(!Array.isArray(r.rivalAmazon)) r.rivalAmazon = [];
     if(typeof r.category !== "string") r.category = "";
     if(typeof r.status !== "string") r.status = "";
   });
@@ -262,7 +270,8 @@ function render(){
     tdName.textContent = row.name || "";
     trb.appendChild(tdName);
 
-    trb.appendChild(urlCell(row.rival));
+    trb.appendChild(urlListCell(row.rivalRakuten));
+    trb.appendChild(urlListCell(row.rivalAmazon));
 
     // ラクマート列
     const tdRak = document.createElement("td");
@@ -336,6 +345,25 @@ function urlCell(url){
   }
   return td;
 }
+// 複数URLを縦並びで表示
+function urlListCell(urls){
+  const td = document.createElement("td");
+  const list = (urls||[]).filter(u=>u && u.trim());
+  if(list.length===0){
+    const span = document.createElement("span"); span.className="muted"; span.textContent="—";
+    td.appendChild(span);
+    return td;
+  }
+  list.forEach(url=>{
+    const line = document.createElement("div"); line.className="sup-line";
+    const a = document.createElement("a");
+    a.href = url; a.target="_blank"; a.rel="noopener";
+    a.className="url-link"; a.textContent = shorten(url); a.title = url;
+    line.appendChild(a);
+    td.appendChild(line);
+  });
+  return td;
+}
 function shorten(url){
   try{ const u=new URL(url); return u.hostname.replace(/^www\./,"") + (u.pathname.length>1?"…":""); }
   catch(e){ return url.length>30 ? url.slice(0,30)+"…" : url; }
@@ -358,7 +386,11 @@ function openEntry(editIndex){
   let row = isEdit ? state.rows[editIndex] : null;
   document.getElementById("fDate").value  = row ? (row.date||today()) : today();
   document.getElementById("fName").value  = row ? (row.name||"") : "";
-  document.getElementById("fRival").value = row ? (row.rival||"") : "";
+  // ライバルURL（楽天/Amazon、最低2行ずつ確保）
+  entry.rivalRakuten = row && Array.isArray(row.rivalRakuten) ? row.rivalRakuten.slice() : [];
+  entry.rivalAmazon  = row && Array.isArray(row.rivalAmazon)  ? row.rivalAmazon.slice()  : [];
+  while(entry.rivalRakuten.length < 2) entry.rivalRakuten.push("");
+  while(entry.rivalAmazon.length  < 2) entry.rivalAmazon.push("");
   entry.image = row ? (row.image||"") : "";
   entry.suppliers = row && Array.isArray(row.suppliers)
     ? row.suppliers.map(s=>({ image:s.image||"", imageIsDataUrl:false, url:s.url||"", memo:s.memo||"", collapsed:false }))
@@ -413,6 +445,7 @@ function openEntry(editIndex){
   renderStatusSelect();
 
   renderEntryImage();
+  renderRivals();
   renderRakumart();
   renderSuppliers();
   renderTables();
@@ -466,6 +499,32 @@ function renderEntryImage(){
   }
   // 画像エリア全体をドロップ対象に（差し替えも可）
   enableImageDrop(box, entry, "image");
+}
+
+// 楽天/Amazonライバルの入力欄を描画
+function renderRivals(){
+  renderRivalList("rivalRakutenList", entry.rivalRakuten, "rivalRakuten");
+  renderRivalList("rivalAmazonList", entry.rivalAmazon, "rivalAmazon");
+}
+function renderRivalList(containerId, arr, key){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  wrap.innerHTML = "";
+  arr.forEach((url, idx)=>{
+    const rowEl = document.createElement("div"); rowEl.className="rival-row";
+    const inp = document.createElement("input");
+    inp.type="text"; inp.placeholder="https://..."; inp.value=url;
+    inp.oninput = e=>{ entry[key][idx] = e.target.value; };
+    const rm = document.createElement("button");
+    rm.type="button"; rm.className="rival-del"; rm.textContent="×"; rm.title="この欄を削除";
+    rm.onclick = ()=>{ entry[key].splice(idx,1); if(entry[key].length===0) entry[key].push(""); renderRivals(); };
+    rowEl.append(inp, rm);
+    wrap.appendChild(rowEl);
+  });
+}
+function addRival(key){
+  entry[key].push("");
+  renderRivals();
 }
 
 
@@ -915,7 +974,8 @@ function saveEntry(){
     date:  document.getElementById("fDate").value || today(),
     image: entry.image || "",
     name:  document.getElementById("fName").value.trim(),
-    rival: document.getElementById("fRival").value.trim(),
+    rivalRakuten: entry.rivalRakuten.map(u=>(u||"").trim()).filter(u=>u),
+    rivalAmazon:  entry.rivalAmazon.map(u=>(u||"").trim()).filter(u=>u),
     category: document.getElementById("fCategory").value || "",
     status: document.getElementById("fStatus").value || "",
     rakumart: entry.rakumart.map(r=>({ text:(r.text||"").trim(), url:(r.url||"").trim() })).filter(r=>r.text||r.url),
@@ -1122,6 +1182,8 @@ function bindUI(){
   document.getElementById("btnSaveEntry").onclick = saveEntry;
   document.getElementById("btnAddSupplier").onclick = addSupplier;
   document.getElementById("btnAddRakumart").onclick = addRakumart;
+  document.getElementById("btnAddRivalR").onclick = ()=>addRival("rivalRakuten");
+  document.getElementById("btnAddRivalA").onclick = ()=>addRival("rivalAmazon");
   document.getElementById("rakumartSectionToggle").onclick = toggleSectionRakumart;
   document.getElementById("suppliersSectionToggle").onclick = toggleSectionSuppliers;
   document.getElementById("btnAddTable").onclick = addTable;
