@@ -92,12 +92,12 @@ function renderTabs(){
     tab.onclick = ()=>{ currentCat = c.id; render(); };
     wrap.appendChild(tab);
   });
-  // 末尾にカテゴリ管理ボタン
-  const manage = document.createElement("button");
-  manage.className = "cat-tab cat-manage"; manage.title = "カテゴリ管理";
-  manage.innerHTML = `<span class="cat-icon">📂</span><span class="cat-label">管理</span>`;
-  manage.onclick = openCatManager;
-  wrap.appendChild(manage);
+  // 末尾に＋新規作成ボタン
+  const newBtn = document.createElement("button");
+  newBtn.className = "cat-tab cat-new"; newBtn.title = "新規作成";
+  newBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">新規作成</span>`;
+  newBtn.onclick = ()=>openEntry(-1);
+  wrap.appendChild(newBtn);
 }
 function countForCat(id){
   if(id==="all") return state.rows.length;
@@ -705,7 +705,6 @@ function closeSettings(){ document.getElementById("settingsModal").hidden = true
 
 /* ---------- UI バインド ---------- */
 function bindUI(){
-  document.getElementById("btnNew").onclick = ()=>openEntry(-1);
   document.getElementById("btnCloseEntry").onclick = closeEntry;
   document.getElementById("btnSaveEntry").onclick = saveEntry;
   document.getElementById("btnAddSupplier").onclick = addSupplier;
@@ -714,6 +713,7 @@ function bindUI(){
   document.getElementById("suppliersSectionToggle").onclick = toggleSectionSuppliers;
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
+  document.getElementById("btnManageCats").onclick = openCatManager;
   document.getElementById("btnCloseSettings").onclick = closeSettings;
   document.getElementById("btnCloseCat").onclick = closeCatManager;
   document.getElementById("btnAddCat").onclick = addCategory;
