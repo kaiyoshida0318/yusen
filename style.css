@@ -126,6 +126,7 @@ tbody td{font-size:13px}
 .section-toggle{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0 6px;line-height:1}
 .section-toggle:hover{color:var(--accent)}
 .section-collapsed .section-body{display:none}
+.section-collapsed .supplier-section-head .btn-add{display:none}
 
 .rakumart-toggle, .supplier-toggle{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0 6px;line-height:1;align-self:center}
 .rakumart-toggle:hover, .supplier-toggle:hover{color:var(--accent)}
