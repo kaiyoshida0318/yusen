@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.16.0";
+const VERSION = "1.17.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -181,7 +181,7 @@ function renderTabs(){
     [ALL_STATUS, ...state.statuses, NONE_STATUS].forEach(s=>{
       const tab = document.createElement("button");
       tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===currentStatus ? " active" : "");
-      tab.innerHTML = `<span class="cat-label">${escapeHtml(s.label)}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
+      tab.innerHTML = `<span class="cat-label">${escapeHtml(s.label)}</span><span class="cat-count">${countBadge(countForStatus(s.id))}</span>`;
       tab.onclick = ()=>{ currentStatus = s.id; render(); };
       swrap.appendChild(tab);
     });
@@ -285,6 +285,38 @@ function iconHtml(icon){
 function iconText(icon){
   if(isLogoIcon(icon)) return "";
   return icon || "";
+}
+
+/* ---------- ステータスタブのカウント表示（1〜4はサイコロ目ロゴ） ----------
+   0 と 5以上は数字のまま。1〜4 は pip 配置のサイコロ目SVGで表示し、
+   数が増えるほど色を濃く（薄緑→濃緑）して進捗感を出す。 */
+const DICE_COLORS = {
+  1: "#a7c4b5", // 薄め
+  2: "#7bb799",
+  3: "#56a37e",
+  4: "#2f8f63", // 濃いめ
+};
+// 各目のpip座標（20x20基準、中心10）
+const DICE_PIPS = {
+  1: [[10,10]],
+  2: [[6,6],[14,14]],
+  3: [[6,6],[10,10],[14,14]],
+  4: [[6,6],[14,6],[6,14],[14,14]],
+};
+function diceSvg(n){
+  const color = DICE_COLORS[n] || "#7a756d";
+  const pips = DICE_PIPS[n] || [];
+  let dots = "";
+  pips.forEach(([cx,cy])=>{ dots += `<circle cx="${cx}" cy="${cy}" r="2.1" fill="#fff"/>`; });
+  return `<svg class="dice-badge" viewBox="0 0 20 20" aria-label="${n}" role="img">`
+    + `<rect x="1.5" y="1.5" width="17" height="17" rx="4.5" fill="${color}"/>`
+    + dots
+    + `</svg>`;
+}
+// カウントのHTML（1〜4はサイコロ目、それ以外は数字）
+function countBadge(n){
+  if(n>=1 && n<=4) return diceSvg(n);
+  return String(n);
 }
 
 // 行だけ追加（モーダルを開かず空の行を1つだけ）
