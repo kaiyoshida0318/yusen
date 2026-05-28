@@ -49,8 +49,8 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .status-bulkdel-btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* モーダルの削除ボタン */
-.btn-danger{background:#fff;border:1px solid #dc3545;color:#dc3545}
-.btn-danger:hover{background:#dc3545;color:#fff}
+.btn-danger{background:#dc3545;border:1px solid #dc3545;color:#fff;font-weight:700;padding:11px 20px;font-size:14px}
+.btn-danger:hover{background:#bb2d3b;border-color:#bb2d3b;color:#fff}
 .actions-spacer{flex:1}
 
 /* 下段：ステータスタブ */
