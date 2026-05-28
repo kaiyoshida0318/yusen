@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.15.0";
+const VERSION = "1.16.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -66,6 +66,8 @@ let sectionCollapsed = { rakumart:false, suppliers:false, tables:false };
 // ブロックID採番用
 let blockSeq = 0;
 function nextBlockId(){ return "b_" + (Date.now().toString(36)) + "_" + (blockSeq++); }
+// 新規作成時の「入力済みか」判定用スナップショット（null=編集中 or 判定不要）
+let entrySnapshot = null;
 
 /* ---------- 初期化 ---------- */
 function init(){
@@ -634,6 +636,10 @@ function openEntry(editIndex){
     entry.tables.forEach(t=>{
       entry.blocks.push({ type:"table", id:nextBlockId(), data: t });
     });
+    // 自由記入欄：内容があればブロックとして復元（末尾）
+    if(entry.freeNote && entry.freeNote.trim()){
+      entry.blocks.push({ type:"freenote", id:nextBlockId(), html: entry.freeNote });
+    }
   }
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
   entry.category = row ? (row.category||"") : ((currentCat==="all"||currentCat==="none") ? "" : currentCat);
@@ -648,7 +654,8 @@ function openEntry(editIndex){
   renderRivals();
   renderRanking();
   renderBlocks();
-  renderFreeNote();
+  // 入力済みフラグ初期化（キャンセル確認用にこの後の編集を検知）
+  entrySnapshot = isEdit ? null : snapshotEntry();
   // 追加メニューは閉じておく
   const menu = document.getElementById("addBlockMenu");
   if(menu) menu.hidden = true;
@@ -687,6 +694,38 @@ function renderCatSelect(){
   });
 }
 function closeEntry(){ document.getElementById("entryModal").hidden = true; }
+
+// 新規作成時の「何か入力されたか」を判定するためのスナップショット。
+// ブロックを集約したうえで主要フィールドを文字列化する。
+function snapshotEntry(){
+  collectBlocksIntoEntry();
+  const name = (document.getElementById("fName")?.value || "").trim();
+  const ranking = (entry.rankingUrls||[]).map(u=>(u||"").trim()).filter(Boolean);
+  const rivR = (entry.rivalRakuten||[]).map(u=>(u||"").trim()).filter(Boolean);
+  const rivA = (entry.rivalAmazon||[]).map(u=>(u||"").trim()).filter(Boolean);
+  const rak = (entry.rakumart||[]).filter(r=>(r.text||"").trim()||(r.url||"").trim());
+  const sup = (entry.suppliers||[]).filter(s=>(s.url||"").trim()||(s.memo||"").trim()||(s.image||""));
+  const note = (entry.freeNote||"").replace(/<[^>]*>/g,"").trim();
+  return JSON.stringify({
+    name, ranking, rivR, rivA,
+    image: entry.image||"",
+    rakLen: rak.length, supLen: sup.length,
+    tblLen: (entry.tables||[]).length,
+    note
+  });
+}
+// 入力済みなら確認、なければそのまま閉じる
+function cancelEntry(){
+  // 編集時 or スナップショット無しは確認なしで閉じる
+  if(entry.editIndex>=0 || entrySnapshot===null){ closeEntry(); return; }
+  let current;
+  try{ current = snapshotEntry(); }catch(e){ current = null; }
+  // 初期状態から変化していれば確認
+  if(current !== null && current !== entrySnapshot){
+    if(!confirm("入力した内容は保存されていません。\n破棄して閉じてもよろしいですか？")) return;
+  }
+  closeEntry();
+}
 
 // 編集中の項目を削除
 function deleteCurrentEntry(){
@@ -1549,7 +1588,7 @@ function bindUI(){
     const btn = e.target.closest("[data-act]");
     if(!btn) return;
     const act = btn.dataset.act;
-    if(act==="cancel") closeEntry();
+    if(act==="cancel") cancelEntry();
     else if(act==="save") saveEntry(true);
     else if(act==="saveclose") saveEntry(false);
     else if(act==="delete") deleteCurrentEntry();
@@ -1624,14 +1663,18 @@ function collectBlocksIntoEntry(){
   const rak = [];
   const sup = [];
   const tbls = [];
+  const notes = [];
   (entry.blocks || []).forEach(b=>{
     if(b.type==="rakumart"){ (b.items||[]).forEach(it=> rak.push(it)); }
     else if(b.type==="supplier"){ (b.items||[]).forEach(it=> sup.push(it)); }
     else if(b.type==="table"){ if(b.data) tbls.push(b.data); }
+    else if(b.type==="freenote"){ if(b.html && b.html.trim()) notes.push(b.html); }
   });
   entry.rakumart = rak;
   entry.suppliers = sup;
   entry.tables = tbls;
+  // 自由記入欄は複数ブロックあれば連結して1つの freeNote にまとめる
+  entry.freeNote = notes.join("<hr>");
 }
 
 // ブロックを順に描画
@@ -1649,7 +1692,11 @@ function renderBlocks(){
     ttl.textContent = blockTitle(block.type);
     head.appendChild(ttl);
 
-    // 種別ごとの「項目を追加」ボタン（rakumart / supplier のみ。表は1ブロック=1表）
+    // 並び替え 上↑下↓ボタン
+    const mv = makeMoveButtons(bi, entry.blocks.length, (dir)=>{ moveItem(entry.blocks, bi, dir); renderBlocks(); }, "block-mv");
+    head.appendChild(mv);
+
+    // 種別ごとの「項目を追加」ボタン（rakumart / supplier のみ。表・自由記入欄は1ブロック=1つ）
     if(block.type==="rakumart"){
       const addItem = document.createElement("button");
       addItem.type="button"; addItem.className="btn btn-add btn-sm block-add-item";
@@ -1700,6 +1747,8 @@ function renderBlocks(){
     }else if(block.type==="table"){
       if(!block.data) block.data = newTableData();
       renderTableInto(body, block);
+    }else if(block.type==="freenote"){
+      renderFreeNoteInto(body, block);
     }
     sec.appendChild(body);
 
@@ -1711,6 +1760,7 @@ function blockTitle(type){
   if(type==="rakumart") return "🛒 ラクマート";
   if(type==="supplier") return "🏭 仕入先（中国輸入元）";
   if(type==="table") return "📋 表";
+  if(type==="freenote") return "📝 自由記入欄";
   return "";
 }
 
@@ -1733,6 +1783,8 @@ function addBlock(type){
     entry.blocks.push({ type:"supplier", id:nextBlockId(), items:[{ image:"", imageIsDataUrl:false, url:"", memo:"", collapsed:false }] });
   }else if(type==="table"){
     entry.blocks.push({ type:"table", id:nextBlockId(), data:newTableData() });
+  }else if(type==="freenote"){
+    entry.blocks.push({ type:"freenote", id:nextBlockId(), html:"" });
   }else{
     return;
   }
@@ -1987,6 +2039,45 @@ function renderTableInto(container, block){
   table.appendChild(colDelTr);
   card.appendChild(table);
   container.appendChild(card);
+}
+
+/* ----- renderFreeNoteInto: 自由記入欄ブロック（リンク貼り付け対応） ----- */
+function renderFreeNoteInto(container, block){
+  container.innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "free-note-box";
+  box.contentEditable = "true";
+  box.setAttribute("spellcheck","false");
+  box.setAttribute("data-ph","メモや補足を自由に記入（リンクの貼り付けもできます）");
+  box.innerHTML = block.html || "";
+  const refreshPh = ()=> box.classList.toggle("is-empty", !(box.textContent.trim() || box.querySelector("a,img")));
+  const sync = ()=>{ block.html = box.innerHTML; refreshPh(); };
+  box.addEventListener("input", sync);
+  box.addEventListener("paste", e=>{
+    try{
+      const html = e.clipboardData && e.clipboardData.getData("text/html");
+      const plain = e.clipboardData && e.clipboardData.getData("text/plain");
+      if(html){
+        const tmp = document.createElement("div"); tmp.innerHTML = html;
+        tmp.querySelectorAll("a").forEach(a=>{ a.target="_blank"; a.rel="noopener"; });
+        e.preventDefault();
+        document.execCommand("insertHTML", false, tmp.innerHTML);
+        sync(); return;
+      }
+      if(plain){
+        e.preventDefault();
+        if(/^https?:\/\/\S+$/i.test(plain.trim())){
+          document.execCommand("insertHTML", false, `<a href="${plain.trim()}" target="_blank" rel="noopener">${plain.trim()}</a>`);
+        }else{
+          document.execCommand("insertText", false, plain);
+        }
+        sync(); return;
+      }
+    }catch(err){}
+    setTimeout(sync,0);
+  });
+  refreshPh();
+  container.appendChild(box);
 }
 
 /* ▲▲▲ v1.12.0 追加ここまで ▲▲▲ */
