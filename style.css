@@ -321,6 +321,12 @@ tbody td{font-size:13px}
 .block-section.block-rakumart{--blk:#3f9b6e;--blk-soft:#eef7f1}
 .block-section.block-supplier{--blk:#2f6fb0;--blk-soft:#eaf2fa}
 .block-section.block-table   {--blk:#d98324;--blk-soft:#fbf0e1}
+.block-section.block-freenote{--blk:#8257c9;--blk-soft:#f2ecfb}
+
+/* ブロック並び替え 上↑下↓ボタン */
+.block-mv{background:#fff;border:1.5px solid var(--border);border-radius:6px;width:28px;height:30px;cursor:pointer;font-size:12px;color:var(--muted);line-height:1;padding:0;margin-left:2px}
+.block-mv:hover{border-color:var(--blk);color:var(--blk)}
+.block-mv:disabled{opacity:.3;cursor:not-allowed}
 
 /* ブロックのヘッダー（種別タイトル＋項目追加＋×削除） */
 .block-head{
