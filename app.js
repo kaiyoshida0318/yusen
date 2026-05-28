@@ -30,17 +30,17 @@ const DEFAULT_CATEGORIES = [
 ];
 const ALL_CAT = { id:"all", label:"全体", icon:"📊" }; // 特別カテゴリ（全件表示）
 
-// 下段：進捗ステータス（固定）。id="all" は全件表示の特別タブ
-const STATUSES = [
-  { id:"all",       label:"全体" },
+// 下段：進捗ステータス（state.statuses で管理、追加・編集・削除可能）
+const DEFAULT_STATUSES = [
   { id:"buy",       label:"買付前・済" },
   { id:"arrived",   label:"到着分" },
   { id:"prearrive", label:"到着前" },
   { id:"working",   label:"着手中" },
   { id:"done",      label:"完了分" },
 ];
+const ALL_STATUS = { id:"all", label:"全体" }; // 全件表示の特別タブ
 
-let state = { rows: [], categories: DEFAULT_CATEGORIES.slice() };
+let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice() };
 let cfg = { pat:"", owner:"", repo:"", branch:"main" };
 let dataSha = null;
 let currentCat = "all"; // 現在選択中のカテゴリID（上段）
@@ -71,12 +71,15 @@ function loadData(){
   let saved = null;
   try{ saved = JSON.parse(localStorage.getItem(LS_DATA)); }catch(e){}
   if(saved && Array.isArray(saved.rows)){ state = migrate(saved); return; }
-  state = { rows: [], categories: DEFAULT_CATEGORIES.slice() };
+  state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice() };
 }
 // 旧データ（supply文字列・categoriesなし）を新スキーマに変換
 function migrate(data){
   if(!Array.isArray(data.categories) || data.categories.length===0){
     data.categories = DEFAULT_CATEGORIES.slice();
+  }
+  if(!Array.isArray(data.statuses) || data.statuses.length===0){
+    data.statuses = DEFAULT_STATUSES.slice();
   }
   data.rows.forEach(r=>{
     if(!Array.isArray(r.suppliers)){
@@ -123,7 +126,7 @@ function renderTabs(){
   const swrap = document.getElementById("statusTabs");
   if(swrap){
     swrap.innerHTML = "";
-    STATUSES.forEach(s=>{
+    [ALL_STATUS, ...state.statuses].forEach(s=>{
       const tab = document.createElement("button");
       tab.className = "status-tab" + (s.id===currentStatus ? " active" : "");
       tab.innerHTML = `<span class="cat-label">${escapeHtml(s.label)}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
@@ -389,7 +392,7 @@ function renderStatusSelect(){
   const opt0 = document.createElement("option");
   opt0.value = ""; opt0.textContent = "— 未設定 —";
   sel.appendChild(opt0);
-  STATUSES.filter(s=>s.id!=="all").forEach(s=>{
+  state.statuses.forEach(s=>{
     const o = document.createElement("option");
     o.value = s.id; o.textContent = s.label;
     if(s.id===entry.status) o.selected = true;
@@ -799,6 +802,50 @@ function addCategory(){
   persistLocal(); renderCatManager(); renderTabs();
 }
 
+/* ---------- ステータス管理 ---------- */
+function openStatusManager(){
+  renderStatusManager();
+  document.getElementById("statusModal").hidden = false;
+}
+function closeStatusManager(){ document.getElementById("statusModal").hidden = true; }
+
+function renderStatusManager(){
+  const list = document.getElementById("statusList");
+  list.innerHTML = "";
+  state.statuses.forEach((s, idx)=>{
+    const row = document.createElement("div"); row.className = "cat-row";
+    const labelInp = document.createElement("input");
+    labelInp.type = "text"; labelInp.value = s.label; labelInp.className = "cat-label-input";
+    labelInp.onchange = ()=>{ s.label = labelInp.value.trim() || s.label; persistLocal(); renderTabs(); };
+    const up = document.createElement("button"); up.className="cat-mv"; up.textContent="▲";
+    up.disabled = idx===0;
+    up.onclick = ()=>{ if(idx>0){ [state.statuses[idx-1], state.statuses[idx]] = [state.statuses[idx], state.statuses[idx-1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
+    const dn = document.createElement("button"); dn.className="cat-mv"; dn.textContent="▼";
+    dn.disabled = idx===state.statuses.length-1;
+    dn.onclick = ()=>{ if(idx<state.statuses.length-1){ [state.statuses[idx+1], state.statuses[idx]] = [state.statuses[idx], state.statuses[idx+1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
+    const del = document.createElement("button"); del.className="cat-del"; del.textContent="🗑";
+    del.title = "このステータスを削除（中のデータは「未設定」になります）";
+    del.onclick = ()=>{
+      if(!confirm(`ステータス「${s.label}」を削除しますか？\n中のデータは「未設定」になります（データ自体は消えません）。`)) return;
+      state.rows.forEach(r=>{ if(r.status===s.id) r.status=""; });
+      state.statuses.splice(idx,1);
+      if(currentStatus===s.id) currentStatus="all";
+      persistLocal(); renderStatusManager(); render();
+    };
+    row.append(labelInp, up, dn, del);
+    list.appendChild(row);
+  });
+}
+
+function addStatus(){
+  const label = document.getElementById("newStatusLabel").value.trim();
+  if(!label){ setStatus("⚠️ ステータス名を入力してください"); return; }
+  const id = "s_"+Date.now().toString(36);
+  state.statuses.push({ id, label });
+  document.getElementById("newStatusLabel").value = "";
+  persistLocal(); renderStatusManager(); renderTabs();
+}
+
 /* ---------- 設定モーダル ---------- */
 function openSettings(){
   document.getElementById("cfgPat").value = cfg.pat;
@@ -820,6 +867,10 @@ function bindUI(){
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnManageCats").onclick = openCatManager;
+  document.getElementById("btnManageStatus").onclick = openStatusManager;
+  document.getElementById("btnCloseStatus").onclick = closeStatusManager;
+  document.getElementById("btnAddStatus").onclick = addStatus;
+  document.getElementById("newStatusLabel").addEventListener("keydown", e=>{ if(e.key==="Enter") addStatus(); });
   document.getElementById("btnCloseSettings").onclick = closeSettings;
   document.getElementById("btnCloseCat").onclick = closeCatManager;
   document.getElementById("btnAddCat").onclick = addCategory;
