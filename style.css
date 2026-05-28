@@ -178,6 +178,12 @@ tbody td{font-size:13px}
 .rakumart-row.is-collapsed .rakumart-summary{flex:1;padding:6px 10px;background:var(--row-alt);border-radius:6px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rakumart-summary a{color:#2563eb;text-decoration:underline}
 
+/* 並び替え 上下ボタン（仕入先・ラクマート・表 共通） */
+.supplier-mv,.rakumart-mv,.tbl-mv{background:#fff;border:1px solid var(--border);border-radius:6px;width:26px;height:28px;cursor:pointer;font-size:12px;color:var(--muted);line-height:1;padding:0;margin-left:2px}
+.supplier-mv:hover,.rakumart-mv:hover,.tbl-mv:hover{border-color:var(--accent);color:var(--accent)}
+.supplier-mv:disabled,.rakumart-mv:disabled,.tbl-mv:disabled{opacity:.3;cursor:not-allowed}
+.rakumart-mv{align-self:center}
+
 /* 表（画像列＋テキスト列） */
 .tbl-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px;background:var(--row-alt)}
 .tbl-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -226,8 +232,8 @@ tbody td{font-size:13px}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:50}
 .modal{background:var(--surface);border-radius:var(--radius);padding:28px;width:420px;max-width:90vw;box-shadow:var(--shadow)}
-.modal.modal-entry{width:1600px;max-width:95vw}
-.entry-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+.modal.modal-entry{width:1600px;max-width:95vw;max-height:92vh;overflow-y:auto}
+.entry-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-28px -28px 16px;padding:18px 28px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:-28px;z-index:5}
 .entry-topbar h2{margin:0}
 .modal-actions-top{margin:0}
 .modal-actions-bottom{margin-top:8px}
