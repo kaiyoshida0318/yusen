@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.10.0";
+const VERSION = "1.10.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -22,8 +22,8 @@ const COLUMNS = [
   { key:"rivalA", label:"Amazonライバル" },
   { key:"rakumart", label:"ラクマート" },
   { key:"supply", label:"仕入先" },
-  { key:"actions", label:"操作" },
   { key:"statusSel", label:"ステータス" },
+  { key:"actions", label:"操作" },
 ];
 
 // デフォルトのカテゴリ（後から追加・編集・並べ替え・削除可能）
@@ -355,7 +355,6 @@ function render(){
     del.className="act-btn act-del"; del.textContent="削除";
     del.onclick = ()=>{ if(confirm("この行を削除しますか？")){ state.rows.splice(ri,1); persistLocal(); render(); } };
     tdAct.appendChild(edit); tdAct.appendChild(del);
-    trb.appendChild(tdAct);
 
     // ステータス変更ドロップダウン
     const tdStatus = document.createElement("td");
@@ -384,7 +383,10 @@ function render(){
       renderTabs(); // クリア・反映ボタンの出し分けを更新
     };
     tdStatus.appendChild(sel);
+
+    // 左にステータス・右に操作
     trb.appendChild(tdStatus);
+    trb.appendChild(tdAct);
 
     body.appendChild(trb);
   });
