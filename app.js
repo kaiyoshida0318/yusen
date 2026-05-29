@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.22.0";
+const VERSION = "1.22.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1372,6 +1372,8 @@ function toggleSectionRakumart(){
 
 /* obj[key] に画像を取り込む（メインライバル/仕入先 共通）。cb で再描画 */
 function pickImageInto(obj, key, cb){
+  // 閲覧モード中はクリック→ファイル選択を抑止（ドロップだけ受け付ける）
+  if(isViewmode()) return;
   const input = document.createElement("input");
   input.type="file"; input.accept="image/*";
   input.onchange = ()=>{
@@ -1381,17 +1383,34 @@ function pickImageInto(obj, key, cb){
   input.click();
 }
 
+// 編集モーダルが閲覧モード状態か
+function isViewmode(){
+  const m = document.querySelector("#entryModal .modal-entry");
+  return !!(m && m.classList.contains("is-viewmode"));
+}
+
 // ファイルを受け取って obj[key] に登録（アップロード or プレビュー）
 async function handleImageFile(file, obj, key, cb){
   if(!file || !file.type || !file.type.startsWith("image/")){
     setStatus("⚠️ 画像ファイルをドロップしてください"); return;
   }
+  const viewmode = isViewmode();
+  const finish = ()=>{
+    if(cb) cb(); else renderEntryImage();
+    // 閲覧モードでのドロップは、その場で自動保存して即反映
+    if(viewmode && entry.editIndex>=0){
+      try{
+        saveEntry(true);  // 開いたまま保存
+        setStatus("✅ 画像を差し替えて保存しました");
+      }catch(e){ console.error("auto-save after drop failed:", e); }
+    }
+  };
   if(!cfg.pat){
     // GitHub未設定では画像は永続化できない。ユーザーに明確に通知。
     const reader = new FileReader();
     reader.onload = e=>{
       obj[key]=e.target.result; obj.imageIsDataUrl=true;
-      if(cb) cb(); else renderEntryImage();
+      finish();
     };
     reader.readAsDataURL(file);
     setStatus("⚠️ GitHub未設定のため、この画像は保存されません（リロードで消えます）。⚙️設定からPAT等を入力してください");
@@ -1401,8 +1420,8 @@ async function handleImageFile(file, obj, key, cb){
   try{
     const filename = await uploadImage(file);
     obj[key]=filename; obj.imageIsDataUrl=false;
-    if(cb) cb(); else renderEntryImage();
-    setStatus("✅ 画像アップロード完了");
+    finish();
+    if(!viewmode) setStatus("✅ 画像アップロード完了");
   }catch(e){ setStatus("❌ 画像アップロード失敗: "+e.message); }
 }
 
