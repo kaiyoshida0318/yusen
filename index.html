@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.20.1">
+<link rel="stylesheet" href="style.css?v=1.21.0">
 </head>
 <body>
 <header class="app-header">
@@ -48,9 +48,11 @@
     <div class="entry-topbar">
       <h2 id="entryTitle">新規作成</h2>
       <div class="modal-actions modal-actions-top">
-        <button class="btn btn-ghost" data-act="cancel">キャンセル</button>
-        <button class="btn btn-ghost" data-act="save">保存</button>
-        <button class="btn btn-primary" data-act="saveclose">保存して閉じる</button>
+        <button class="btn btn-ghost viewmode-only" data-act="close-view">閉じる</button>
+        <button class="btn btn-primary viewmode-only" data-act="startedit">✏️ 編集</button>
+        <button class="btn btn-ghost editmode-only" data-act="cancel">キャンセル</button>
+        <button class="btn btn-ghost editmode-only" data-act="save">保存</button>
+        <button class="btn btn-primary editmode-only" data-act="saveclose">保存して閉じる</button>
       </div>
     </div>
     <div class="entry-body">
@@ -113,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div class="modal-actions modal-actions-bottom">
+    <div class="modal-actions modal-actions-bottom editmode-only">
       <button class="btn btn-danger" data-act="delete" id="btnDeleteEntry">🗑 この項目を削除する</button>
       <span class="actions-spacer"></span>
       <button class="btn btn-ghost" data-act="cancel">キャンセル</button>
@@ -179,6 +181,6 @@
   </div>
 </div>
 
-<script src="app.js?v=1.20.1"></script>
+<script src="app.js?v=1.21.0"></script>
 </body>
 </html>
