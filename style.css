@@ -373,3 +373,63 @@ tbody td{font-size:13px}
 .add-block-menu{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;gap:4px}
 .add-block-opt{display:block;width:100%;text-align:left;padding:11px 14px;background:#fff;border:1px solid transparent;border-radius:8px;font:inherit;font-size:14px;color:var(--text);cursor:pointer;transition:all .12s}
 .add-block-opt:hover{background:var(--row-alt);border-color:var(--border)}
+
+/* ===================================================================
+   ▼▼▼ v1.21.0 追加：閲覧モード/編集モード切替 ▼▼▼
+   既定（編集モード時）= editmode-only 表示 / viewmode-only 非表示
+   .modal-entry.is-viewmode が付くと逆になる。
+   =================================================================== */
+.viewmode-only{display:none}
+.modal-entry.is-viewmode .viewmode-only{display:inline-flex;align-items:center}
+.modal-entry.is-viewmode .editmode-only{display:none}
+
+/* 閲覧モード時：入力欄を見やすい固定表示に */
+.modal-entry.is-viewmode input,
+.modal-entry.is-viewmode select,
+.modal-entry.is-viewmode textarea{
+  pointer-events:none;background:var(--row-alt);color:var(--text);
+  border-color:transparent;cursor:default;
+}
+.modal-entry.is-viewmode select{appearance:none}
+.modal-entry.is-viewmode [contenteditable]{
+  pointer-events:auto;            /* リンクのクリックは通す */
+  background:var(--row-alt);
+  border-color:transparent;
+  cursor:default;
+  -webkit-user-modify:read-only;
+}
+/* 閲覧モード：項目を追加/削除/移動/＋追加/画像差し替え系を隠す */
+.modal-entry.is-viewmode .add-block-wrap,
+.modal-entry.is-viewmode .block-del,
+.modal-entry.is-viewmode .block-mv,
+.modal-entry.is-viewmode .block-add-item,
+.modal-entry.is-viewmode .rakumart-del,
+.modal-entry.is-viewmode .rakumart-mv,
+.modal-entry.is-viewmode .supplier-del,
+.modal-entry.is-viewmode .supplier-mv,
+.modal-entry.is-viewmode .tbl-del-btn,
+.modal-entry.is-viewmode .tbl-coldel,
+.modal-entry.is-viewmode .tbl-rowdel,
+.modal-entry.is-viewmode .tbl-mv,
+.modal-entry.is-viewmode .tbl-head .btn,
+.modal-entry.is-viewmode .rival-del,
+.modal-entry.is-viewmode #btnAddRivalR,
+.modal-entry.is-viewmode #btnAddRivalA,
+.modal-entry.is-viewmode #btnAddRanking{
+  display:none!important;
+}
+/* 閲覧モード：画像クリックでファイル選択させない */
+.modal-entry.is-viewmode .entry-image,
+.modal-entry.is-viewmode .supplier-image,
+.modal-entry.is-viewmode .tbl-img-box{
+  pointer-events:none;
+}
+/* 閲覧モード時、リンクは目立たせて新規タブで開けるように見せる */
+.modal-entry.is-viewmode a[href]{
+  color:#2563eb;text-decoration:underline;pointer-events:auto;cursor:pointer;
+}
+.modal-entry.is-viewmode .rakumart-paste a[href],
+.modal-entry.is-viewmode .free-note-box a[href],
+.modal-entry.is-viewmode .tbl-cell-edit a[href]{
+  pointer-events:auto;
+}
