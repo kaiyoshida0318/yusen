@@ -433,3 +433,11 @@ tbody td{font-size:13px}
 .modal-entry.is-viewmode .tbl-cell-edit a[href]{
   pointer-events:auto;
 }
+
+
+/* 詳細設定トグル（GitHub設定モーダル） */
+.btn-toggle-advanced{
+  background:transparent;border:none;color:var(--muted);font:inherit;font-size:12px;
+  padding:6px 0;margin:-4px 0 10px;cursor:pointer;text-align:left;display:block;
+}
+.btn-toggle-advanced:hover{color:var(--accent)}
