@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.21.1">
+<link rel="stylesheet" href="style.css?v=1.22.0">
 </head>
 <body>
 <header class="app-header">
@@ -129,19 +129,22 @@
 <div class="modal-overlay" id="settingsModal" hidden>
   <div class="modal">
     <h2>GitHub設定</h2>
-    <p class="hint">既存ツールと同じPAT方式です。入力情報はこのブラウザ内（localStorage）にのみ保存されます。</p>
+    <p class="hint">PATを入力するだけでOK。入力情報はこのブラウザ内（localStorage）にのみ保存されます。</p>
     <label>Personal Access Token (PAT)
-      <input type="password" id="cfgPat" placeholder="ghp_xxxx">
+      <input type="password" id="cfgPat" placeholder="github_pat_xxxx">
     </label>
-    <label>オーナー（ユーザー名）
-      <input type="text" id="cfgOwner" placeholder="kaiyoshida0318">
-    </label>
-    <label>リポジトリ名
-      <input type="text" id="cfgRepo" placeholder="yusen">
-    </label>
-    <label>ブランチ
-      <input type="text" id="cfgBranch" placeholder="main" value="main">
-    </label>
+    <button type="button" class="btn-toggle-advanced" id="btnToggleAdvSettings">▶ 詳細設定（オーナー／リポジトリ／ブランチ）</button>
+    <div id="advSettings" hidden>
+      <label>オーナー（ユーザー名）
+        <input type="text" id="cfgOwner" placeholder="kaiyoshida0318" value="kaiyoshida0318">
+      </label>
+      <label>リポジトリ名
+        <input type="text" id="cfgRepo" placeholder="yusen" value="yusen">
+      </label>
+      <label>ブランチ
+        <input type="text" id="cfgBranch" placeholder="main" value="main">
+      </label>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btnCloseSettings">閉じる</button>
       <button class="btn btn-primary" id="btnSaveSettings">保存</button>
@@ -181,6 +184,6 @@
   </div>
 </div>
 
-<script src="app.js?v=1.21.1"></script>
+<script src="app.js?v=1.22.0"></script>
 </body>
 </html>
