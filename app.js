@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.19.0";
+const VERSION = "1.20.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -130,7 +130,49 @@ function migrate(data){
   });
   return data;
 }
-function persistLocal(){ localStorage.setItem(LS_DATA, JSON.stringify(state)); }
+function persistLocal(){
+  try{
+    localStorage.setItem(LS_DATA, JSON.stringify(state));
+  }catch(e){
+    // localStorage は通常5MB。容量超過時は DataURL 画像を抜いた軽量版で再試行
+    if(e && (e.name==="QuotaExceededError" || /quota/i.test(e.message||""))){
+      try{
+        const slim = stripDataUrlImages(state);
+        localStorage.setItem(LS_DATA, JSON.stringify(slim));
+        setStatus("⚠️ ローカル保存の容量を超えたため、画像データURLは保存しませんでした（メモリ上は保持。GitHubに保存すれば画像も反映されます）");
+        return;
+      }catch(e2){
+        console.error("persistLocal slim failed:", e2);
+      }
+    }
+    console.error("persistLocal failed:", e);
+    setStatus("⚠️ ローカル保存に失敗しました: " + (e && e.message ? e.message : e));
+  }
+}
+
+// state のディープコピーを作り、DataURL（data:...）画像は空文字に置き換える
+// （localStorage の容量を圧迫しないため。メモリ上の state は変更しない）
+function stripDataUrlImages(src){
+  const isDataUrl = v=> typeof v==="string" && v.indexOf("data:")===0;
+  const stripImg = v=> isDataUrl(v) ? "" : v;
+  const rows = (src.rows||[]).map(r=>{
+    const nr = { ...r };
+    nr.image = stripImg(r.image||"");
+    nr.suppliers = (r.suppliers||[]).map(s=>({ ...s, image: stripImg(s.image||"") }));
+    nr.tables = (r.tables||[]).map(t=>({
+      columns: (t.columns||[]).map(c=>({ type:c.type })),
+      header: (t.header||[]).slice(),
+      rows: (t.rows||[]).map(rr=>({
+        cells: (rr.cells||[]).map(c=>{
+          if(c && typeof c.image==="string") return { ...c, image: stripImg(c.image) };
+          return { ...c };
+        })
+      }))
+    }));
+    return nr;
+  });
+  return { ...src, rows };
+}
 
 function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
 
@@ -1341,45 +1383,71 @@ function enableImageDrop(el, obj, key, cb){
 }
 
 function saveEntry(keepOpen){
-  // ブロックから従来形式へ集約
-  collectBlocksIntoEntry();
-  const row = {
-    date:  document.getElementById("fDate").value || today(),
-    image: entry.image || "",
-    name:  document.getElementById("fName").value.trim(),
-    rivalRakuten: entry.rivalRakuten.map(u=>(u||"").trim()).filter(u=>u),
-    rivalAmazon:  entry.rivalAmazon.map(u=>(u||"").trim()).filter(u=>u),
-    rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
-    freeNote:     entry.freeNote || "",
-    category: document.getElementById("fCategory").value || "",
-    status: document.getElementById("fStatus").value || "",
-    rakumart: entry.rakumart.map(r=>({ text:(r.text||"").trim(), url:(r.url||"").trim() })).filter(r=>r.text||r.url),
-    suppliers: entry.suppliers.map(s=>({ image:s.image||"", url:(s.url||"").trim(), memo:(s.memo||"").trim() })),
-    tables: entry.tables.map(t=>({
-      columns: t.columns.map(c=>({ type:c.type })),
-      header: t.header.map(h=>(h||"").trim()),
-      rows: t.rows.map(r=>({
-        cells: r.cells.map((c,ci)=>{
-          const type = t.columns[ci] ? t.columns[ci].type : "text";
-          return type==="image"
-            ? { image:c.image||"" }
-            : { text:(c.text||"").trim(), url:(c.url||"").trim() };
-        })
-      }))
-    })),
-  };
-  if(entry.editIndex>=0){ state.rows[entry.editIndex] = row; }
-  else {
-    state.rows.push(row);
-    // 開いたまま保存した場合、以降は今追加した行を編集対象にする
-    if(keepOpen) entry.editIndex = state.rows.length - 1;
-  }
-  persistLocal(); render();
-  if(keepOpen){
-    setStatus("✅ 保存しました（編集を続けられます。GitHub反映は「💾 GitHubに保存」）");
-  }else{
-    closeEntry();
-    setStatus("✅ 登録しました（GitHubに反映するには「💾 GitHubに保存」）");
+  try{
+    // ブロックから従来形式へ集約
+    collectBlocksIntoEntry();
+    // 配列フィールドのガード（万一壊れていてもmapで落ちないように）
+    if(!Array.isArray(entry.rivalRakuten)) entry.rivalRakuten = [];
+    if(!Array.isArray(entry.rivalAmazon))  entry.rivalAmazon  = [];
+    if(!Array.isArray(entry.rankingUrls))  entry.rankingUrls  = [];
+    if(!Array.isArray(entry.rakumart))     entry.rakumart     = [];
+    if(!Array.isArray(entry.suppliers))    entry.suppliers    = [];
+    if(!Array.isArray(entry.tables))       entry.tables       = [];
+    const fName = document.getElementById("fName");
+    const fDate = document.getElementById("fDate");
+    const fCat  = document.getElementById("fCategory");
+    const fSt   = document.getElementById("fStatus");
+    const row = {
+      date:  (fDate && fDate.value) || today(),
+      image: entry.image || "",
+      name:  fName ? fName.value.trim() : "",
+      rivalRakuten: entry.rivalRakuten.map(u=>(u||"").trim()).filter(u=>u),
+      rivalAmazon:  entry.rivalAmazon.map(u=>(u||"").trim()).filter(u=>u),
+      rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
+      freeNote:     entry.freeNote || "",
+      category: (fCat && fCat.value) || "",
+      status:   (fSt  && fSt.value)  || "",
+      rakumart: entry.rakumart.map(r=>({ text:((r&&r.text)||"").trim(), url:((r&&r.url)||"").trim() })).filter(r=>r.text||r.url),
+      suppliers: entry.suppliers.map(s=>({ image:(s&&s.image)||"", url:((s&&s.url)||"").trim(), memo:((s&&s.memo)||"").trim() })),
+      tables: entry.tables.map(t=>{
+        const cols = Array.isArray(t && t.columns) ? t.columns : [];
+        const hdr  = Array.isArray(t && t.header)  ? t.header  : [];
+        const rws  = Array.isArray(t && t.rows)    ? t.rows    : [];
+        return {
+          columns: cols.map(c=>({ type:(c && c.type) || "text" })),
+          header: cols.map((_,i)=> ((hdr[i]||"")+"").trim()),
+          rows: rws.map(r=>({
+            cells: cols.map((c,ci)=>{
+              const cell = (r && r.cells && r.cells[ci]) || {};
+              const type = (c && c.type) || "text";
+              return type==="image"
+                ? { image:cell.image||"" }
+                : { text:((cell.text)||"").trim(), url:((cell.url)||"").trim() };
+            })
+          }))
+        };
+      }),
+    };
+    if(entry.editIndex>=0){ state.rows[entry.editIndex] = row; }
+    else {
+      state.rows.push(row);
+      // 開いたまま保存した場合、以降は今追加した行を編集対象にする
+      if(keepOpen) entry.editIndex = state.rows.length - 1;
+    }
+    persistLocal(); render();
+    if(keepOpen){
+      // 入力差分検知のためスナップショットを更新
+      try{ entrySnapshot = snapshotEntry(); }catch(_){}
+      setStatus("✅ 保存しました（編集を続けられます。GitHub反映は「💾 GitHubに保存」）");
+    }else{
+      closeEntry();
+      setStatus("✅ 登録しました（GitHubに反映するには「💾 GitHubに保存」）");
+    }
+  }catch(e){
+    // 何かで失敗しても無音にならないようにユーザーへ通知
+    console.error("saveEntry error:", e);
+    setStatus("❌ 保存に失敗しました: " + (e && e.message ? e.message : e));
+    try{ alert("保存に失敗しました。\n" + (e && e.message ? e.message : e)); }catch(_){}
   }
 }
 
