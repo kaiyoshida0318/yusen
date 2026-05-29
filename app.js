@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.21.1";
+const VERSION = "1.22.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -48,7 +48,7 @@ const ALL_STATUS = { id:"all", label:"全体" }; // 全件表示の特別タブ
 const NONE_STATUS = { id:"none", label:"未設定" }; // 未設定の行を表示
 
 let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice() };
-let cfg = { pat:"", owner:"", repo:"", branch:"main" };
+let cfg = { pat:"", owner:"kaiyoshida0318", repo:"yusen", branch:"main" };
 let dataSha = null;
 let currentCat = "all"; // 現在選択中のカテゴリID（上段）
 let currentStatus = "all"; // 現在選択中のステータスID（下段）
@@ -1763,9 +1763,14 @@ function addStatus(){
 /* ---------- 設定モーダル ---------- */
 function openSettings(){
   document.getElementById("cfgPat").value = cfg.pat;
-  document.getElementById("cfgOwner").value = cfg.owner;
-  document.getElementById("cfgRepo").value = cfg.repo;
+  document.getElementById("cfgOwner").value = cfg.owner || "kaiyoshida0318";
+  document.getElementById("cfgRepo").value = cfg.repo || "yusen";
   document.getElementById("cfgBranch").value = cfg.branch || "main";
+  // 詳細設定は閉じた状態で開く
+  const adv = document.getElementById("advSettings");
+  const btn = document.getElementById("btnToggleAdvSettings");
+  if(adv) adv.hidden = true;
+  if(btn) btn.textContent = "▶ 詳細設定（オーナー／リポジトリ／ブランチ）";
   document.getElementById("settingsModal").hidden = false;
 }
 function closeSettings(){ document.getElementById("settingsModal").hidden = true; }
@@ -1822,13 +1827,23 @@ function bindUI(){
   document.getElementById("btnAddStatus").onclick = addStatus;
   document.getElementById("newStatusLabel").addEventListener("keydown", e=>{ if(e.key==="Enter") addStatus(); });
   document.getElementById("btnCloseSettings").onclick = closeSettings;
+  // 詳細設定トグル
+  const btnToggleAdv = document.getElementById("btnToggleAdvSettings");
+  if(btnToggleAdv){
+    btnToggleAdv.onclick = ()=>{
+      const wrap = document.getElementById("advSettings");
+      const showing = !wrap.hidden;
+      wrap.hidden = showing;
+      btnToggleAdv.textContent = (showing ? "▶" : "▼") + " 詳細設定（オーナー／リポジトリ／ブランチ）";
+    };
+  }
   document.getElementById("btnCloseCat").onclick = closeCatManager;
   document.getElementById("btnAddCat").onclick = addCategory;
   document.getElementById("newCatLabel").addEventListener("keydown", e=>{ if(e.key==="Enter") addCategory(); });
   document.getElementById("btnSaveSettings").onclick = ()=>{
     cfg.pat = document.getElementById("cfgPat").value.trim();
-    cfg.owner = document.getElementById("cfgOwner").value.trim();
-    cfg.repo = document.getElementById("cfgRepo").value.trim();
+    cfg.owner = document.getElementById("cfgOwner").value.trim() || "kaiyoshida0318";
+    cfg.repo = document.getElementById("cfgRepo").value.trim() || "yusen";
     cfg.branch = document.getElementById("cfgBranch").value.trim() || "main";
     saveCfg(); closeSettings();
     setStatus("✅ 設定を保存しました");
