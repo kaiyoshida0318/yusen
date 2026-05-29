@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.21.0";
+const VERSION = "1.21.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1387,13 +1387,14 @@ async function handleImageFile(file, obj, key, cb){
     setStatus("⚠️ 画像ファイルをドロップしてください"); return;
   }
   if(!cfg.pat){
+    // GitHub未設定では画像は永続化できない。ユーザーに明確に通知。
     const reader = new FileReader();
     reader.onload = e=>{
       obj[key]=e.target.result; obj.imageIsDataUrl=true;
       if(cb) cb(); else renderEntryImage();
     };
     reader.readAsDataURL(file);
-    setStatus("⚠️ GitHub未設定のためローカルプレビュー（保存時はアップロードされません）");
+    setStatus("⚠️ GitHub未設定のため、この画像は保存されません（リロードで消えます）。⚙️設定からPAT等を入力してください");
     return;
   }
   setStatus("画像アップロード中…");
@@ -1540,6 +1541,12 @@ async function saveToGitHub(){
   if(!cfg.pat||!cfg.owner||!cfg.repo){ openSettings(); setStatus("⚠️ 先にGitHub設定を入力してください"); return; }
   setStatus("保存中…");
   try{
+    // 行内に残っている DataURL 画像を、保存前にすべてアップロードしてファイル名に置換
+    const rescued = await uploadDataUrlImagesInState();
+    if(rescued > 0){
+      persistLocal(); render();
+      setStatus(`画像 ${rescued} 件をアップロードしました。データ保存中…`);
+    }
     await fetchDataSha();
     const content = b64encode(JSON.stringify(state, null, 2));
     const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${DATA_PATH}`;
@@ -1554,6 +1561,45 @@ async function saveToGitHub(){
     dataSha = (await res.json()).content.sha;
     setStatus("✅ GitHubに保存しました");
   }catch(e){ setStatus("❌ 保存失敗: "+e.message); }
+}
+
+// data:image/* で始まる画像をGitHubにアップロードし、ファイル名に置換する。
+// state.rows[*].image / .suppliers[*].image / .tables[*].rows[*].cells[*].image を走査。
+// 戻り値: アップロードした件数。
+async function uploadDataUrlImagesInState(){
+  let count = 0;
+  const upOne = async (val)=>{
+    if(typeof val !== "string" || !val.startsWith("data:")) return null;
+    try{
+      const blob = await (await fetch(val)).blob();
+      const file = new File([blob], "img.png", { type: blob.type || "image/png" });
+      const filename = await uploadImage(file);
+      count++;
+      return filename;
+    }catch(err){
+      console.error("uploadDataUrl failed:", err);
+      return null; // 置換失敗：DataURLのまま残す（行を壊さないため）
+    }
+  };
+  for(const row of (state.rows||[])){
+    const np = await upOne(row.image);
+    if(np) row.image = np;
+    for(const s of (row.suppliers||[])){
+      const sp = await upOne(s.image);
+      if(sp) s.image = sp;
+    }
+    for(const t of (row.tables||[])){
+      for(const rr of (t.rows||[])){
+        for(const c of (rr.cells||[])){
+          if(c && typeof c.image === "string"){
+            const cp = await upOne(c.image);
+            if(cp) c.image = cp;
+          }
+        }
+      }
+    }
+  }
+  return count;
 }
 
 async function fetchDataSha(){
