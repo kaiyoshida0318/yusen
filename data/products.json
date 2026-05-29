@@ -1,0 +1,229 @@
+{
+  "columns": [
+    {
+      "id": "date",
+      "label": "日付",
+      "type": "date"
+    },
+    {
+      "id": "image",
+      "label": "画像",
+      "type": "image"
+    },
+    {
+      "id": "cmpntk5j30",
+      "label": "",
+      "type": "text"
+    },
+    {
+      "id": "cmpntk5j31",
+      "label": "",
+      "type": "text"
+    },
+    {
+      "id": "cmpntk5j32",
+      "label": "",
+      "type": "text"
+    },
+    {
+      "id": "cmpntk7bg3",
+      "label": "",
+      "type": "text"
+    }
+  ],
+  "rows": [
+    {
+      "date": "2026-05-27",
+      "image": "",
+      "name": "ウエスト調整",
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/kiracoco/mz2108-copy/"
+      ],
+      "rivalAmazon": [],
+      "category": "new",
+      "status": "arrived",
+      "rakumart": [
+        {
+          "text": "2026010815054728-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026010815054728-2147"
+        },
+        {
+          "text": "2026010815215716-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026010815215716-2147"
+        }
+      ],
+      "suppliers": [],
+      "tables": [],
+      "rankingUrls": [],
+      "freeNote": ""
+    },
+    {
+      "date": "2026-05-28",
+      "image": "",
+      "name": "PS5 コントローラー カバー",
+      "rivalRakuten": [],
+      "rivalAmazon": [
+        "https://www.amazon.co.jp/NEWDERY-%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC-%E4%BA%A4%E6%8F%9B%E7%94%A8%E3%82%B9%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF%E3%82%AD%E3%83%A3%E3%83%83%E3%83%97-%E4%BA%A4%E6%8F%9B%E7%94%A8%E3%82%B8%E3%83%A7%E3%82%A4%E3%82%B9%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF%E3%82%AD%E3%83%A3%E3%83%83%E3%83%97-%E5%BF%AB%E9%81%A9%E3%81%AA%E3%82%B0%E3%83%AA%E3%83%83%E3%83%97/dp/B0FDQZF1SZ/ref=sr_1_1?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&crid=N461HTW8IOTU&dib=eyJ2IjoiMSJ9.Z153nMT31Mzco1mB6ALHOlDejLXBYlYQHYnuC_mtEqFj13-rSMt3R6E71VRhUTzZR2l8u7gxHBqsoyc9cjwNof0Ehc5S8klzMw83jblvfMJhTjPcIHBDNV462BmbgiIIqrC5yeR36l9ftU2sijmbrs06b9J8oN3MbBXj0QFi0W4ZymIdmg9mKc66IJ4ZoQusC6TLW-XEl3ZVKRnwwwU5OyG2EP8UrkU47e95wZ88STrsoJwbmFm_L-uSS9fu5excg1qjBA7aAmCt4zvs-1Q35iDEHeaeP4oFGC-VmnkgKFg.DJ7QRcqG5mrFqgPAk3oCUzdUbq7aci5C1TZJ4M-zcm8&dib_tag=se&keywords=PS5%2B%E3%82%B8%E3%83%A7%E3%82%A4%E3%82%B3%E3%83%B3%E3%82%AB%E3%83%90%E3%83%BC&qid=1768556411&sprefix=ps5%2B%E3%82%B8%E3%83%A7%E3%82%A4%E3%82%B3%E3%83%B3%E3%82%AB%E3%83%90%E3%83%BC%2Caps%2C182&sr=8-1&ufe=app_do%3Aamzn1.fos.d8e7ee72-073f-4b97-8ec0-59c18d6dfebe&th=1",
+        "https://www.amazon.co.jp/PS5%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC-%E3%82%B9%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF-%E6%BB%91%E3%82%8A%E6%AD%A2%E3%82%81%E5%8A%A0%E5%B7%A5-%E5%BF%AB%E9%81%A9%E6%80%A7%E3%82%A2%E3%83%83%E3%83%97-%E5%8F%96%E3%82%8A%E4%BB%98%E3%81%91%E7%B0%A1%E5%8D%98%E3%80%90%E3%82%B9%E3%82%AB%E3%83%BC%E3%83%AC%E3%83%83%E3%83%88net%E3%80%91/dp/B0FXT8ZYGM/ref=zg_bs_g_8019280051_d_sccl_2/355-8190517-1304632?th=1",
+        "https://www.amazon.co.jp/ShiMa-Owl-PS5%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%80%81PS4%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%80%81%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E3%83%97%E3%83%AD-%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%80%81Xbox%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%BC%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%81%A7%E3%81%8D%E3%82%8B-%E3%82%B9%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF%E3%82%AD%E3%83%A3%E3%83%83%E3%83%97/dp/B0BYNPTKYF/ref=zg_bs_g_8019280051_d_sccl_3/355-8190517-1304632?th=1"
+      ],
+      "category": "new",
+      "status": "arrived",
+      "rakumart": [
+        {
+          "text": "2026012013070458-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026012013070458-2147"
+        },
+        {
+          "text": "2026011917211523-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026011917211523-2147"
+        }
+      ],
+      "suppliers": [
+        {
+          "image": "",
+          "url": "https://detail.1688.com/offer/1000706690677.html",
+          "memo": ""
+        },
+        {
+          "image": "",
+          "url": "https://detail.1688.com/offer/541081047095.html",
+          "memo": ""
+        }
+      ],
+      "tables": [],
+      "rankingUrls": [],
+      "freeNote": ""
+    },
+    {
+      "date": "2026-05-29",
+      "image": "",
+      "name": "メガネチェーン",
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/daily/509193/?l2-id=review_PC_il_rk_01"
+      ],
+      "freeNote": "男女比率　2:3",
+      "category": "new",
+      "status": "",
+      "rakumart": [
+        {
+          "text": "2025071608355998-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2025071608355998-2147"
+        }
+      ],
+      "suppliers": [],
+      "tables": [
+        {
+          "columns": [
+            {
+              "type": "image"
+            },
+            {
+              "type": "text"
+            },
+            {
+              "type": "text"
+            }
+          ],
+          "header": [
+            "画像",
+            "",
+            ""
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "image": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "new",
+      "label": "新商品",
+      "icon": "🆕"
+    },
+    {
+      "id": "rakuten",
+      "label": "楽天",
+      "icon": "logo:rakuten"
+    },
+    {
+      "id": "yahoo",
+      "label": "Yahoo",
+      "icon": "logo:yahoo"
+    }
+  ],
+  "statuses": [
+    {
+      "id": "buy",
+      "label": "買付前・済",
+      "icon": "num:1"
+    },
+    {
+      "id": "prearrive",
+      "label": "到着前",
+      "icon": "num:2"
+    },
+    {
+      "id": "arrived",
+      "label": "到着分",
+      "icon": "num:3"
+    },
+    {
+      "id": "working",
+      "label": "制作着手中",
+      "icon": "num:4"
+    },
+    {
+      "id": "done",
+      "label": "完了分"
+    }
+  ]
+}
