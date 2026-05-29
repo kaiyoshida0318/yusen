@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.20.1";
+const VERSION = "1.21.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -733,7 +733,41 @@ function openEntry(editIndex){
   // 削除ボタンは編集時のみ表示
   const delBtn = document.getElementById("btnDeleteEntry");
   if(delBtn) delBtn.style.display = isEdit ? "" : "none";
+  // モード切替：既存項目を開いたときは閲覧モード、新規は最初から編集モード
+  const modal = document.querySelector("#entryModal .modal-entry");
+  if(modal){
+    if(isEdit){ modal.classList.add("is-viewmode"); }
+    else      { modal.classList.remove("is-viewmode"); }
+  }
+  // リンクが新規タブで開くよう整える（既存データのa要素も含めて）
+  ensureLinksOpenInNewTab();
+  applyViewmodeEditability();
   document.getElementById("entryModal").hidden = false;
+}
+
+// モーダル内のすべての a[href] に target=_blank rel=noopener を付与
+function ensureLinksOpenInNewTab(){
+  document.querySelectorAll("#entryModal a[href]").forEach(a=>{
+    a.target = "_blank";
+    a.rel = "noopener";
+  });
+}
+
+// 閲覧/編集モードに応じて contenteditable を切り替え
+function applyViewmodeEditability(){
+  const modal = document.querySelector("#entryModal .modal-entry");
+  if(!modal) return;
+  const isView = modal.classList.contains("is-viewmode");
+  modal.querySelectorAll("[contenteditable]").forEach(el=>{
+    el.setAttribute("contenteditable", isView ? "false" : "true");
+  });
+}
+
+// 閲覧モード→編集モードに切り替える
+function startEditEntry(){
+  const modal = document.querySelector("#entryModal .modal-entry");
+  if(modal) modal.classList.remove("is-viewmode");
+  applyViewmodeEditability();
 }
 
 function renderStatusSelect(){
@@ -1698,6 +1732,8 @@ function bindUI(){
     if(!btn) return;
     const act = btn.dataset.act;
     if(act==="cancel") cancelEntry();
+    else if(act==="close-view") closeEntry();
+    else if(act==="startedit") startEditEntry();
     else if(act==="save") saveEntry(true);
     else if(act==="saveclose") saveEntry(false);
     else if(act==="delete") deleteCurrentEntry();
