@@ -418,12 +418,31 @@ tbody td{font-size:13px}
 .modal-entry.is-viewmode #btnAddRanking{
   display:none!important;
 }
-/* 閲覧モード：画像クリックでファイル選択させない */
+/* 閲覧モードでも画像のドラッグ&ドロップだけは受け付ける（保存も自動）。
+   ※ クリックでのファイル選択はJS側で抑止する */
 .modal-entry.is-viewmode .entry-image,
 .modal-entry.is-viewmode .supplier-image,
 .modal-entry.is-viewmode .tbl-img-box{
-  pointer-events:none;
+  cursor:default;
 }
+.modal-entry.is-viewmode .entry-image::after,
+.modal-entry.is-viewmode .supplier-image::after,
+.modal-entry.is-viewmode .tbl-img-box::after{
+  content:"画像をドロップで差し替え";
+  position:absolute;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.55);color:#fff;font-size:10px;
+  text-align:center;padding:2px;
+  opacity:0;transition:opacity .15s;pointer-events:none;
+}
+.modal-entry.is-viewmode .entry-image,
+.modal-entry.is-viewmode .supplier-image,
+.modal-entry.is-viewmode .tbl-img-box{ position:relative }
+.modal-entry.is-viewmode .entry-image:hover::after,
+.modal-entry.is-viewmode .supplier-image:hover::after,
+.modal-entry.is-viewmode .tbl-img-box:hover::after,
+.modal-entry.is-viewmode .entry-image.drag-over::after,
+.modal-entry.is-viewmode .supplier-image.drag-over::after,
+.modal-entry.is-viewmode .tbl-img-box.drag-over::after{ opacity:1 }
 /* 閲覧モード時、リンクは目立たせて新規タブで開けるように見せる */
 .modal-entry.is-viewmode a[href]{
   color:#2563eb;text-decoration:underline;pointer-events:auto;cursor:pointer;
