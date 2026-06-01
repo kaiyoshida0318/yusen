@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.24.0";
+const VERSION = "1.25.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1537,13 +1537,25 @@ function saveEntry(keepOpen){
       if(keepOpen) entry.editIndex = state.rows.length - 1;
     }
     persistLocal(); render();
+    // GitHub保存を自動実行（設定済みのときのみ）
+    const hasGh = !!(cfg.pat && cfg.owner && cfg.repo);
     if(keepOpen){
       // 入力差分検知のためスナップショットを更新
       try{ entrySnapshot = snapshotEntry(); }catch(_){}
-      setStatus("✅ 保存しました（編集を続けられます。GitHub反映は「💾 GitHubに保存」）");
+      if(hasGh){
+        setStatus("ローカル保存OK。GitHubに反映中…");
+        saveToGitHub().catch(()=>{}); // 内部でステータス更新するのでここでは何もしない
+      }else{
+        setStatus("✅ 保存しました（編集を続けられます。GitHub反映は「💾 GitHubに保存」）");
+      }
     }else{
       closeEntry();
-      setStatus("✅ 登録しました（GitHubに反映するには「💾 GitHubに保存」）");
+      if(hasGh){
+        setStatus("ローカル保存OK。GitHubに反映中…");
+        saveToGitHub().catch(()=>{});
+      }else{
+        setStatus("✅ 登録しました（GitHubに反映するには「💾 GitHubに保存」）");
+      }
     }
   }catch(e){
     // 何かで失敗しても無音にならないようにユーザーへ通知
