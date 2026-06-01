@@ -37,10 +37,13 @@
       "image": "img_mpui2cz6_100.webp",
       "name": "ウエスト調整",
       "rivalRakuten": [
-        "https://item.rakuten.co.jp/kiracoco/mz2108-copy/"
+        "https://item.rakuten.co.jp/kiracoco/mz2108-copy/",
+        "https://item.rakuten.co.jp/oobikiyaking/10097/"
       ],
       "rivalAmazon": [],
-      "rankingUrls": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/daily/564897/"
+      ],
       "freeNote": "",
       "category": "new",
       "status": "arrived",
@@ -55,7 +58,88 @@
         }
       ],
       "suppliers": [],
-      "tables": []
+      "tables": [
+        {
+          "columns": [
+            {
+              "type": "image"
+            },
+            {
+              "type": "text"
+            },
+            {
+              "type": "text"
+            }
+          ],
+          "header": [
+            "画像",
+            "",
+            ""
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "image": ""
+                },
+                {
+                  "text": "https://x.gd/1D20b",
+                  "url": "https://x.gd/1D20b"
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": ""
+                },
+                {
+                  "text": "https://x.gd/p5UAr",
+                  "url": "https://x.gd/p5UAr"
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": ""
+                },
+                {
+                  "text": "https://x.gd/VO9jf",
+                  "url": "https://x.gd/VO9jf"
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": ""
+                },
+                {
+                  "text": "https://x.gd/a0VWP",
+                  "url": "https://x.gd/a0VWP"
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "date": "2026-05-28",
