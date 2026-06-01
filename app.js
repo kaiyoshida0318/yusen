@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.28.0";
+const VERSION = "1.28.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -583,9 +583,10 @@ function render(){
     state.statuses.forEach(st=>{
       const o=document.createElement("option");
       o.value=st.id;
-      // ラベルのみ表示（左側の色付きバッジで番号は分かるため、option側には番号を入れない）
-      // 念のためレンダリング時にも先頭の番号文字（①②③④）を除去
-      o.textContent = (st.label||"").replace(/^[①②③④]\s*/, "");
+      // ラベルに番号文字（① ② ③ ④）を頭に付けて、ドロップダウン展開中も番号で識別できるようにする
+      const cleanLabel = (st.label||"").replace(/^[①②③④]\s*/, "");
+      const numChar = statusNumChar(st.icon);
+      o.textContent = (numChar ? numChar+" " : "") + cleanLabel;
       sel.appendChild(o);
     });
     // 保留中があればそれを、なければ現在値を選択
