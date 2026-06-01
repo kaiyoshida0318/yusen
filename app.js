@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.29.0";
+const VERSION = "1.29.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1881,8 +1881,8 @@ async function putDataJson(){
     return res;
   };
   let res = await doPut();
-  // SHA不一致の場合は最大2回までリトライ
-  for(let attempt=0; attempt<2 && !res.ok; attempt++){
+  // SHA不一致の場合は最大4回までリトライ（指数バックオフ）
+  for(let attempt=0; attempt<4 && !res.ok; attempt++){
     let info = {};
     try{ info = await res.clone().json(); }catch(_){}
     const msg = info.message || ("HTTP "+res.status);
@@ -1894,9 +1894,9 @@ async function putDataJson(){
     if(!looksLikeShaMismatch){
       throw new Error(msg);
     }
-    setStatus(`⚠️ 競合検出。最新版に追従して再保存中…(${attempt+1}回目)`);
-    // GitHub APIのキャッシュが落ち着くまで少し待ってからSHAを取り直す
-    await new Promise(r=>setTimeout(r, 500));
+    const wait = 500 * Math.pow(2, attempt); // 500ms, 1s, 2s, 4s
+    setStatus(`⚠️ 競合検出。最新版に追従して再保存中…(${attempt+1}回目, ${wait}ms待機)`);
+    await new Promise(r=>setTimeout(r, wait));
     await fetchDataSha();
     res = await doPut();
   }
