@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.34.1";
+const VERSION = "1.35.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -42,6 +42,14 @@ function getColCfg(key){
 function setColCfg(key, patch){
   colCfg[key] = { ...getColCfg(key), ...patch };
   saveColCfg();
+}
+// 一覧表で現在実際に表示されている列幅(px)を取得（自動幅の確認用）。
+// 該当の th が見つからない（列が非表示など）場合は null。
+function getRenderedColWidth(key){
+  const th = document.querySelector(`#gridHead th[data-col-key="${key}"]`);
+  if(!th) return null;
+  const w = th.getBoundingClientRect().width;
+  return w > 0 ? Math.round(w) : null;
 }
 // 列の表示スタイルを要素に反映
 function applyColStyle(el, cc){
@@ -2176,15 +2184,24 @@ function renderColManager(){
     const lbl = document.createElement("span"); lbl.className = "col-name";
     lbl.textContent = c.label;
 
-    // 幅(px) 空欄=自動
+    // 幅(px) 空欄=自動。自動のときは現在の実際の表示幅(px)をプレースホルダに見せる
     const w = document.createElement("input");
-    w.type = "number"; w.min = "0"; w.step = "10"; w.placeholder = "自動";
-    w.value = cc.width ? String(cc.width) : "";
+    w.type = "number"; w.min = "0"; w.step = "10";
     w.className = "col-width-input";
+    if(cc.width){
+      w.value = String(cc.width);
+      w.placeholder = "自動";
+    }else{
+      w.value = "";
+      const measured = getRenderedColWidth(c.key);
+      w.placeholder = (measured != null) ? `${measured}（自動）` : "自動";
+    }
     w.onchange = ()=>{
       const v = parseInt(w.value.trim(), 10);
       setColCfg(c.key, { width: (Number.isFinite(v) && v > 0) ? v : null });
       render();
+      // 自動に戻したときは、新しい実幅をプレースホルダへ反映する
+      renderColManager();
     };
 
     // テキスト処理（折り返し / 以降を非表示）
