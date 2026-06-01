@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.27.1";
+const VERSION = "1.27.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -232,7 +232,7 @@ function renderTabs(){
     [ALL_STATUS, ...state.statuses, NONE_STATUS].forEach(s=>{
       const tab = document.createElement("button");
       tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===currentStatus ? " active" : "");
-      tab.innerHTML = `<span class="status-ico">${statusIconHtml(s.icon)}</span><span class="cat-label">${escapeHtml(s.label)}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
+      tab.innerHTML = `<span class="status-ico">${statusIconHtml(s.icon)}</span><span class="cat-label">${escapeHtml((s.label||"").replace(/^[①②③④]\s*/,""))}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
       tab.onclick = ()=>{ currentStatus = s.id; render(); };
       swrap.appendChild(tab);
     });
@@ -562,9 +562,9 @@ function render(){
     state.statuses.forEach(st=>{
       const o=document.createElement("option");
       o.value=st.id;
-      // 番号付きのときは「①②③④」を頭に付与（option内ではSVGが使えないため）
-      const numChar = statusNumChar(st.icon);
-      o.textContent = (numChar ? numChar+" " : "") + st.label;
+      // ラベルのみ表示（左側の色付きバッジで番号は分かるため、option側には番号を入れない）
+      // 念のためレンダリング時にも先頭の番号文字（①②③④）を除去
+      o.textContent = (st.label||"").replace(/^[①②③④]\s*/, "");
       sel.appendChild(o);
     });
     // 保留中があればそれを、なければ現在値を選択
@@ -1946,7 +1946,9 @@ function renderStatusManager(){
       numWrap.appendChild(btn);
     });
     const labelInp = document.createElement("input");
-    labelInp.type = "text"; labelInp.value = s.label; labelInp.className = "cat-label-input";
+    labelInp.type = "text";
+    labelInp.value = (s.label||"").replace(/^[①②③④]\s*/,"");
+    labelInp.className = "cat-label-input";
     labelInp.onchange = ()=>{
       const cleaned = labelInp.value.replace(/^[①②③④]\s*/, "").trim();
       s.label = cleaned || s.label;
