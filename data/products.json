@@ -179,6 +179,77 @@
               ]
             }
           ]
+        },
+        {
+          "columns": [
+            {
+              "type": "image"
+            },
+            {
+              "type": "text"
+            }
+          ],
+          "header": [
+            "画像",
+            ""
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "image": "img_mpuqelnf_751.webp"
+                },
+                {
+                  "text": "https://item.rakuten.co.jp/skonlineshop/10000006/",
+                  "url": "https://item.rakuten.co.jp/skonlineshop/10000006/"
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mpuqen6m_641.webp"
+                },
+                {
+                  "text": "https://item.rakuten.co.jp/ks1949/e40505/",
+                  "url": "https://item.rakuten.co.jp/ks1949/e40505/"
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mpuqes7r_789.webp"
+                },
+                {
+                  "text": "https://item.rakuten.co.jp/ginyaten/mc1/",
+                  "url": "https://item.rakuten.co.jp/ginyaten/mc1/"
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mpuqetkv_869.webp"
+                },
+                {
+                  "text": "https://item.rakuten.co.jp/ayjudie/s34-001/",
+                  "url": "https://item.rakuten.co.jp/ayjudie/s34-001/"
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mpuqev1y_348.webp"
+                },
+                {
+                  "text": "https://item.rakuten.co.jp/highcamp/10012501/",
+                  "url": "https://item.rakuten.co.jp/highcamp/10012501/"
+                }
+              ]
+            }
+          ]
         }
       ]
     }
