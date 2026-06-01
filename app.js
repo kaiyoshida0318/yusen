@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.40.0";
+const VERSION = "1.40.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -526,6 +526,7 @@ function render(){
       }
     }else{
       if(c.key==="image") th.className="col-image";
+      if(c.key==="name") th.className="col-name-cell";
       if(c.key==="expectedSales") th.className="col-exp-sales";
       if(c.key==="actions") th.className="col-actions";
       if(c.key==="catSel") th.className="col-catsel";
@@ -589,6 +590,7 @@ function render(){
     trb.appendChild(tdImg);
 
     const tdName = document.createElement("td");
+    tdName.classList.add("col-name-cell");
     if(listEditMode){
       tdName.classList.add("list-edit-cell");
       const inp = document.createElement("input");
@@ -1821,19 +1823,15 @@ async function handleImageUrl(url, obj, key, cb, containerEl){
   }catch(e){
     if(overlay) overlay.stop("❌");
     logWarn("handleImageUrl: fetch失敗、URL直参照にフォールバック", { url, error: String(e && e.message || e) });
-    // フォールバック: URLそのまま参照
-    if(confirm(`画像のダウンロードに失敗しました（CORS等）。\nこのURLをそのまま参照する形で表示しますか？\n（GitHubには保存されず、元URLが消えたら表示も消えます）\n\n${e.message || e}`)){
-      obj[key] = url;
-      obj.imageIsDataUrl = false;
-      if(cb) cb(); else renderEntryImage();
-      // 閲覧モードでのURL貼り付けも自動保存
-      if(isViewmode() && entry.editIndex>=0){
-        try{ saveEntry(true); }catch(_){}
-      }
-      setStatus("✅ URLを画像として登録しました（直接参照）");
-    }else{
-      setStatus("❌ URLからの画像取得を中止しました");
+    // CORS等でダウンロードできない場合でも、確認ダイアログは出さずにURL直参照で表示する
+    obj[key] = url;
+    obj.imageIsDataUrl = false;
+    if(cb) cb(); else renderEntryImage();
+    // 閲覧モードでのURL貼り付けも自動保存
+    if(isViewmode() && entry.editIndex>=0){
+      try{ saveEntry(true); }catch(_){}
     }
+    setStatus("✅ URLを画像として登録しました（直接参照／GitHubには保存されません）");
   }
 }
 
