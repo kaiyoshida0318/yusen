@@ -429,6 +429,33 @@
         }
       ],
       "tables": []
+    },
+    {
+      "date": "2026-06-01",
+      "image": "img_mput6cbb_333.webp",
+      "name": "",
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/kei-onlineshop2023/70001755/"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [
+        {
+          "text": "2026052716031520-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026052716031520-2147"
+        }
+      ],
+      "suppliers": [
+        {
+          "image": "",
+          "url": "https://detail.1688.com/offer/733697508590.html?kj_agent_plugin=aliprice&fromkv=xytTrace:212b5ecd17730458541141757e0df3&token=L5Hs89X1CRigolW%2BzZL9luafK%2B2DwhvhVLaVsyl1CrnyWjpIqjfsA%2B2%2B6P9v8zeJ",
+          "memo": ""
+        }
+      ],
+      "tables": []
     }
   ],
   "categories": [
