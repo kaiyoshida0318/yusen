@@ -10,9 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.31.0">
+<link rel="stylesheet" href="style.css?v=1.32.0">
 </head>
 <body>
+<div class="sticky-top">
 <header class="app-header">
   <div class="header-inner">
     <img class="logo-img" src="logo.png" alt="優先順位決定くん" height="40">
@@ -31,14 +32,17 @@
   </div>
 </header>
 
-<main class="container">
+<main class="container container-top">
   <nav class="cat-tabs" id="catTabs"></nav>
   <nav class="status-tabs" id="statusTabs"></nav>
 
   <div class="toolbar">
     <span class="status" id="status"></span>
   </div>
+</main>
+</div>
 
+<main class="container">
   <div class="table-wrap">
     <table id="grid">
       <thead id="gridHead"></thead>
@@ -206,6 +210,6 @@
   </div>
 </div>
 
-<script src="app.js?v=1.31.0"></script>
+<script src="app.js?v=1.32.0"></script>
 </body>
 </html>
