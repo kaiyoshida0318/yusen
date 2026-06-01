@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.25.1";
+const VERSION = "1.26.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -357,6 +357,12 @@ function statusIconHtml(icon){
   if(isNumIcon(icon)) return statusNumSvg(icon);
   return "";
 }
+// 番号のテキスト記号（option用、SVG不可な場所で使う）
+const NUM_CHARS = { 1:"①", 2:"②", 3:"③", 4:"④" };
+function statusNumChar(icon){
+  if(!isNumIcon(icon)) return "";
+  return NUM_CHARS[parseInt(icon.split(":")[1],10)] || "";
+}
 
 // 行だけ追加（モーダルを開かず空の行を1つだけ）
 function addQuickRow(){
@@ -542,6 +548,8 @@ function render(){
     // ステータス変更ドロップダウン
     const tdStatus = document.createElement("td");
     tdStatus.className="col-statussel";
+    // selectをラッパに入れて、左に色付き番号バッジを重ねる
+    const selWrap = document.createElement("div"); selWrap.className="status-sel-wrap";
     const sel = document.createElement("select");
     sel.className="status-select";
     const opt0 = document.createElement("option");
@@ -549,13 +557,24 @@ function render(){
     sel.appendChild(opt0);
     state.statuses.forEach(st=>{
       const o=document.createElement("option");
-      o.value=st.id; o.textContent=st.label;
+      o.value=st.id;
+      // 番号付きのときは「①②③④」を頭に付与（option内ではSVGが使えないため）
+      const numChar = statusNumChar(st.icon);
+      o.textContent = (numChar ? numChar+" " : "") + st.label;
       sel.appendChild(o);
     });
     // 保留中があればそれを、なければ現在値を選択
     const pending = (ri in pendingStatus) ? pendingStatus[ri] : row.status;
     sel.value = pending || "";
     if(pending !== row.status && (ri in pendingStatus)) sel.classList.add("status-pending");
+    // 選択中ステータスに対応する色付き番号バッジを左にオーバーレイ
+    const numBadge = document.createElement("span"); numBadge.className="status-sel-badge";
+    const refreshBadge = ()=>{
+      const cur = state.statuses.find(s=>s.id===sel.value);
+      numBadge.innerHTML = (cur && isNumIcon(cur.icon)) ? statusNumSvg(cur.icon) : "";
+      selWrap.classList.toggle("has-badge", numBadge.children.length>0);
+    };
+    refreshBadge();
     sel.onchange = ()=>{
       if(sel.value === (row.status||"")){
         delete pendingStatus[ri]; // 元に戻したら保留解除
@@ -563,9 +582,11 @@ function render(){
         pendingStatus[ri] = sel.value;
       }
       sel.classList.toggle("status-pending", (ri in pendingStatus));
+      refreshBadge();
       renderTabs(); // クリア・反映ボタンの出し分けを更新
     };
-    tdStatus.appendChild(sel);
+    selWrap.append(numBadge, sel);
+    tdStatus.appendChild(selWrap);
 
     // カテゴリ変更ドロップダウン
     const tdCat = document.createElement("td");
