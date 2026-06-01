@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.36.0";
+const VERSION = "1.36.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -459,7 +459,7 @@ function updateListEditBtn(){
   const b = document.getElementById("btnListEdit");
   if(!b) return;
   b.classList.toggle("active", listEditMode);
-  b.textContent = listEditMode ? "✅ 編集モード終了" : "✏️ 項目名・月商編集";
+  b.textContent = listEditMode ? "✅ 編集モード終了（保存）" : "✏️ 項目名・月商編集";
 }
 
 // 行だけ追加（モーダルを開かず空の行を1つだけ）
