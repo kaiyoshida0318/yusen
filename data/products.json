@@ -677,6 +677,36 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-06-01",
+      "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-22-06-sin-b-01.jpg",
+      "name": "静電気除去ブレスレット",
+      "expectedSales": 2,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
+    },
+    {
+      "date": "2026-06-01",
+      "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/ss/ih-25-01-01b-ss.jpg",
+      "name": "しわ伸ばしテープ",
+      "expectedSales": 0.25,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
