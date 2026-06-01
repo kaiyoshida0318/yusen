@@ -456,6 +456,53 @@
         }
       ],
       "tables": []
+    },
+    {
+      "date": "2026-06-01",
+      "image": "img_mputpyw7_672.jpg",
+      "name": "おしゃぶり　ホルダー",
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/ichiiro/001/?s-id=rk_rank2item_pc_4",
+        "https://item.rakuten.co.jp/gudeza/con-bhp-00/?s-id=rk_rank2item_pc_5"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/keyword/pacifier_holder/"
+      ],
+      "freeNote": "",
+      "category": "rakuten",
+      "status": "prearrive",
+      "rakumart": [
+        {
+          "text": "2026052617212895-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026052617212895-2147"
+        },
+        {
+          "text": "2026052715513673-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026052715513673-2147"
+        },
+        {
+          "text": "2026052617212895-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026052617212895-2147"
+        },
+        {
+          "text": "2026051215010685-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026051215010685-2147"
+        }
+      ],
+      "suppliers": [
+        {
+          "image": "",
+          "url": "https://detail.1688.com/offer/551253441370.html?kj_agent_plugin=aliprice&fromkv=xytTrace:0bf89a7417798668721978383e0c7a&token=VC%2Fqgh9zNJOXGBehxmzLGksQh5zxXC14WpnLQGtCkGMwgWxQr%2BsAGI%2FlHbKje9V3",
+          "memo": ""
+        },
+        {
+          "image": "",
+          "url": "https://detail.1688.com/offer/551510732918.html?kj_agent_plugin=aliprice&fromkv=xytTrace%3A0bb405a417781156932957737e0f3d&token=sfl2UdM9FPORFv7fKdzp1iljWKHVQfc8GVPLQ%2BmWeg0MlNIRCDJNLL%2F2Lz0b6APL&tracelog=cps&clickid=7f029199c2cf82ef01eed3acf2ee2390&targetUrl=https%3A%2F%2Fs.click.1688.com%2Ft%3Fe%3DD2DC7A927D55C03D6511A0CCA913FD65D6FA062685DFF8F7D920A558D1D5758C4B369BE324A83E744B8F19128B0D93E33FB8088B45F57B9E47F28FD2CC0E231BA15182958F4940DB60FEF997084D4D5331EB6FC8DBCADED4C6C8CEEEE21320CC4BD39EA2FE12E3B1908640C334FFF0F0C5A833396CADBB48CB5BB775D5EAFA2EDEA90D07BA2C2AE1348394BC3CC3C62B9992F8828C4BE892BAD97C2EB6E06FDA387AC609567926DD2DD349A65EF5BEC0D7EF6F12500159ADBE8153530DAD85161DD108F839E7EAAF0BDEEACEC97CD9FD16AF6A83E76AF84392338C1B3899ED1F7BE572B39C39A2BDD8637C668B3555BE%26cbu_cps_trace_flag%3Dwrite",
+          "memo": ""
+        }
+      ],
+      "tables": []
     }
   ],
   "categories": [
