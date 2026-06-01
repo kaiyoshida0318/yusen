@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.40.3";
+const VERSION = "1.41.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -37,7 +37,7 @@ function loadColCfg(){
 }
 function saveColCfg(){ try{ localStorage.setItem(LS_COLS, JSON.stringify(colCfg)); }catch(_){} }
 function getColCfg(key){
-  return colCfg[key] || { visible:true, width:null, wrap:"wrap" };
+  return colCfg[key] || { visible:true, width:null, wrap:"wrap", align:"left" };
 }
 function setColCfg(key, patch){
   colCfg[key] = { ...getColCfg(key), ...patch };
@@ -66,6 +66,12 @@ function applyColStyle(el, cc){
     el.style.whiteSpace = "";
     el.style.overflow = "";
     el.style.textOverflow = "";
+  }
+  // テキストの揃え（左/中央/右）。未設定はクラス/既定に従う
+  if(cc.align === "left" || cc.align === "center" || cc.align === "right"){
+    el.style.textAlign = cc.align;
+  }else{
+    el.style.textAlign = "";
   }
 }
 
@@ -526,7 +532,6 @@ function render(){
       }
     }else{
       if(c.key==="image") th.className="col-image";
-      if(c.key==="name") th.className="col-name-cell";
       if(c.key==="expectedSales") th.className="col-exp-sales";
       if(c.key==="actions") th.className="col-actions";
       if(c.key==="catSel") th.className="col-catsel";
@@ -590,7 +595,6 @@ function render(){
     trb.appendChild(tdImg);
 
     const tdName = document.createElement("td");
-    tdName.classList.add("col-name-cell");
     if(listEditMode){
       tdName.classList.add("list-edit-cell");
       const inp = document.createElement("input");
@@ -2306,13 +2310,21 @@ function renderColManager(){
         render();
         renderColManager();
       };
+      const alignSel = document.createElement("select"); alignSel.className = "col-align-sel";
+      [["left","左揃え"],["center","中央揃え"],["right","右揃え"]].forEach(([val,txt])=>{
+        const o = document.createElement("option"); o.value = val; o.textContent = txt; alignSel.appendChild(o);
+      });
+      alignSel.value = cc.align || "left";
+      alignSel.title = "テキストの揃え";
+      alignSel.onchange = ()=>{ setColCfg(c.key, { align: alignSel.value }); render(); };
+
       const sel = document.createElement("select"); sel.className = "col-wrap-sel";
       const o1 = document.createElement("option"); o1.value = "wrap"; o1.textContent = "折り返す";
       const o2 = document.createElement("option"); o2.value = "clip"; o2.textContent = "以降を非表示";
       sel.append(o1, o2);
       sel.value = cc.wrap || "wrap";
       sel.onchange = ()=>{ setColCfg(c.key, { wrap: sel.value }); render(); };
-      controls.append(w, sel);
+      controls.append(w, alignSel, sel);
       card.appendChild(controls);
 
       // 非表示へ移動
