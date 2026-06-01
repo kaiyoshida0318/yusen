@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.33.0";
+const VERSION = "1.34.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -27,6 +27,39 @@ const COLUMNS = [
   { key:"statusSel", label:"ステータス" },
   { key:"actions", label:"操作" },
 ];
+
+/* 列の表示設定（localStorageに保存、端末ごとの好み）
+   shape: { [key]: { visible, width(px|null), wrap("wrap"|"clip") } } */
+const LS_COLS = "yusen_cols_v1";
+let colCfg = {};
+function loadColCfg(){
+  try{ const c = JSON.parse(localStorage.getItem(LS_COLS)); if(c && typeof c==="object") colCfg = c; }catch(_){}
+}
+function saveColCfg(){ try{ localStorage.setItem(LS_COLS, JSON.stringify(colCfg)); }catch(_){} }
+function getColCfg(key){
+  return colCfg[key] || { visible:true, width:null, wrap:"wrap" };
+}
+function setColCfg(key, patch){
+  colCfg[key] = { ...getColCfg(key), ...patch };
+  saveColCfg();
+}
+// 列の表示スタイルを要素に反映
+function applyColStyle(el, cc){
+  if(cc.width && cc.width > 0){
+    el.style.width = cc.width + "px";
+    el.style.minWidth = cc.width + "px";
+    el.style.maxWidth = cc.width + "px";
+  }
+  if(cc.wrap === "clip"){
+    el.style.whiteSpace = "nowrap";
+    el.style.overflow = "hidden";
+    el.style.textOverflow = "ellipsis";
+  }else{
+    el.style.whiteSpace = "";
+    el.style.overflow = "";
+    el.style.textOverflow = "";
+  }
+}
 
 // デフォルトのカテゴリ（後から追加・編集・並べ替え・削除可能）
 const DEFAULT_CATEGORIES = [
@@ -74,6 +107,7 @@ let entrySnapshot = null;
 function init(){
   document.getElementById("version").textContent = "v"+VERSION;
   loadCfg();
+  loadColCfg();
   loadData();
   bindUI();
   render();
@@ -449,8 +483,11 @@ function render(){
   const body = document.getElementById("gridBody");
 
   const tr = document.createElement("tr");
-  COLUMNS.forEach(c=>{
+  COLUMNS.forEach((c, ci)=>{
+    const cc = getColCfg(c.key);
+    if(cc.visible === false) return; // 非表示は描画しない
     const th = document.createElement("th");
+    th.dataset.colKey = c.key;
     if(c.key==="date"){
       th.className="col-date sortable";
       const arrow = dateSort==="asc" ? " ▲" : dateSort==="desc" ? " ▼" : " ⇅";
@@ -468,6 +505,7 @@ function render(){
       if(c.key==="statusSel") th.className="col-statussel";
       th.textContent = c.label;
     }
+    applyColStyle(th, cc);
     tr.appendChild(th);
   });
   head.innerHTML=""; head.appendChild(tr);
@@ -657,6 +695,17 @@ function render(){
     trb.appendChild(tdCat);
     trb.appendChild(tdStatus);
     trb.appendChild(tdAct);
+
+    // 列設定に従って各tdを表示/非表示・スタイル適用（COLUMNS順とtd追加順は一致）
+    const tds = trb.children;
+    for(let i=0;i<COLUMNS.length && i<tds.length;i++){
+      const c = COLUMNS[i];
+      const cc = getColCfg(c.key);
+      const td = tds[i];
+      td.dataset.colKey = c.key;
+      if(cc.visible === false){ td.style.display = "none"; continue; }
+      applyColStyle(td, cc);
+    }
 
     body.appendChild(trb);
   });
@@ -2105,6 +2154,59 @@ async function loadFromGitHub(){
 
 function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
 
+/* ---------- 項目（列）管理 ---------- */
+function openColManager(){
+  renderColManager();
+  document.getElementById("colModal").hidden = false;
+}
+function closeColManager(){ document.getElementById("colModal").hidden = true; }
+function renderColManager(){
+  const list = document.getElementById("colList");
+  list.innerHTML = "";
+  COLUMNS.forEach(c=>{
+    const cc = getColCfg(c.key);
+    const row = document.createElement("div"); row.className = "col-row";
+
+    // 表示チェック
+    const vis = document.createElement("input");
+    vis.type = "checkbox"; vis.checked = cc.visible !== false;
+    vis.onchange = ()=>{ setColCfg(c.key, { visible: vis.checked }); render(); };
+
+    // 名前
+    const lbl = document.createElement("span"); lbl.className = "col-name";
+    lbl.textContent = c.label;
+
+    // 幅(px) 空欄=自動
+    const w = document.createElement("input");
+    w.type = "number"; w.min = "0"; w.step = "10"; w.placeholder = "自動";
+    w.value = cc.width ? String(cc.width) : "";
+    w.className = "col-width-input";
+    w.onchange = ()=>{
+      const v = parseInt(w.value.trim(), 10);
+      setColCfg(c.key, { width: (Number.isFinite(v) && v > 0) ? v : null });
+      render();
+    };
+
+    // テキスト処理（折り返し / 以降を非表示）
+    const sel = document.createElement("select"); sel.className = "col-wrap-sel";
+    const o1 = document.createElement("option"); o1.value = "wrap";  o1.textContent = "折り返す";
+    const o2 = document.createElement("option"); o2.value = "clip";  o2.textContent = "以降を非表示";
+    sel.append(o1, o2);
+    sel.value = cc.wrap || "wrap";
+    sel.onchange = ()=>{ setColCfg(c.key, { wrap: sel.value }); render(); };
+
+    row.append(vis, lbl, w, sel);
+    list.appendChild(row);
+  });
+}
+function resetColCfg(){
+  if(!confirm("項目の表示設定をすべてデフォルトに戻します。よろしいですか？")) return;
+  colCfg = {};
+  saveColCfg();
+  renderColManager();
+  render();
+}
+
 /* ---------- カテゴリ管理 ---------- */
 const CAT_ICONS = ["📦","✨","🛒","🛍️","📊","🎯","🔥","⭐","🏷️","💡","📸","🎨","📝","🆕","🇯🇵","🇨🇳","💰","🎁","👕","👟","🧸","🍳","🏠","🚗","⚽","🎮","💄","📱","💻","🔧","🌸","🐾"];
 
@@ -2320,6 +2422,9 @@ function bindUI(){
   document.getElementById("btnSave").onclick = saveToGitHub;
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnManageCats").onclick = openCatManager;
+  document.getElementById("btnManageCols").onclick = openColManager;
+  document.getElementById("btnCloseCols").onclick = closeColManager;
+  document.getElementById("btnResetCols").onclick = resetColCfg;
   document.getElementById("btnManageStatus").onclick = openStatusManager;
   document.getElementById("btnCloseStatus").onclick = closeStatusManager;
   document.getElementById("btnAddStatus").onclick = addStatus;
