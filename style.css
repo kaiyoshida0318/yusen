@@ -460,3 +460,20 @@ tbody td{font-size:13px}
   padding:6px 0;margin:-4px 0 10px;cursor:pointer;text-align:left;display:block;
 }
 .btn-toggle-advanced:hover{color:var(--accent)}
+
+/* 画像アップロード中オーバーレイ（スピナー＋経過秒） */
+.upload-overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.85);color:var(--text);font-size:12px;font-weight:600;
+  border-radius:inherit;z-index:5;gap:6px;
+  backdrop-filter:blur(2px);
+}
+.upload-overlay .up-spin{
+  width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);
+  border-radius:50%;animation:upspin .8s linear infinite;
+}
+.upload-overlay .up-sec{font-variant-numeric:tabular-nums}
+@keyframes upspin{ to{ transform:rotate(360deg); } }
+
+/* オーバーレイが描画されるためには、画像コンテナにposition:relativeが必要 */
+.entry-image,.supplier-image,.tbl-img-box{position:relative}
