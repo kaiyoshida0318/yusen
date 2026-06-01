@@ -599,3 +599,11 @@ thead th{position:sticky;top:var(--sticky-h, 200px);z-index:5}
 .list-edit-num-wrap{display:flex;align-items:center;gap:4px;justify-content:flex-end}
 .list-edit-num{text-align:right;max-width:110px}
 .list-edit-unit{font-size:11px;color:var(--muted);flex:0 0 auto}
+
+/* 列幅ドラッグ調整モード */
+th.resizable-th{position:sticky} /* sticky自体がpositioned。ハンドルの基準になる */
+.col-resize-handle{position:absolute;top:0;right:0;width:9px;height:100%;cursor:col-resize;z-index:6;display:flex;align-items:center;justify-content:flex-end}
+.col-resize-handle::after{content:"";width:3px;height:60%;margin-right:2px;background:var(--accent);border-radius:2px;opacity:.55}
+.col-resize-handle:hover::after{opacity:1;width:4px}
+.resize-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:10px 16px;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--text)}
+.resize-bar-text{font-weight:500}
