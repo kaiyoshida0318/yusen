@@ -630,3 +630,7 @@ th.resizable-th{position:sticky} /* sticky自体がpositioned。ハンドルの�
 .list-edit-col{background:#fdf0ec!important;box-shadow:inset 0 2px 0 var(--accent)}
 .list-edit-cell{background:#fdf6f4;box-shadow:inset 0 0 0 1px rgba(232,90,55,.35)}
 tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
+
+/* 商品名列を中央寄せ */
+.col-name-cell{text-align:center}
+.col-name-cell .list-edit-input{text-align:center}
