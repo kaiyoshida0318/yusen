@@ -139,7 +139,8 @@
             }
           ]
         }
-      ]
+      ],
+      "expectedSales": 0
     },
     {
       "date": "2026-05-28",
@@ -177,7 +178,8 @@
           "memo": ""
         }
       ],
-      "tables": []
+      "tables": [],
+      "expectedSales": 0
     },
     {
       "date": "2026-05-29",
@@ -335,7 +337,8 @@
             }
           ]
         }
-      ]
+      ],
+      "expectedSales": 0
     },
     {
       "date": "2026-05-28",
@@ -356,7 +359,8 @@
         }
       ],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "expectedSales": 0
     },
     {
       "date": "2026-06-01",
@@ -377,7 +381,8 @@
         }
       ],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "expectedSales": 0
     },
     {
       "date": "2026-06-01",
@@ -395,7 +400,8 @@
       "status": "arrived",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "expectedSales": 0
     },
     {
       "date": "2026-06-01",
@@ -428,7 +434,8 @@
           "memo": "01set 3.02 / 03set 3.45 / 05set 3.88 / 10set 4.96"
         }
       ],
-      "tables": []
+      "tables": [],
+      "expectedSales": 0
     },
     {
       "date": "2026-06-01",
@@ -455,7 +462,8 @@
           "memo": ""
         }
       ],
-      "tables": []
+      "tables": [],
+      "expectedSales": 0
     },
     {
       "date": "2026-06-01",
@@ -502,6 +510,22 @@
           "memo": ""
         }
       ],
+      "tables": [],
+      "expectedSales": 0
+    },
+    {
+      "date": "2026-06-01",
+      "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-22-05d-01.jpg",
+      "name": "",
+      "expectedSales": 33,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [],
+      "suppliers": [],
       "tables": []
     }
   ],
