@@ -523,7 +523,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -538,7 +538,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -553,7 +553,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -568,7 +568,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -583,7 +583,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -598,7 +598,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -613,7 +613,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -628,7 +628,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -643,7 +643,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -658,7 +658,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -673,7 +673,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -688,7 +688,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -703,7 +703,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -718,7 +718,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyjj72",
+      "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -755,6 +755,11 @@
     {
       "id": "arrived",
       "label": "到着分",
+      "icon": "num:3"
+    },
+    {
+      "id": "s_mpuyvtej",
+      "label": "リニューアル検討分",
       "icon": "num:3"
     },
     {
