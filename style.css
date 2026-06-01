@@ -591,3 +591,11 @@ thead th{position:sticky;top:var(--sticky-h, 200px);z-index:5}
 .col-row .col-name{font-size:13px;font-weight:500}
 .col-row .col-width-input{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:12px;background:#fff;width:100%;box-sizing:border-box}
 .col-row .col-wrap-sel{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:12px;background:#fff;width:100%;cursor:pointer}
+
+/* 一覧インライン編集モード（項目名・予想月商を表上で直接編集） */
+.header-actions .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.list-edit-input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:13px;background:#fff;color:var(--text);box-sizing:border-box}
+.list-edit-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,90,55,.15)}
+.list-edit-num-wrap{display:flex;align-items:center;gap:4px;justify-content:flex-end}
+.list-edit-num{text-align:right;max-width:110px}
+.list-edit-unit{font-size:11px;color:var(--muted);flex:0 0 auto}
