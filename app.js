@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.39.1";
+const VERSION = "1.40.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -16,7 +16,7 @@ const LS_DATA = "yusen_data_v1";
 const COLUMNS = [
   { key:"date",   label:"日付" },
   { key:"image",  label:"画像" },
-  { key:"name",   label:"項目名" },
+  { key:"name",   label:"商品名" },
   { key:"expectedSales", label:"予想月商" },
   { key:"ranking", label:"ランキング" },
   { key:"rivalR", label:"楽天ライバル" },
@@ -460,7 +460,7 @@ function updateListEditBtn(){
   const b = document.getElementById("btnListEdit");
   if(!b) return;
   b.classList.toggle("active", listEditMode);
-  b.textContent = listEditMode ? "✅ 編集モード終了（保存）" : "✏️ 項目名・月商編集";
+  b.textContent = listEditMode ? "✅ 編集モード終了（保存）" : "✏️ 商品名・月商編集";
 }
 
 // 行だけ追加（モーダルを開かず空の行を1つだけ）
@@ -534,6 +534,7 @@ function render(){
     }
     applyColStyle(th, cc);
     if(colResizeMode) addColResizeHandle(th, c.key);
+    if(listEditMode && (c.key==="name" || c.key==="expectedSales")) th.classList.add("list-edit-col");
     tr.appendChild(th);
   });
   head.innerHTML=""; head.appendChild(tr);
@@ -589,9 +590,10 @@ function render(){
 
     const tdName = document.createElement("td");
     if(listEditMode){
+      tdName.classList.add("list-edit-cell");
       const inp = document.createElement("input");
       inp.type = "text"; inp.className = "list-edit-input";
-      inp.value = row.name || ""; inp.placeholder = "項目名";
+      inp.value = row.name || ""; inp.placeholder = "商品名";
       inp.onclick = e=>e.stopPropagation();
       inp.onchange = ()=>{ if(state.rows[ri]){ state.rows[ri].name = inp.value.trim(); persistLocal(); } };
       tdName.appendChild(inp);
@@ -605,6 +607,7 @@ function render(){
     tdExp.className = "col-exp-sales";
     const v = (typeof row.expectedSales === "number" && row.expectedSales > 0) ? row.expectedSales : 0;
     if(listEditMode){
+      tdExp.classList.add("list-edit-cell");
       const wrap = document.createElement("div"); wrap.className = "list-edit-num-wrap";
       const inp = document.createElement("input");
       inp.type = "number"; inp.min = "0"; inp.step = "0.1";
