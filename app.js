@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.26.0";
+const VERSION = "1.27.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1646,21 +1646,91 @@ async function applyPendingChanges(){
 }
 
 /* ---------- GitHub データ保存 ---------- */
+// 同時実行を防ぐためのフラグと、実行中の Promise
+let saveToGitHubRunning = null;
+// 実行中に saveToGitHub が再度呼ばれたとき、終わったら一度だけ追加実行することを示すフラグ
+let saveToGitHubPending = false;
+
+/* ヘッダーのGitHub保存進行中インジケーター */
+function showGhProgress(label){
+  const el = document.getElementById("ghProgress");
+  if(!el) return null;
+  el.hidden = false;
+  el.classList.remove("done","error");
+  el.querySelector(".gh-text").textContent = label || "GitHub保存中…";
+  const secEl = el.querySelector(".gh-sec");
+  secEl.textContent = "0.0s";
+  const start = performance.now();
+  const timer = setInterval(()=>{
+    const t = (performance.now()-start)/1000;
+    secEl.textContent = t.toFixed(1) + "s";
+  }, 100);
+  return {
+    update: (text)=>{ el.querySelector(".gh-text").textContent = text; },
+    success: (text)=>{
+      clearInterval(timer);
+      el.classList.add("done");
+      el.querySelector(".gh-text").textContent = text || "GitHubに保存しました";
+      // 2秒後に消える
+      setTimeout(()=>{ if(el && !el.classList.contains("active")) el.hidden = true; }, 2000);
+    },
+    error: (text)=>{
+      clearInterval(timer);
+      el.classList.add("error");
+      el.querySelector(".gh-text").textContent = text || "保存失敗";
+      // 5秒後に消える
+      setTimeout(()=>{ if(el && !el.classList.contains("active")) el.hidden = true; }, 5000);
+    }
+  };
+}
+
 async function saveToGitHub(){
   if(!cfg.pat||!cfg.owner||!cfg.repo){ openSettings(); setStatus("⚠️ 先にGitHub設定を入力してください"); return; }
-  setStatus("保存中…");
-  try{
-    // 行内に残っている DataURL 画像を、保存前にすべてアップロードしてファイル名に置換
-    const rescued = await uploadDataUrlImagesInState();
-    if(rescued > 0){
-      persistLocal(); render();
-      setStatus(`画像 ${rescued} 件をアップロードしました。データ保存中…`);
+  // 既に実行中なら、終了後に1度だけ追加実行（連続呼び出しの最新版を必ず反映）
+  if(saveToGitHubRunning){
+    saveToGitHubPending = true;
+    return saveToGitHubRunning;
+  }
+  // 「💾 GitHubに保存」ボタンを処理中は無効化
+  const btn = document.getElementById("btnSave");
+  if(btn) btn.disabled = true;
+  const prog = showGhProgress("GitHub保存中…");
+  saveToGitHubRunning = (async ()=>{
+    try{
+      setStatus("保存中…");
+      try{
+        // 行内に残っている DataURL 画像を、保存前にすべてアップロードしてファイル名に置換
+        if(prog) prog.update("画像をアップロード中…");
+        const rescued = await uploadDataUrlImagesInState();
+        if(rescued > 0){
+          persistLocal(); render();
+          setStatus(`画像 ${rescued} 件をアップロードしました。データ保存中…`);
+          if(prog) prog.update(`画像${rescued}件アップ済 → データ保存中…`);
+        }else{
+          if(prog) prog.update("データ保存中…");
+        }
+        // 直前に最新SHAを取り直す（他の場所で更新されている場合に備える）
+        await fetchDataSha();
+        await putDataJson();
+        setStatus("✅ GitHubに保存しました");
+        if(prog) prog.success("GitHubに保存しました");
+      }catch(e){
+        const msg = "❌ 保存失敗: "+(e && e.message ? e.message : e);
+        setStatus(msg);
+        if(prog) prog.error(msg);
+      }
+    }finally{
+      saveToGitHubRunning = null;
+      if(btn) btn.disabled = false;
+      // 実行中に追加呼び出しがあった場合、最新の state でもう一度保存
+      if(saveToGitHubPending){
+        saveToGitHubPending = false;
+        // 即座にではなく、ステータスメッセージを少し見せてから
+        setTimeout(()=>{ saveToGitHub(); }, 100);
+      }
     }
-    // 直前に最新SHAを取り直す（他の場所で更新されている場合に備える）
-    await fetchDataSha();
-    await putDataJson();
-    setStatus("✅ GitHubに保存しました");
-  }catch(e){ setStatus("❌ 保存失敗: "+(e && e.message ? e.message : e)); }
+  })();
+  return saveToGitHubRunning;
 }
 
 // data/products.json を実際にPUT。SHA不一致エラーが出たらSHAを取り直して1回だけ自動リトライ。
@@ -1678,27 +1748,29 @@ async function putDataJson(){
     return res;
   };
   let res = await doPut();
-  if(!res.ok){
+  // SHA不一致の場合は最大2回までリトライ
+  for(let attempt=0; attempt<2 && !res.ok; attempt++){
     let info = {};
     try{ info = await res.clone().json(); }catch(_){}
     const msg = info.message || ("HTTP "+res.status);
-    // SHA不一致（409 or "does not match"）の場合は最新SHAを取り直して1回リトライ
     const looksLikeShaMismatch =
       res.status===409 ||
+      res.status===422 ||
       /does not match/i.test(msg) ||
-      /sha/i.test(msg) && /match/i.test(msg);
-    if(looksLikeShaMismatch){
-      setStatus("⚠️ 競合検出。最新版に追従して再保存中…");
-      await fetchDataSha();
-      res = await doPut();
-      if(!res.ok){
-        let info2={};
-        try{ info2 = await res.clone().json(); }catch(_){}
-        throw new Error(info2.message || ("HTTP "+res.status));
-      }
-    }else{
+      (/sha/i.test(msg) && /match/i.test(msg));
+    if(!looksLikeShaMismatch){
       throw new Error(msg);
     }
+    setStatus(`⚠️ 競合検出。最新版に追従して再保存中…(${attempt+1}回目)`);
+    // GitHub APIのキャッシュが落ち着くまで少し待ってからSHAを取り直す
+    await new Promise(r=>setTimeout(r, 500));
+    await fetchDataSha();
+    res = await doPut();
+  }
+  if(!res.ok){
+    let info2={};
+    try{ info2 = await res.clone().json(); }catch(_){}
+    throw new Error(info2.message || ("HTTP "+res.status));
   }
   const ok = await res.json();
   dataSha = ok.content ? ok.content.sha : dataSha;
