@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.23.1";
+const VERSION = "1.24.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -519,10 +519,16 @@ function render(){
 
     const tdAct = document.createElement("td");
     tdAct.className="col-actions";
+    // 閲覧（左）と編集（右）の2ボタン
+    const actWrap = document.createElement("div"); actWrap.className="act-btn-row";
+    const view = document.createElement("button");
+    view.className="act-btn act-view"; view.textContent="閲覧";
+    view.onclick = (e)=>{ e.stopPropagation(); openEntry(ri, "view"); };
     const edit = document.createElement("button");
     edit.className="act-btn act-edit"; edit.textContent="編集";
-    edit.onclick = (e)=>{ e.stopPropagation(); openEntry(ri); };
-    tdAct.appendChild(edit);
+    edit.onclick = (e)=>{ e.stopPropagation(); openEntry(ri, "edit"); };
+    actWrap.append(view, edit);
+    tdAct.appendChild(actWrap);
 
     // ステータス変更ドロップダウン
     const tdStatus = document.createElement("td");
@@ -635,10 +641,14 @@ function imgUrl(filename){
 }
 
 /* ---------- 登録モーダル ---------- */
-function openEntry(editIndex){
+function openEntry(editIndex, mode){
+  // mode: "edit" | "view" | undefined
+  // 既存項目を編集ボタンで開く → "edit"（編集モード直行）
+  // 既存項目を閲覧ボタンで開く → "view"（閲覧モード）
+  // 新規作成（editIndex<0）→ 常に編集モード
   const isEdit = (typeof editIndex==="number" && editIndex>=0);
   entry = { editIndex: isEdit?editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], category:"", blocks:[] };
-  document.getElementById("entryTitle").textContent = isEdit ? "編集" : "新規作成";
+  document.getElementById("entryTitle").textContent = isEdit ? (mode==="view"?"閲覧":"編集") : "新規作成";
 
   let row = isEdit ? state.rows[editIndex] : null;
   document.getElementById("fDate").value  = row ? (row.date||today()) : today();
@@ -733,11 +743,12 @@ function openEntry(editIndex){
   // 削除ボタンは編集時のみ表示
   const delBtn = document.getElementById("btnDeleteEntry");
   if(delBtn) delBtn.style.display = isEdit ? "" : "none";
-  // モード切替：既存項目を開いたときは閲覧モード、新規は最初から編集モード
+  // モード切替：modeパラメータに従う。新規作成は常に編集モード。
+  // mode="view" のみ閲覧モード、それ以外は編集モード。
   const modal = document.querySelector("#entryModal .modal-entry");
   if(modal){
-    if(isEdit){ modal.classList.add("is-viewmode"); }
-    else      { modal.classList.remove("is-viewmode"); }
+    if(isEdit && mode==="view"){ modal.classList.add("is-viewmode"); }
+    else                       { modal.classList.remove("is-viewmode"); }
   }
   // リンクが新規タブで開くよう整える（既存データのa要素も含めて）
   ensureLinksOpenInNewTab();
