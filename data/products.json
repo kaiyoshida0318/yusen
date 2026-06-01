@@ -523,7 +523,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -538,7 +538,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -553,7 +553,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -568,7 +568,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -583,7 +583,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -598,7 +598,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -613,7 +613,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -628,7 +628,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -643,7 +643,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -658,7 +658,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -673,7 +673,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -688,7 +688,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -703,7 +703,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -718,7 +718,7 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "",
+      "status": "s_mpuyjj72",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -760,6 +760,11 @@
     {
       "id": "working",
       "label": "制作着手中",
+      "icon": "num:4"
+    },
+    {
+      "id": "s_mpuyjj72",
+      "label": "リニューアル中",
       "icon": "num:4"
     },
     {
