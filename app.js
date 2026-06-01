@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.27.2";
+const VERSION = "1.28.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -325,16 +325,37 @@ function logoSvg(icon){
       + `<text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="14" fill="#fff">Y</text>`
       + `</svg>`;
   }
+  if(isLetterIcon(icon)){ return letterSvg(icon); }
   return "";
+}
+
+/* ---------- カテゴリの色付き文字バッジ（letter:X 形式、A〜Z） ---------- */
+// 文字ごとの色（同じ文字なら常に同じ色になるよう固定）
+const LETTER_COLORS = {
+  A:"#3f9b6e", B:"#2f6fb0", C:"#d98324", D:"#8257c9", E:"#c0392b",
+  F:"#16a085", G:"#2980b9", H:"#e67e22", I:"#9b59b6", J:"#e74c3c",
+  K:"#27ae60", L:"#0e7c8a", M:"#ad6a00", N:"#7d3c98", O:"#c0392b",
+  P:"#117a65", Q:"#1f618d", R:"#bf0000", S:"#6d4c41", T:"#5e35b1",
+  U:"#00838f", V:"#558b2f", W:"#8e24aa", X:"#5d4037", Y:"#ef6c00",
+  Z:"#283593"
+};
+function isLetterIcon(icon){ return typeof icon==="string" && /^letter:[A-Z]$/.test(icon); }
+function letterSvg(icon){
+  const ch = icon.split(":")[1];
+  const color = LETTER_COLORS[ch] || "#7a756d";
+  return `<svg class="cat-logo" viewBox="0 0 20 20" aria-label="${ch}" role="img">`
+    + `<rect width="20" height="20" rx="4" fill="${color}"/>`
+    + `<text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="14" fill="#fff">${ch}</text>`
+    + `</svg>`;
 }
 // アイコンのHTML（タブ・セレクトのテキスト用ではなくHTML描画用）
 function iconHtml(icon){
-  if(isLogoIcon(icon)) return logoSvg(icon);
+  if(isLogoIcon(icon) || isLetterIcon(icon)) return logoSvg(icon);
   return escapeHtml(icon||"");
 }
 // セレクトの <option> 用テキスト（SVG不可なので、ロゴは空にしてラベルだけ見せる）
 function iconText(icon){
-  if(isLogoIcon(icon)) return "";
+  if(isLogoIcon(icon) || isLetterIcon(icon)) return "";
   return icon || "";
 }
 
@@ -1859,7 +1880,7 @@ function renderCatManager(){
     // 絵文字ボタン（クリックでパレット開閉）
     const iconBtn = document.createElement("button");
     iconBtn.className = "cat-icon-btn";
-    if(isLogoIcon(c.icon)){ iconBtn.innerHTML = logoSvg(c.icon); }
+    if(isLogoIcon(c.icon) || isLetterIcon(c.icon)){ iconBtn.innerHTML = logoSvg(c.icon); }
     else { iconBtn.textContent = c.icon || "📦"; }
     iconBtn.title = "クリックで絵文字を選ぶ";
     iconBtn.onclick = ()=>{ catIconOpen = (catIconOpen===idx ? -1 : idx); renderCatManager(); };
@@ -1898,6 +1919,16 @@ function renderCatManager(){
         b.innerHTML = logoSvg(lk);
         b.title = LOGO_KEYS[lk] + "ロゴ";
         b.onclick = ()=>{ c.icon = lk; catIconOpen = -1; persistLocal(); renderCatManager(); renderTabs(); };
+        palette.appendChild(b);
+      });
+      // 色付き文字バッジ A〜Z（角丸四角に白文字）
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(ch=>{
+        const b = document.createElement("button");
+        const key = "letter:"+ch;
+        b.className = "cat-icon-opt" + (key===c.icon ? " selected" : "");
+        b.innerHTML = letterSvg(key);
+        b.title = ch + "バッジ";
+        b.onclick = ()=>{ c.icon = key; catIconOpen = -1; persistLocal(); renderCatManager(); renderTabs(); };
         palette.appendChild(b);
       });
       CAT_ICONS.forEach(ic=>{
