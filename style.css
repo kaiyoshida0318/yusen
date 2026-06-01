@@ -7,7 +7,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text);font-size:14px}
 
-.app-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);z-index:10}
 .header-inner{margin:0;padding:12px 16px;display:flex;align-items:center;gap:14px}
 .logo{font-family:"Zen Kaku Gothic New",sans-serif;font-size:20px;font-weight:700;letter-spacing:.02em}
 .logo-img{display:block;height:40px;width:auto}
@@ -556,3 +556,18 @@ tbody td{font-size:13px}
 .supplier-image-col .img-url-row{margin-top:4px}
 .supplier-image-col .img-url-input{font-size:10px;padding:4px 6px}
 .supplier-image-col .img-url-go{font-size:10px;padding:4px 6px}
+
+/* 上部の固定領域（ヘッダ + タブ + ツールバー）。スクロール中も常に表示 */
+.sticky-top{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 2px 6px rgba(0,0,0,.04);
+}
+.container-top{padding-top:8px!important;padding-bottom:10px!important;background:var(--bg)}
+.container-top .toolbar{margin-bottom:0}
+.container-top .status-tabs{margin-bottom:6px;padding-bottom:6px}
+/* スクロールしない領域分の上余白（JSで .sticky-top の高さを CSS 変数に） */
+main.container:not(.container-top){padding-top:calc(var(--sticky-h, 200px) + 12px)}
+/* テーブルヘッダーも sticky 化（上の固定領域の下にぴったり） */
+thead th{position:sticky;top:var(--sticky-h, 200px);z-index:5}
