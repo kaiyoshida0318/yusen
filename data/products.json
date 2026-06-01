@@ -647,6 +647,36 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-06-01",
+      "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-22-08b-01a.jpg",
+      "name": "爪垢取り",
+      "expectedSales": 12,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
+    },
+    {
+      "date": "2026-06-01",
+      "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-24-03-01.jpg",
+      "name": "汗取りパッド",
+      "expectedSales": 4,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
