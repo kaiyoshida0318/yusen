@@ -252,6 +252,27 @@
           ]
         }
       ]
+    },
+    {
+      "date": "2026-05-28",
+      "image": "img_mpus5glu_849.jpg",
+      "name": "PS5 スティックキャップ",
+      "rivalRakuten": [
+        "https://x.gd/RaMZ9"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "new",
+      "status": "arrived",
+      "rakumart": [
+        {
+          "text": "2026012013070458-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026012013070458-2147"
+        }
+      ],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
