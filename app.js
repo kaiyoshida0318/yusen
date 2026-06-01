@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.35.0";
+const VERSION = "1.36.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -100,6 +100,7 @@ let pendingCat = {};     // 一覧でのカテゴリ保留変更 { rowIndex: new
 let catIconOpen = -1;    // カテゴリ管理で絵文字パレットを開いているインデックス
 let selectMode = false;  // 一括削除の選択モード
 let selectedRows = {};   // 選択中の行 { rowIndex: true }
+let listEditMode = false; // 一覧インライン編集モード（項目名・予想月商を表上で直接編集）
 
 // 登録モーダルの作業用。image=メインライバル画像, suppliers=作業中の仕入先配列
 let entry = { editIndex:-1, image:"", imageIsDataUrl:false, suppliers:[], rakumart:[], tables:[], rivalRakuten:[], rivalAmazon:[], rankingUrls:[], freeNote:"", category:"", blocks:[] };
@@ -264,6 +265,7 @@ function renderTabs(){
   bulkBtn.onclick = ()=>{
     selectMode = !selectMode;
     selectedRows = {};
+    if(selectMode && listEditMode){ listEditMode = false; updateListEditBtn(); }
     render();
   };
   wrap.appendChild(bulkBtn);
@@ -446,6 +448,20 @@ function statusNumChar(icon){
   return NUM_CHARS[parseInt(icon.split(":")[1],10)] || "";
 }
 
+// 一覧インライン編集モードの切替（項目名・予想月商を表上で直接編集）
+function toggleListEditMode(){
+  listEditMode = !listEditMode;
+  if(listEditMode){ selectMode = false; selectedRows = {}; }
+  updateListEditBtn();
+  render();
+}
+function updateListEditBtn(){
+  const b = document.getElementById("btnListEdit");
+  if(!b) return;
+  b.classList.toggle("active", listEditMode);
+  b.textContent = listEditMode ? "✅ 編集モード終了" : "✏️ 項目名・月商編集";
+}
+
 // 行だけ追加（モーダルを開かず空の行を1つだけ）
 function addQuickRow(){
   state.rows.push({
@@ -568,14 +584,41 @@ function render(){
     trb.appendChild(tdImg);
 
     const tdName = document.createElement("td");
-    tdName.textContent = row.name || "";
+    if(listEditMode){
+      const inp = document.createElement("input");
+      inp.type = "text"; inp.className = "list-edit-input";
+      inp.value = row.name || ""; inp.placeholder = "項目名";
+      inp.onclick = e=>e.stopPropagation();
+      inp.onchange = ()=>{ if(state.rows[ri]){ state.rows[ri].name = inp.value.trim(); persistLocal(); } };
+      tdName.appendChild(inp);
+    }else{
+      tdName.textContent = row.name || "";
+    }
     trb.appendChild(tdName);
 
     // 予想月商
     const tdExp = document.createElement("td");
     tdExp.className = "col-exp-sales";
     const v = (typeof row.expectedSales === "number" && row.expectedSales > 0) ? row.expectedSales : 0;
-    tdExp.textContent = v > 0 ? (v.toLocaleString() + " 万円") : "—";
+    if(listEditMode){
+      const wrap = document.createElement("div"); wrap.className = "list-edit-num-wrap";
+      const inp = document.createElement("input");
+      inp.type = "number"; inp.min = "0"; inp.step = "1";
+      inp.className = "list-edit-input list-edit-num";
+      inp.value = v > 0 ? String(v) : ""; inp.placeholder = "0";
+      inp.onclick = e=>e.stopPropagation();
+      inp.onchange = ()=>{
+        if(!state.rows[ri]) return;
+        const n = parseInt((inp.value||"").trim(), 10);
+        state.rows[ri].expectedSales = (Number.isFinite(n) && n >= 0) ? n : 0;
+        persistLocal();
+      };
+      const unit = document.createElement("span"); unit.className = "list-edit-unit"; unit.textContent = "万円";
+      wrap.append(inp, unit);
+      tdExp.appendChild(wrap);
+    }else{
+      tdExp.textContent = v > 0 ? (v.toLocaleString() + " 万円") : "—";
+    }
     trb.appendChild(tdExp);
 
     trb.appendChild(urlListCell(row.rankingUrls));
@@ -2437,6 +2480,8 @@ function bindUI(){
     if(!wrap) menu.hidden = true;
   });
   document.getElementById("btnSave").onclick = saveToGitHub;
+  const btnListEdit = document.getElementById("btnListEdit");
+  if(btnListEdit){ btnListEdit.onclick = toggleListEditMode; updateListEditBtn(); }
   document.getElementById("btnSettings").onclick = openSettings;
   document.getElementById("btnManageCats").onclick = openCatManager;
   document.getElementById("btnManageCols").onclick = openColManager;
