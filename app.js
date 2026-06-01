@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.25.0";
+const VERSION = "1.25.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -377,13 +377,22 @@ function addQuickRow(){
 function deleteSelectedRows(){
   const idxs = Object.keys(selectedRows).map(n=>parseInt(n,10));
   if(idxs.length===0) return;
-  if(!confirm(`${idxs.length}件削除しますか？\nこの操作は取り消せません（GitHub反映は「💾 GitHubに保存」）。`)) return;
+  const hasGh = !!(cfg.pat && cfg.owner && cfg.repo);
+  const confirmMsg = hasGh
+    ? `${idxs.length}件削除しますか？\nこの操作は取り消せません（GitHubにも即時反映されます）。`
+    : `${idxs.length}件削除しますか？\nこの操作は取り消せません（GitHub反映は「💾 GitHubに保存」）。`;
+  if(!confirm(confirmMsg)) return;
   // インデックスの大きい順に削除（ずれ防止）
   idxs.sort((a,b)=>b-a).forEach(i=>{ state.rows.splice(i,1); });
   selectedRows = {};
   selectMode = false;
   persistLocal(); render();
-  setStatus(`✅ ${idxs.length}件を削除しました（GitHubに反映するには「💾 GitHubに保存」）`);
+  if(hasGh){
+    setStatus(`${idxs.length}件削除しました。GitHubに反映中…`);
+    saveToGitHub().catch(()=>{});
+  }else{
+    setStatus(`✅ ${idxs.length}件を削除しました（GitHubに反映するには「💾 GitHubに保存」）`);
+  }
 }
 
 /* ---------- 一覧レンダリング ---------- */
