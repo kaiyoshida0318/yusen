@@ -10,15 +10,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.33.0">
+<link rel="stylesheet" href="style.css?v=1.34.1">
 </head>
 <body>
 <div class="sticky-top">
 <header class="app-header">
   <div class="header-inner">
     <img class="logo-img" src="logo.png" alt="優先順位決定くん" height="40">
-    <span class="version" id="version">v1.0.0</span>
     <div class="header-actions">
+      <button class="btn btn-ghost" id="btnManageCols">📐 項目管理</button>
       <button class="btn btn-ghost" id="btnManageCats">📂 カテゴリ管理</button>
       <button class="btn btn-ghost" id="btnManageStatus">📋 ステータス管理</button>
       <button class="btn btn-ghost" id="btnSettings">⚙️ 設定</button>
@@ -28,6 +28,7 @@
         <span class="gh-sec">0.0s</span>
       </div>
       <button class="btn btn-primary" id="btnSave">💾 GitHubに保存</button>
+      <span class="version" id="version">v1.0.0</span>
     </div>
   </div>
 </header>
@@ -184,6 +185,26 @@
   </div>
 </div>
 
+<!-- 項目管理モーダル -->
+<div class="modal-overlay" id="colModal" hidden>
+  <div class="modal modal-col">
+    <h2>📐 項目管理</h2>
+    <p class="hint">一覧表の各列の表示／非表示・幅・テキストの折り返しを設定します。この設定はこの端末にのみ保存されます（GitHubには同期しません）。</p>
+    <div class="col-list-head">
+      <span>表示</span>
+      <span>項目名</span>
+      <span>幅(px)</span>
+      <span>テキスト</span>
+    </div>
+    <div id="colList" class="col-list"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnResetCols">🔄 デフォルトに戻す</button>
+      <span class="actions-spacer"></span>
+      <button class="btn btn-ghost" id="btnCloseCols">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <!-- カテゴリ管理モーダル -->
 <div class="modal-overlay" id="catModal" hidden>
   <div class="modal">
@@ -216,6 +237,6 @@
   </div>
 </div>
 
-<script src="app.js?v=1.33.0"></script>
+<script src="app.js?v=1.34.1"></script>
 </body>
 </html>
