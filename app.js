@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.23.0";
+const VERSION = "1.23.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1603,9 +1603,18 @@ async function saveToGitHub(){
       persistLocal(); render();
       setStatus(`画像 ${rescued} 件をアップロードしました。データ保存中…`);
     }
+    // 直前に最新SHAを取り直す（他の場所で更新されている場合に備える）
     await fetchDataSha();
-    const content = b64encode(JSON.stringify(state, null, 2));
-    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${DATA_PATH}`;
+    await putDataJson();
+    setStatus("✅ GitHubに保存しました");
+  }catch(e){ setStatus("❌ 保存失敗: "+(e && e.message ? e.message : e)); }
+}
+
+// data/products.json を実際にPUT。SHA不一致エラーが出たらSHAを取り直して1回だけ自動リトライ。
+async function putDataJson(){
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${DATA_PATH}`;
+  const content = b64encode(JSON.stringify(state, null, 2));
+  const doPut = async ()=>{
     const body = { message:`update ${DATA_PATH}`, content, branch:cfg.branch };
     if(dataSha) body.sha = dataSha;
     const res = await fetch(url, {
@@ -1613,10 +1622,33 @@ async function saveToGitHub(){
       headers:{ Authorization:`token ${cfg.pat}`, Accept:"application/vnd.github+json" },
       body: JSON.stringify(body)
     });
-    if(!res.ok){ throw new Error((await res.json()).message || res.status); }
-    dataSha = (await res.json()).content.sha;
-    setStatus("✅ GitHubに保存しました");
-  }catch(e){ setStatus("❌ 保存失敗: "+e.message); }
+    return res;
+  };
+  let res = await doPut();
+  if(!res.ok){
+    let info = {};
+    try{ info = await res.clone().json(); }catch(_){}
+    const msg = info.message || ("HTTP "+res.status);
+    // SHA不一致（409 or "does not match"）の場合は最新SHAを取り直して1回リトライ
+    const looksLikeShaMismatch =
+      res.status===409 ||
+      /does not match/i.test(msg) ||
+      /sha/i.test(msg) && /match/i.test(msg);
+    if(looksLikeShaMismatch){
+      setStatus("⚠️ 競合検出。最新版に追従して再保存中…");
+      await fetchDataSha();
+      res = await doPut();
+      if(!res.ok){
+        let info2={};
+        try{ info2 = await res.clone().json(); }catch(_){}
+        throw new Error(info2.message || ("HTTP "+res.status));
+      }
+    }else{
+      throw new Error(msg);
+    }
+  }
+  const ok = await res.json();
+  dataSha = ok.content ? ok.content.sha : dataSha;
 }
 
 // data:image/* で始まる画像をGitHubにアップロードし、ファイル名に置換する。
