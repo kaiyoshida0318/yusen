@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.32.1";
+const VERSION = "1.33.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -17,6 +17,7 @@ const COLUMNS = [
   { key:"date",   label:"日付" },
   { key:"image",  label:"画像" },
   { key:"name",   label:"項目名" },
+  { key:"expectedSales", label:"予想月商" },
   { key:"ranking", label:"ランキング" },
   { key:"rivalR", label:"楽天ライバル" },
   { key:"rivalA", label:"Amazonライバル" },
@@ -125,6 +126,7 @@ function migrate(data){
     }
   });
   data.rows.forEach(r=>{
+    if(typeof r.expectedSales !== "number") r.expectedSales = 0;
     if(!Array.isArray(r.suppliers)){
       r.suppliers = [];
       if(r.supply){ r.suppliers.push({ image:"", url:r.supply, memo:"" }); delete r.supply; }
@@ -408,6 +410,7 @@ function addQuickRow(){
     date: today(),
     image: "",
     name: "",
+    expectedSales: 0,
     rivalRakuten: [], rivalAmazon: [], rankingUrls: [], freeNote: "",
     category: ((currentCat==="all"||currentCat==="none") ? "" : currentCat),
     status: ((currentStatus==="all"||currentStatus==="none") ? "" : currentStatus),
@@ -459,6 +462,7 @@ function render(){
       };
     }else{
       if(c.key==="image") th.className="col-image";
+      if(c.key==="expectedSales") th.className="col-exp-sales";
       if(c.key==="actions") th.className="col-actions";
       if(c.key==="catSel") th.className="col-catsel";
       if(c.key==="statusSel") th.className="col-statussel";
@@ -520,6 +524,13 @@ function render(){
     const tdName = document.createElement("td");
     tdName.textContent = row.name || "";
     trb.appendChild(tdName);
+
+    // 予想月商
+    const tdExp = document.createElement("td");
+    tdExp.className = "col-exp-sales";
+    const v = (typeof row.expectedSales === "number" && row.expectedSales > 0) ? row.expectedSales : 0;
+    tdExp.textContent = v > 0 ? (v.toLocaleString() + " 万円") : "—";
+    trb.appendChild(tdExp);
 
     trb.appendChild(urlListCell(row.rankingUrls));
 
@@ -829,6 +840,8 @@ function openEntry(editIndex, mode){
   let row = isEdit ? state.rows[editIndex] : null;
   document.getElementById("fDate").value  = row ? (row.date||today()) : today();
   document.getElementById("fName").value  = row ? (row.name||"") : "";
+  const fExp = document.getElementById("fExpectedSales");
+  if(fExp) fExp.value = (row && (row.expectedSales!=null)) ? String(row.expectedSales) : "";
   // ライバルURL（楽天/Amazon、最低2行ずつ確保）
   entry.rivalRakuten = row && Array.isArray(row.rivalRakuten) ? row.rivalRakuten.slice() : [];
   entry.rivalAmazon  = row && Array.isArray(row.rivalAmazon)  ? row.rivalAmazon.slice()  : [];
@@ -1762,10 +1775,17 @@ function saveEntry(keepOpen){
     const fDate = document.getElementById("fDate");
     const fCat  = document.getElementById("fCategory");
     const fSt   = document.getElementById("fStatus");
+    const fExp  = document.getElementById("fExpectedSales");
+    let expectedSales = 0;
+    if(fExp){
+      const v = parseInt((fExp.value||"").trim(), 10);
+      expectedSales = (Number.isFinite(v) && v >= 0) ? v : 0;
+    }
     const row = {
       date:  (fDate && fDate.value) || today(),
       image: entry.image || "",
       name:  fName ? fName.value.trim() : "",
+      expectedSales,
       rivalRakuten: entry.rivalRakuten.map(u=>(u||"").trim()).filter(u=>u),
       rivalAmazon:  entry.rivalAmazon.map(u=>(u||"").trim()).filter(u=>u),
       rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
