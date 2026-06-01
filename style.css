@@ -544,3 +544,15 @@ tbody td{font-size:13px}
 /* ログモーダル */
 .modal.modal-log{width:760px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column}
 #logArea{flex:1;min-height:380px;width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;border:1px solid var(--border);border-radius:8px;padding:10px;background:#0f1419;color:#e6edf3;resize:vertical;white-space:pre;overflow:auto;margin:8px 0 12px}
+
+/* 画像エリア下のURL貼り欄 */
+.img-url-row{display:flex;gap:4px;align-items:center;margin-top:6px}
+.img-url-input{flex:1;min-width:0;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:11px;background:#fff;color:var(--text)}
+.img-url-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,90,55,.15)}
+.img-url-go{padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--muted);font:inherit;font-size:11px;cursor:pointer;flex:0 0 auto}
+.img-url-go:hover{background:var(--row-alt);color:var(--text)}
+.entry-image-url-slot{width:320px}
+.supplier-image-col{display:flex;flex-direction:column;flex:0 0 110px;width:110px}
+.supplier-image-col .img-url-row{margin-top:4px}
+.supplier-image-col .img-url-input{font-size:10px;padding:4px 6px}
+.supplier-image-col .img-url-go{font-size:10px;padding:4px 6px}
