@@ -540,3 +540,7 @@ tbody td{font-size:13px}
 .cs-opt.cs-selected{background:#fdf0ec;color:var(--accent);font-weight:600}
 .cs-opt .cs-ico{width:20px;height:20px;flex:0 0 20px}
 .cs-opt .cs-ico svg{width:20px;height:20px}
+
+/* ログモーダル */
+.modal.modal-log{width:760px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column}
+#logArea{flex:1;min-height:380px;width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;border:1px solid var(--border);border-radius:8px;padding:10px;background:#0f1419;color:#e6edf3;resize:vertical;white-space:pre;overflow:auto;margin:8px 0 12px}
