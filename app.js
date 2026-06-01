@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.38.1";
+const VERSION = "1.39.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -2271,52 +2271,75 @@ function startColResize(e, th, key){
   document.addEventListener("mouseup", up);
 }
 function renderColManager(){
-  const list = document.getElementById("colList");
-  list.innerHTML = "";
+  const visWrap = document.getElementById("colListVisible");
+  const hidWrap = document.getElementById("colListHidden");
+  if(!visWrap || !hidWrap) return;
+  visWrap.innerHTML = "";
+  hidWrap.innerHTML = "";
+
   COLUMNS.forEach(c=>{
     const cc = getColCfg(c.key);
-    const row = document.createElement("div"); row.className = "col-row";
+    const isVisible = cc.visible !== false;
+    const card = document.createElement("div"); card.className = "col-card";
 
-    // 表示チェック
-    const vis = document.createElement("input");
-    vis.type = "checkbox"; vis.checked = cc.visible !== false;
-    vis.onchange = ()=>{ setColCfg(c.key, { visible: vis.checked }); render(); };
+    const name = document.createElement("div"); name.className = "col-card-name";
+    name.textContent = c.label;
+    card.appendChild(name);
 
-    // 名前
-    const lbl = document.createElement("span"); lbl.className = "col-name";
-    lbl.textContent = c.label;
+    if(isVisible){
+      // 幅(px)＋テキスト処理
+      const controls = document.createElement("div"); controls.className = "col-card-controls";
+      const w = document.createElement("input");
+      w.type = "number"; w.min = "0"; w.step = "10"; w.className = "col-width-input";
+      w.title = "幅(px)。空欄で自動";
+      if(cc.width){
+        w.value = String(cc.width); w.placeholder = "自動";
+      }else{
+        w.value = "";
+        const measured = getRenderedColWidth(c.key);
+        w.placeholder = (measured != null) ? `${measured}（自動）` : "自動";
+      }
+      w.onchange = ()=>{
+        const v = parseInt(w.value.trim(), 10);
+        setColCfg(c.key, { width: (Number.isFinite(v) && v > 0) ? v : null });
+        render();
+        renderColManager();
+      };
+      const sel = document.createElement("select"); sel.className = "col-wrap-sel";
+      const o1 = document.createElement("option"); o1.value = "wrap"; o1.textContent = "折り返す";
+      const o2 = document.createElement("option"); o2.value = "clip"; o2.textContent = "以降を非表示";
+      sel.append(o1, o2);
+      sel.value = cc.wrap || "wrap";
+      sel.onchange = ()=>{ setColCfg(c.key, { wrap: sel.value }); render(); };
+      controls.append(w, sel);
+      card.appendChild(controls);
 
-    // 幅(px) 空欄=自動。自動のときは現在の実際の表示幅(px)をプレースホルダに見せる
-    const w = document.createElement("input");
-    w.type = "number"; w.min = "0"; w.step = "10";
-    w.className = "col-width-input";
-    if(cc.width){
-      w.value = String(cc.width);
-      w.placeholder = "自動";
+      // 非表示へ移動
+      const mv = document.createElement("button"); mv.type = "button"; mv.className = "col-move-btn";
+      mv.textContent = "非表示にする →"; mv.title = "この項目を非表示にする";
+      mv.onclick = ()=>{ setColCfg(c.key, { visible:false }); render(); renderColManager(); };
+      card.appendChild(mv);
+
+      visWrap.appendChild(card);
     }else{
-      w.value = "";
-      const measured = getRenderedColWidth(c.key);
-      w.placeholder = (measured != null) ? `${measured}（自動）` : "自動";
+      // 表示へ戻す
+      const mv = document.createElement("button"); mv.type = "button"; mv.className = "col-move-btn col-move-back";
+      mv.textContent = "← 表示する"; mv.title = "この項目を表示する";
+      mv.onclick = ()=>{ setColCfg(c.key, { visible:true }); render(); renderColManager(); };
+      card.appendChild(mv);
+
+      hidWrap.appendChild(card);
     }
-    w.onchange = ()=>{
-      const v = parseInt(w.value.trim(), 10);
-      setColCfg(c.key, { width: (Number.isFinite(v) && v > 0) ? v : null });
-      render();
-      // 自動に戻したときは、新しい実幅をプレースホルダへ反映する
-      renderColManager();
-    };
-
-    // テキスト処理（折り返し / 以降を非表示）
-    const sel = document.createElement("select"); sel.className = "col-wrap-sel";
-    const o1 = document.createElement("option"); o1.value = "wrap";  o1.textContent = "折り返す";
-    const o2 = document.createElement("option"); o2.value = "clip";  o2.textContent = "以降を非表示";
-    sel.append(o1, o2);
-    sel.value = cc.wrap || "wrap";
-    sel.onchange = ()=>{ setColCfg(c.key, { wrap: sel.value }); render(); };
-
-    row.append(vis, lbl, w, sel);
-    list.appendChild(row);
   });
+
+  if(!visWrap.children.length){
+    const e = document.createElement("div"); e.className = "col-empty"; e.textContent = "表示中の項目がありません";
+    visWrap.appendChild(e);
+  }
+  if(!hidWrap.children.length){
+    const e = document.createElement("div"); e.className = "col-empty"; e.textContent = "（すべて表示中）";
+    hidWrap.appendChild(e);
+  }
 }
 function resetColCfg(){
   if(!confirm("項目の表示設定をすべてデフォルトに戻します。よろしいですか？")) return;
