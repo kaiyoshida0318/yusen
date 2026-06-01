@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.31.1";
+const VERSION = "1.32.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -77,6 +77,16 @@ function init(){
   bindUI();
   render();
   loadFromGitHub();
+  updateStickyHeight();
+  window.addEventListener("resize", updateStickyHeight);
+}
+
+// 上部固定領域の高さを CSS 変数として設定（テーブルヘッダや本文の余白に使う）
+function updateStickyHeight(){
+  const el = document.querySelector(".sticky-top");
+  if(!el) return;
+  const h = el.offsetHeight;
+  document.documentElement.style.setProperty("--sticky-h", h + "px");
 }
 
 function loadCfg(){
@@ -265,6 +275,8 @@ function renderTabs(){
       swrap.append(delBtn);
     }
   }
+  // タブが描画されたあと、固定領域の高さを更新
+  if(typeof updateStickyHeight === "function") updateStickyHeight();
 }
 // 上段カウント: 現在の下段ステータス絞り込みを反映
 // カテゴリ/ステータスのマッチ判定: all=全部, none=未設定(空), それ以外=id一致
