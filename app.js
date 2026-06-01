@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.29.1";
+const VERSION = "1.30.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1732,6 +1732,7 @@ function saveEntry(keepOpen){
 async function uploadImage(file){
   const ext = (file.name.split(".").pop()||"png").toLowerCase();
   const filename = `img_${Date.now().toString(36)}_${Math.floor(Math.random()*1000)}.${ext}`;
+  logInfo("uploadImage: 開始", { filename, sizeKB: Math.round((file.size||0)/1024) });
   const b64 = await fileToBase64(file);
   const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${IMG_DIR}/${filename}`;
   const res = await fetch(url, {
@@ -1739,7 +1740,12 @@ async function uploadImage(file){
     headers:{ Authorization:`token ${cfg.pat}`, Accept:"application/vnd.github+json" },
     body: JSON.stringify({ message:`add image ${filename}`, content:b64, branch:cfg.branch })
   });
-  if(!res.ok){ throw new Error((await res.json()).message || res.status); }
+  if(!res.ok){
+    const m = (await res.json()).message || res.status;
+    logError("uploadImage: 失敗", { filename, status: res.status, msg: m });
+    throw new Error(m);
+  }
+  logInfo("uploadImage: 成功", { filename });
   return filename;
 }
 function fileToBase64(file){
@@ -1821,9 +1827,11 @@ async function saveToGitHub(){
   if(!cfg.pat||!cfg.owner||!cfg.repo){ openSettings(); setStatus("⚠️ 先にGitHub設定を入力してください"); return; }
   // 既に実行中なら、終了後に1度だけ追加実行（連続呼び出しの最新版を必ず反映）
   if(saveToGitHubRunning){
+    logInfo("saveToGitHub: 既に実行中。pending=true");
     saveToGitHubPending = true;
     return saveToGitHubRunning;
   }
+  logInfo("saveToGitHub: 開始", { rows: (state.rows||[]).length });
   // 「💾 GitHubに保存」ボタンを処理中は無効化
   const btn = document.getElementById("btnSave");
   if(btn) btn.disabled = true;
@@ -1880,7 +1888,9 @@ async function putDataJson(){
     });
     return res;
   };
+  logInfo("putDataJson: PUT開始", { sha: dataSha });
   let res = await doPut();
+  logInfo("putDataJson: PUT結果", { status: res.status, ok: res.ok });
   // SHA不一致の場合は最大4回までリトライ（指数バックオフ）
   for(let attempt=0; attempt<4 && !res.ok; attempt++){
     let info = {};
@@ -1891,6 +1901,7 @@ async function putDataJson(){
       res.status===422 ||
       /does not match/i.test(msg) ||
       (/sha/i.test(msg) && /match/i.test(msg));
+    logWarn(`putDataJson: PUT失敗 attempt=${attempt}`, { status: res.status, msg, looksLikeShaMismatch });
     if(!looksLikeShaMismatch){
       throw new Error(msg);
     }
@@ -1898,15 +1909,19 @@ async function putDataJson(){
     setStatus(`⚠️ 競合検出。最新版に追従して再保存中…(${attempt+1}回目, ${wait}ms待機)`);
     await new Promise(r=>setTimeout(r, wait));
     await fetchDataSha();
+    logInfo(`putDataJson: SHA再取得 attempt=${attempt+1}`, { newSha: dataSha });
     res = await doPut();
+    logInfo(`putDataJson: 再PUT結果 attempt=${attempt+1}`, { status: res.status, ok: res.ok });
   }
   if(!res.ok){
     let info2={};
     try{ info2 = await res.clone().json(); }catch(_){}
+    logError("putDataJson: 全リトライ失敗", { status: res.status, msg: info2.message });
     throw new Error(info2.message || ("HTTP "+res.status));
   }
   const ok = await res.json();
   dataSha = ok.content ? ok.content.sha : dataSha;
+  logInfo("putDataJson: 成功", { newSha: dataSha });
 }
 
 // data:image/* で始まる画像をGitHubにアップロードし、ファイル名に置換する。
@@ -2212,11 +2227,78 @@ function bindUI(){
     setStatus("✅ 設定を保存しました");
     loadFromGitHub();
   };
+  // ログモーダル
+  document.getElementById("btnViewLog").onclick = openLogModal;
+  document.getElementById("btnCloseLog").onclick = ()=>{ document.getElementById("logModal").hidden = true; };
+  document.getElementById("btnCopyLog").onclick = ()=>{
+    const text = document.getElementById("logArea").value;
+    try{
+      navigator.clipboard.writeText(text).then(
+        ()=>setStatus("✅ ログをクリップボードにコピーしました"),
+        ()=>setStatus("❌ クリップボードへのコピーに失敗（手動で選択してコピーしてください）")
+      );
+    }catch(e){
+      // フォールバック: 選択
+      document.getElementById("logArea").select();
+      setStatus("⚠️ 手動で Ctrl+C / Cmd+C を押してください");
+    }
+  };
+  document.getElementById("btnClearLog").onclick = ()=>{
+    if(!confirm("ログを全削除します。よろしいですか？")) return;
+    clearAppLog();
+    document.getElementById("logArea").value = "";
+    setStatus("✅ ログをクリアしました");
+  };
 }
+
+function openLogModal(){
+  document.getElementById("logArea").value = formatAppLogs() || "（ログはまだありません）";
+  document.getElementById("logModal").hidden = false;
+}
+
+/* ---------- アプリログ（デバッグ用、設定モーダルから閲覧可能） ---------- */
+const LS_LOG = "yusen_log_v1";
+const LOG_MAX = 500;
+let appLogs = [];
+try{ appLogs = JSON.parse(localStorage.getItem(LS_LOG) || "[]"); if(!Array.isArray(appLogs)) appLogs = []; }catch(_){ appLogs = []; }
+function appLog(level, message, extra){
+  try{
+    const e = {
+      t: new Date().toISOString(),
+      lv: level || "info",
+      msg: String(message || ""),
+    };
+    if(extra) e.extra = (typeof extra==="string" ? extra : JSON.stringify(extra)).slice(0, 1000);
+    appLogs.push(e);
+    if(appLogs.length > LOG_MAX) appLogs = appLogs.slice(-LOG_MAX);
+    try{ localStorage.setItem(LS_LOG, JSON.stringify(appLogs)); }catch(_){ /* 容量超過時は無視 */ }
+  }catch(_){}
+}
+function clearAppLog(){
+  appLogs = [];
+  try{ localStorage.removeItem(LS_LOG); }catch(_){}
+}
+function formatAppLogs(){
+  return appLogs.map(e=>{
+    const t = e.t.replace("T"," ").replace(/\..*$/, "");
+    return `[${t}] [${e.lv}] ${e.msg}` + (e.extra ? ` | ${e.extra}` : "");
+  }).join("\n");
+}
+// レベル別ショートカット
+function logInfo(m, x){ appLog("info", m, x); }
+function logWarn(m, x){ appLog("warn", m, x); }
+function logError(m, x){ appLog("error", m, x); }
 
 function setStatus(msg){
   const el = document.getElementById("status");
   el.textContent = msg;
+  // ステータスメッセージを自動でログに記録（先頭の絵文字でレベル判定）
+  let lv = "info";
+  if(typeof msg === "string"){
+    if(msg.startsWith("❌")) lv = "error";
+    else if(msg.startsWith("⚠️")) lv = "warn";
+  }
+  if(msg) appLog(lv, msg);
   if(msg && msg.startsWith("✅")) setTimeout(()=>{ if(el.textContent===msg) el.textContent=""; }, 3500);
 }
 
