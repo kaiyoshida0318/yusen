@@ -34,12 +34,14 @@
   "rows": [
     {
       "date": "2026-05-27",
-      "image": "",
+      "image": "img_mpui2cz6_100.webp",
       "name": "ウエスト調整",
       "rivalRakuten": [
         "https://item.rakuten.co.jp/kiracoco/mz2108-copy/"
       ],
       "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
       "category": "new",
       "status": "arrived",
       "rakumart": [
@@ -53,9 +55,7 @@
         }
       ],
       "suppliers": [],
-      "tables": [],
-      "rankingUrls": [],
-      "freeNote": ""
+      "tables": []
     },
     {
       "date": "2026-05-28",
@@ -136,7 +136,7 @@
             {
               "cells": [
                 {
-                  "image": ""
+                  "image": "img_mpui2uso_597.jpg"
                 },
                 {
                   "text": "",
@@ -151,7 +151,7 @@
             {
               "cells": [
                 {
-                  "image": ""
+                  "image": "img_mpui2woi_776.jpg"
                 },
                 {
                   "text": "",
