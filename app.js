@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.32.0";
+const VERSION = "1.32.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -85,7 +85,8 @@ function init(){
 function updateStickyHeight(){
   const el = document.querySelector(".sticky-top");
   if(!el) return;
-  const h = el.offsetHeight;
+  // 高さの小数差で1pxずれて見えるのを防ぐため切り上げ
+  const h = Math.ceil(el.getBoundingClientRect().height);
   document.documentElement.style.setProperty("--sticky-h", h + "px");
 }
 
