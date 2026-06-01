@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.38.1">
+<link rel="stylesheet" href="style.css?v=1.39.0">
 </head>
 <body>
 <div class="sticky-top">
@@ -190,14 +190,17 @@
 <div class="modal-overlay" id="colModal" hidden>
   <div class="modal modal-col">
     <h2>📐 項目管理</h2>
-    <p class="hint">一覧表の各列の表示／非表示・幅・テキストの折り返しを設定します。この設定はこの端末にのみ保存されます（GitHubには同期しません）。</p>
-    <div class="col-list-head">
-      <span>表示</span>
-      <span>項目名</span>
-      <span>幅(px)</span>
-      <span>テキスト</span>
+    <p class="hint">左が「表示中」、右が「非表示」の項目です。「非表示にする →」「← 表示する」で切り替えられます。表示中の項目は幅(px)やテキストの折り返しも設定できます。この設定はこの端末にのみ保存されます（GitHubには同期しません）。</p>
+    <div class="col-cols">
+      <div class="col-col col-col-visible">
+        <div class="col-col-head">✅ 表示中</div>
+        <div id="colListVisible" class="col-list"></div>
+      </div>
+      <div class="col-col col-col-hidden">
+        <div class="col-col-head">🚫 非表示</div>
+        <div id="colListHidden" class="col-list"></div>
+      </div>
     </div>
-    <div id="colList" class="col-list"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="btnResetCols">🔄 デフォルトに戻す</button>
       <button class="btn btn-ghost" id="btnDragResize">↔ ドラッグで幅調整</button>
@@ -245,6 +248,6 @@
   <button class="btn btn-primary" id="btnResizeDone">完了</button>
 </div>
 
-<script src="app.js?v=1.38.1"></script>
+<script src="app.js?v=1.39.0"></script>
 </body>
 </html>
