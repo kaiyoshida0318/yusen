@@ -5,6 +5,7 @@
   --shadow:0 1px 3px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-gutter:stable}
 body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text);font-size:14px}
 
 .app-header{background:var(--surface);border-bottom:1px solid var(--border);z-index:10}
@@ -564,9 +565,10 @@ tbody td{font-size:13px}
   border-bottom:1px solid var(--border);
   box-shadow:0 2px 6px rgba(0,0,0,.04);
 }
-.container-top{padding-top:8px!important;padding-bottom:10px!important;background:var(--bg)}
-.container-top .toolbar{margin-bottom:0}
-.container-top .status-tabs{margin-bottom:6px;padding-bottom:6px}
+.container-top{padding:8px 16px 10px!important;background:var(--bg)}
+.container-top .toolbar{margin:0}
+.container-top .status-tabs{margin:0 0 6px;padding:0 0 6px}
+.container-top .cat-tabs{margin:0 0 10px;padding:0 0 8px}
 /* スクロールしない領域分の上余白（JSで .sticky-top の高さを CSS 変数に） */
 main.container:not(.container-top){padding-top:calc(var(--sticky-h, 200px) + 12px)}
 /* テーブルヘッダーも sticky 化（上の固定領域の下にぴったり） */
