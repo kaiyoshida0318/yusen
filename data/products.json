@@ -396,6 +396,39 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-06-01",
+      "image": "img_mpusztm8_327.webp",
+      "name": "ゲーミング指サック",
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/apnshop/finger-sliver100/?s-id=rk_shop_pc_rnkInShop",
+        "https://item.rakuten.co.jp/hbridge/o0300098a/?s-id=rk_shop_pc_rnkInShop"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [
+        {
+          "text": "2026051214502515-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026051214502515-2147"
+        }
+      ],
+      "suppliers": [
+        {
+          "image": "img_mput1fdw_197.jpg",
+          "url": "https://x.gd/eipKD",
+          "memo": "1set 5.5 / 2set 7.5"
+        },
+        {
+          "image": "img_mput1gy0_271.webp",
+          "url": "https://x.gd/4GER0",
+          "memo": "01set 3.02 / 03set 3.45 / 05set 3.88 / 10set 4.96"
+        }
+      ],
+      "tables": []
     }
   ],
   "categories": [
