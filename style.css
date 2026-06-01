@@ -507,3 +507,36 @@ tbody td{font-size:13px}
 .gh-progress.error .gh-spin{animation:none;border:none}
 .gh-progress.error .gh-spin::before{content:"✗";display:block;font-size:14px;line-height:1;color:#a13030;font-weight:700;text-align:center}
 .gh-progress .gh-sec{font-variant-numeric:tabular-nums;opacity:.8}
+
+/* ---------- カスタムドロップダウン（色付きバッジ対応） ---------- */
+.cs-wrap{position:relative;width:100%;font-size:12px}
+.cs-btn{
+  width:100%;display:flex;align-items:center;gap:6px;
+  padding:6px 8px;border:1px solid var(--border);border-radius:6px;
+  background:#fff;color:var(--text);font:inherit;font-size:12px;
+  cursor:pointer;text-align:left;line-height:1.2;
+}
+.cs-btn:hover{border-color:#bbb}
+.cs-wrap.cs-open .cs-btn{border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,90,55,.15)}
+.cs-wrap.cs-pending .cs-btn{background:#fff4e3;border-color:#f0b969;color:#8a4b00}
+.cs-ico{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex:0 0 18px}
+.cs-ico:empty{display:none}
+.cs-ico svg{width:18px;height:18px;display:block}
+.cs-ico .cs-emoji{font-size:14px;line-height:1}
+.cs-lbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-lbl.cs-placeholder{color:var(--muted)}
+.cs-arrow{flex:0 0 12px;color:var(--muted);font-size:10px}
+.cs-menu{
+  position:fixed;z-index:1000;
+  background:#fff;border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 6px 24px rgba(0,0,0,.15);padding:4px;max-height:280px;overflow-y:auto;
+}
+.cs-opt{
+  width:100%;display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border:none;border-radius:6px;background:transparent;
+  font:inherit;font-size:13px;color:var(--text);cursor:pointer;text-align:left;
+}
+.cs-opt:hover{background:var(--row-alt)}
+.cs-opt.cs-selected{background:#fdf0ec;color:var(--accent);font-weight:600}
+.cs-opt .cs-ico{width:20px;height:20px;flex:0 0 20px}
+.cs-opt .cs-ico svg{width:20px;height:20px}
