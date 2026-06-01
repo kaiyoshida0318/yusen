@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.30.0";
+const VERSION = "1.31.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1033,6 +1033,12 @@ function renderEntryImage(){
   }
   // 画像エリア全体をドロップ対象に（差し替えも可）
   enableImageDrop(box, entry, "image");
+  // 下にURL貼り付け欄を1つ置く
+  const slot = document.getElementById("entryImageUrlSlot");
+  if(slot){
+    slot.innerHTML = "";
+    slot.appendChild(makeUrlPasteRow(entry, "image", null, box));
+  }
 }
 
 // 楽天/Amazonライバルの入力欄を描画
@@ -1645,6 +1651,87 @@ function enableImageDrop(el, obj, key, cb){
     const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
     if(file) handleImageFile(file, obj, key, cb, el);  // ドロップ先要素を渡す
   });
+}
+
+/* URLから画像をfetchしてアップロード扱いにする。
+   CORS等で fetch できないURLは、フォールバックとして URL を直接 obj[key] に入れる。 */
+async function handleImageUrl(url, obj, key, cb, containerEl){
+  url = (url||"").trim();
+  if(!url) return;
+  if(!/^https?:\/\//i.test(url)){
+    setStatus("⚠️ 画像URLは http(s)://… で始める必要があります");
+    return;
+  }
+  logInfo("handleImageUrl: 開始", { url });
+  const overlay = showUploadOverlay(containerEl);
+  setStatus("URLから画像取得中…");
+  try{
+    const res = await fetch(url, { mode: "cors" });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const blob = await res.blob();
+    if(!/^image\//.test(blob.type)){
+      throw new Error("画像ではないようです (type: "+blob.type+")");
+    }
+    // URLから拡張子を推測
+    let ext = "png";
+    const m = url.match(/\.(jpg|jpeg|png|gif|webp|bmp|avif)(?:\?|#|$)/i);
+    if(m) ext = m[1].toLowerCase();
+    else if(blob.type){
+      const tm = blob.type.match(/^image\/(\w+)/);
+      if(tm) ext = tm[1].replace("jpeg","jpg");
+    }
+    const file = new File([blob], "url_image."+ext, { type: blob.type || "image/png" });
+    // 既存の画像アップロード経路に乗せる
+    await handleImageFile(file, obj, key, cb, null); // overlayは自前で出しているので2重表示しない
+    if(overlay) overlay.stop("✅");
+    logInfo("handleImageUrl: 成功", { url, ext });
+  }catch(e){
+    if(overlay) overlay.stop("❌");
+    logWarn("handleImageUrl: fetch失敗、URL直参照にフォールバック", { url, error: String(e && e.message || e) });
+    // フォールバック: URLそのまま参照
+    if(confirm(`画像のダウンロードに失敗しました（CORS等）。\nこのURLをそのまま参照する形で表示しますか？\n（GitHubには保存されず、元URLが消えたら表示も消えます）\n\n${e.message || e}`)){
+      obj[key] = url;
+      obj.imageIsDataUrl = false;
+      if(cb) cb(); else renderEntryImage();
+      // 閲覧モードでのURL貼り付けも自動保存
+      if(isViewmode() && entry.editIndex>=0){
+        try{ saveEntry(true); }catch(_){}
+      }
+      setStatus("✅ URLを画像として登録しました（直接参照）");
+    }else{
+      setStatus("❌ URLからの画像取得を中止しました");
+    }
+  }
+}
+
+// 画像エリアの下に置く小さなURL貼り付け欄
+function makeUrlPasteRow(obj, key, cb, containerEl){
+  const row = document.createElement("div");
+  row.className = "img-url-row";
+  const inp = document.createElement("input");
+  inp.type = "url"; inp.className = "img-url-input";
+  inp.placeholder = "またはURLを貼り付け（http://… / https://…）";
+  const go = document.createElement("button");
+  go.type = "button"; go.className = "img-url-go"; go.textContent = "適用";
+  const submit = ()=>{
+    const v = inp.value.trim();
+    if(!v) return;
+    handleImageUrl(v, obj, key, cb, containerEl);
+    inp.value = "";
+  };
+  go.onclick = submit;
+  inp.addEventListener("keydown", e=>{
+    if(e.key === "Enter"){ e.preventDefault(); submit(); }
+  });
+  // ペーストでURL貼られたら即実行（任意UX）
+  inp.addEventListener("paste", (e)=>{
+    setTimeout(()=>{
+      const v = inp.value.trim();
+      if(/^https?:\/\//i.test(v)) submit();
+    }, 0);
+  });
+  row.append(inp, go);
+  return row;
 }
 
 function saveEntry(keepOpen){
@@ -2575,6 +2662,7 @@ function renderSuppliersInto(container, items){
     if(!s.collapsed){
       const bodyRow = document.createElement("div"); bodyRow.className="supplier-body";
 
+      const imgCol = document.createElement("div"); imgCol.className="supplier-image-col";
       const imgBox = document.createElement("div"); imgBox.className="supplier-image";
       if(s.image){
         const im=document.createElement("img"); im.src=s.imageIsDataUrl?s.image:imgUrl(s.image);
@@ -2587,7 +2675,9 @@ function renderSuppliersInto(container, items){
         imgBox.appendChild(drop);
       }
       enableImageDrop(imgBox, s, "image", ()=>renderSuppliersInto(container, items));
-      bodyRow.appendChild(imgBox);
+      imgCol.appendChild(imgBox);
+      imgCol.appendChild(makeUrlPasteRow(s, "image", ()=>renderSuppliersInto(container, items), imgBox));
+      bodyRow.appendChild(imgCol);
 
       const fields = document.createElement("div"); fields.className="supplier-fields";
       const lUrl=document.createElement("label"); lUrl.textContent="仕入先URL";
