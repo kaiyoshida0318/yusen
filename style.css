@@ -138,6 +138,12 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .col-statussel{width:140px}
 .col-catsel{width:140px}
 .status-select{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:12px;background:#fff;color:var(--text);cursor:pointer}
+/* 一覧のステータスドロップダウン：選択中の番号バッジを左に重ねる */
+.status-sel-wrap{position:relative;width:100%}
+.status-sel-wrap .status-sel-badge{position:absolute;left:5px;top:50%;transform:translateY(-50%);width:18px;height:18px;display:none;pointer-events:none;z-index:1}
+.status-sel-wrap.has-badge .status-sel-badge{display:block}
+.status-sel-wrap.has-badge .status-select{padding-left:27px}
+.status-sel-wrap .status-sel-badge svg{width:18px;height:18px;display:block}
 .status-select:focus{border-color:var(--accent);outline:none}
 .status-select.status-pending{border-color:#f0a500;background:#fff8e8;font-weight:600}
 .btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text)}
