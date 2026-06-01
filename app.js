@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.27.0";
+const VERSION = "1.27.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -108,6 +108,10 @@ function migrate(data){
   const DEF_STATUS_ICON = { buy:"num:1", arrived:"num:2", prearrive:"num:3", working:"num:4" };
   data.statuses.forEach(s=>{
     if(typeof s.icon === "undefined" && DEF_STATUS_ICON[s.id]) s.icon = DEF_STATUS_ICON[s.id];
+    // ラベル先頭の番号文字（①②③④）を削除（バッジと二重表示になるため）
+    if(typeof s.label === "string"){
+      s.label = s.label.replace(/^[①②③④]\s*/, "").trim();
+    }
   });
   data.rows.forEach(r=>{
     if(!Array.isArray(r.suppliers)){
@@ -1943,7 +1947,12 @@ function renderStatusManager(){
     });
     const labelInp = document.createElement("input");
     labelInp.type = "text"; labelInp.value = s.label; labelInp.className = "cat-label-input";
-    labelInp.onchange = ()=>{ s.label = labelInp.value.trim() || s.label; persistLocal(); renderTabs(); };
+    labelInp.onchange = ()=>{
+      const cleaned = labelInp.value.replace(/^[①②③④]\s*/, "").trim();
+      s.label = cleaned || s.label;
+      labelInp.value = s.label;
+      persistLocal(); renderTabs();
+    };
     const up = document.createElement("button"); up.className="cat-mv"; up.textContent="▲";
     up.disabled = idx===0;
     up.onclick = ()=>{ if(idx>0){ [state.statuses[idx-1], state.statuses[idx]] = [state.statuses[idx], state.statuses[idx-1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
