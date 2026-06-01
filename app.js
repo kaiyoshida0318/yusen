@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.28.1";
+const VERSION = "1.29.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -570,77 +570,64 @@ function render(){
     actWrap.append(view, edit);
     tdAct.appendChild(actWrap);
 
-    // ステータス変更ドロップダウン
+    // ステータス変更ドロップダウン（カスタム：色付きバッジ表示）
     const tdStatus = document.createElement("td");
     tdStatus.className="col-statussel";
-    // selectをラッパに入れて、左に色付き番号バッジを重ねる
-    const selWrap = document.createElement("div"); selWrap.className="status-sel-wrap";
-    const sel = document.createElement("select");
-    sel.className="status-select";
-    const opt0 = document.createElement("option");
-    opt0.value=""; opt0.textContent="— 未設定 —";
-    sel.appendChild(opt0);
-    state.statuses.forEach(st=>{
-      const o=document.createElement("option");
-      o.value=st.id;
-      // ラベルに番号文字（① ② ③ ④）を頭に付けて、ドロップダウン展開中も番号で識別できるようにする
-      const cleanLabel = (st.label||"").replace(/^[①②③④]\s*/, "");
-      const numChar = statusNumChar(st.icon);
-      o.textContent = (numChar ? numChar+" " : "") + cleanLabel;
-      sel.appendChild(o);
-    });
-    // 保留中があればそれを、なければ現在値を選択
     const pending = (ri in pendingStatus) ? pendingStatus[ri] : row.status;
-    sel.value = pending || "";
-    if(pending !== row.status && (ri in pendingStatus)) sel.classList.add("status-pending");
-    // 選択中ステータスに対応する色付き番号バッジを左にオーバーレイ
-    const numBadge = document.createElement("span"); numBadge.className="status-sel-badge";
-    const refreshBadge = ()=>{
-      const cur = state.statuses.find(s=>s.id===sel.value);
-      numBadge.innerHTML = (cur && isNumIcon(cur.icon)) ? statusNumSvg(cur.icon) : "";
-      selWrap.classList.toggle("has-badge", numBadge.children.length>0);
-    };
-    refreshBadge();
-    sel.onchange = ()=>{
-      if(sel.value === (row.status||"")){
-        delete pendingStatus[ri]; // 元に戻したら保留解除
-      }else{
-        pendingStatus[ri] = sel.value;
+    const statusItems = [
+      { value:"", label:"— 未設定 —", iconHtml:"" },
+      ...state.statuses.map(st=>({
+        value: st.id,
+        label: (st.label||"").replace(/^[①②③④]\s*/, ""),
+        iconHtml: isNumIcon(st.icon) ? statusNumSvg(st.icon) : ""
+      }))
+    ];
+    const statusSel = createCustomSelect({
+      items: statusItems,
+      value: pending || "",
+      placeholder: "— 未設定 —",
+      pending: (pending !== row.status) && (ri in pendingStatus),
+      onChange: (v)=>{
+        if(v === (row.status||"")){
+          delete pendingStatus[ri];
+        }else{
+          pendingStatus[ri] = v;
+        }
+        // ボタンの保留中ハイライトを更新
+        statusSel.classList.toggle("cs-pending", (ri in pendingStatus));
+        renderTabs();
       }
-      sel.classList.toggle("status-pending", (ri in pendingStatus));
-      refreshBadge();
-      renderTabs(); // クリア・反映ボタンの出し分けを更新
-    };
-    selWrap.append(numBadge, sel);
-    tdStatus.appendChild(selWrap);
+    });
+    tdStatus.appendChild(statusSel);
 
-    // カテゴリ変更ドロップダウン
+    // カテゴリ変更ドロップダウン（カスタム：色付きバッジ表示）
     const tdCat = document.createElement("td");
     tdCat.className="col-catsel";
-    const csel = document.createElement("select");
-    csel.className="status-select cat-select";
-    const copt0 = document.createElement("option");
-    copt0.value=""; copt0.textContent="— 未分類 —";
-    csel.appendChild(copt0);
-    state.categories.forEach(c=>{
-      const o=document.createElement("option");
-      o.value=c.id; o.textContent=`${iconText(c.icon)} ${c.label}`.trim();
-      csel.appendChild(o);
-    });
-    // 保留中があればそれを、なければ現在値を選択
     const pendingC = (ri in pendingCat) ? pendingCat[ri] : row.category;
-    csel.value = pendingC || "";
-    if(pendingC !== row.category && (ri in pendingCat)) csel.classList.add("status-pending");
-    csel.onchange = ()=>{
-      if(csel.value === (row.category||"")){
-        delete pendingCat[ri]; // 元に戻したら保留解除
-      }else{
-        pendingCat[ri] = csel.value;
+    const catItems = [
+      { value:"", label:"— 未分類 —", iconHtml:"" },
+      ...state.categories.map(c=>({
+        value: c.id,
+        label: c.label,
+        iconHtml: (isLogoIcon(c.icon) || isLetterIcon(c.icon)) ? logoSvg(c.icon) : (c.icon ? `<span class="cs-emoji">${escapeHtml(c.icon)}</span>` : "")
+      }))
+    ];
+    const catSel = createCustomSelect({
+      items: catItems,
+      value: pendingC || "",
+      placeholder: "— 未分類 —",
+      pending: (pendingC !== row.category) && (ri in pendingCat),
+      onChange: (v)=>{
+        if(v === (row.category||"")){
+          delete pendingCat[ri];
+        }else{
+          pendingCat[ri] = v;
+        }
+        catSel.classList.toggle("cs-pending", (ri in pendingCat));
+        renderTabs();
       }
-      csel.classList.toggle("status-pending", (ri in pendingCat));
-      renderTabs(); // クリア・反映ボタンの出し分けを更新
-    };
-    tdCat.appendChild(csel);
+    });
+    tdCat.appendChild(catSel);
 
     // 左からカテゴリ・ステータス・操作
     trb.appendChild(tdCat);
@@ -695,6 +682,126 @@ function imgUrl(filename){
   }
   return filename;
 }
+
+/* ---------- カスタムドロップダウン（色付きバッジ付き） ----------
+   items: [{ value, label, iconHtml }] - iconHtml はSVG文字列、空なら無視
+   value: 現在の選択値
+   onChange: (newValue) => void
+   placeholder: 未選択時の表示
+   pending: trueなら色を変えて「変更保留中」表示
+*/
+let openCustomSelect = null; // 開いているドロップダウン参照（外クリックで閉じる用）
+function createCustomSelect(opts){
+  const wrap = document.createElement("div");
+  wrap.className = "cs-wrap";
+  if(opts.pending) wrap.classList.add("cs-pending");
+  // ボタン部分
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "cs-btn";
+  btn.setAttribute("aria-haspopup","listbox");
+  btn.setAttribute("aria-expanded","false");
+  // メニュー部分
+  const menu = document.createElement("div");
+  menu.className = "cs-menu"; menu.hidden = true;
+  menu.setAttribute("role","listbox");
+
+  const renderBtn = ()=>{
+    const cur = opts.items.find(it=>it.value===opts.value);
+    if(cur){
+      btn.innerHTML = `<span class="cs-ico">${cur.iconHtml||""}</span><span class="cs-lbl">${escapeHtml(cur.label)}</span><span class="cs-arrow">▾</span>`;
+    }else{
+      btn.innerHTML = `<span class="cs-ico"></span><span class="cs-lbl cs-placeholder">${escapeHtml(opts.placeholder||"")}</span><span class="cs-arrow">▾</span>`;
+    }
+  };
+
+  const closeMenu = ()=>{
+    menu.hidden = true;
+    btn.setAttribute("aria-expanded","false");
+    wrap.classList.remove("cs-open");
+    if(openCustomSelect===wrap) openCustomSelect = null;
+  };
+  const positionMenu = ()=>{
+    const r = btn.getBoundingClientRect();
+    menu.style.left = r.left + "px";
+    menu.style.top = (r.bottom + 4) + "px";
+    menu.style.width = r.width + "px";
+    // 下に入りきらない場合は上に出す
+    const menuH = menu.offsetHeight || 200;
+    if(r.bottom + 4 + menuH > window.innerHeight){
+      menu.style.top = Math.max(8, r.top - 4 - menuH) + "px";
+    }
+  };
+  const openMenu = ()=>{
+    // 他に開いているものがあれば閉じる
+    if(openCustomSelect && openCustomSelect!==wrap){
+      const otherMenu = openCustomSelect.querySelector(".cs-menu");
+      if(otherMenu) otherMenu.hidden = true;
+      openCustomSelect.classList.remove("cs-open");
+    }
+    menu.hidden = false;
+    btn.setAttribute("aria-expanded","true");
+    wrap.classList.add("cs-open");
+    openCustomSelect = wrap;
+    positionMenu();
+  };
+
+  btn.onclick = (e)=>{
+    e.stopPropagation();
+    if(menu.hidden) openMenu(); else closeMenu();
+  };
+
+  // メニューの各項目
+  opts.items.forEach(it=>{
+    const opt = document.createElement("button");
+    opt.type = "button";
+    opt.className = "cs-opt" + (it.value===opts.value ? " cs-selected" : "");
+    opt.setAttribute("role","option");
+    opt.innerHTML = `<span class="cs-ico">${it.iconHtml||""}</span><span class="cs-lbl">${escapeHtml(it.label)}</span>`;
+    opt.onclick = (e)=>{
+      e.stopPropagation();
+      opts.value = it.value;
+      renderBtn();
+      menu.querySelectorAll(".cs-opt").forEach(el=>el.classList.remove("cs-selected"));
+      opt.classList.add("cs-selected");
+      closeMenu();
+      if(opts.onChange) opts.onChange(it.value);
+    };
+    menu.appendChild(opt);
+  });
+
+  wrap.append(btn, menu);
+  renderBtn();
+  return wrap;
+}
+// 外クリックで開いているカスタムドロップダウンを閉じる
+document.addEventListener("click", ()=>{
+  if(openCustomSelect){
+    const m = openCustomSelect.querySelector(".cs-menu");
+    if(m) m.hidden = true;
+    openCustomSelect.classList.remove("cs-open");
+    const b = openCustomSelect.querySelector(".cs-btn");
+    if(b) b.setAttribute("aria-expanded","false");
+    openCustomSelect = null;
+  }
+});
+// スクロール／リサイズで開いているメニューを閉じる（位置ずれ防止）
+window.addEventListener("scroll", ()=>{
+  if(openCustomSelect){
+    const m = openCustomSelect.querySelector(".cs-menu");
+    if(m) m.hidden = true;
+    openCustomSelect.classList.remove("cs-open");
+    openCustomSelect = null;
+  }
+}, true);
+window.addEventListener("resize", ()=>{
+  if(openCustomSelect){
+    const m = openCustomSelect.querySelector(".cs-menu");
+    if(m) m.hidden = true;
+    openCustomSelect.classList.remove("cs-open");
+    openCustomSelect = null;
+  }
+});
 
 /* ---------- 登録モーダル ---------- */
 function openEntry(editIndex, mode){
