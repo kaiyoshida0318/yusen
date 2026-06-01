@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.22.1";
+const VERSION = "1.23.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -849,12 +849,12 @@ function renderEntryImage(){
     const img = document.createElement("img");
     img.src = entry.imageIsDataUrl ? entry.image : imgUrl(entry.image);
     img.className = "entry-preview"; img.title = "クリック／ドロップで差し替え";
-    img.onclick = ()=>pickImageInto(entry, "image");
+    img.onclick = ()=>pickImageInto(entry, "image", null, box);
     box.appendChild(img);
   }else{
     const drop = document.createElement("div");
     drop.className="img-drop"; drop.innerHTML="クリック<br>またはドロップ";
-    drop.onclick = ()=>pickImageInto(entry, "image");
+    drop.onclick = ()=>pickImageInto(entry, "image", null, box);
     box.appendChild(drop);
   }
   // 画像エリア全体をドロップ対象に（差し替えも可）
@@ -1014,11 +1014,11 @@ function renderSuppliers(){
       if(s.image){
         const im=document.createElement("img"); im.src=s.imageIsDataUrl?s.image:imgUrl(s.image);
         im.className="supplier-preview"; im.title="クリック／ドロップで差し替え";
-        im.onclick=()=>pickImageInto(s,"image", renderSuppliers);
+        im.onclick=()=>pickImageInto(s,"image", renderSuppliers, imgBox);
         imgBox.appendChild(im);
       }else{
         const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="仕入先画像<br>クリック／ドロップ";
-        drop.onclick=()=>pickImageInto(s,"image", renderSuppliers);
+        drop.onclick=()=>pickImageInto(s,"image", renderSuppliers, imgBox);
         imgBox.appendChild(drop);
       }
       enableImageDrop(imgBox, s, "image", renderSuppliers);
@@ -1197,11 +1197,11 @@ function renderTables(){
           if(cell.image){
             const im=document.createElement("img"); im.src=cell.imageIsDataUrl?cell.image:imgUrl(cell.image);
             im.className="tbl-img"; im.title="\u30af\u30ea\u30c3\u30af\uff0f\u30c9\u30ed\u30c3\u30d7\u3067\u5dee\u3057\u66ff\u3048";
-            im.onclick=()=>pickImageInto(cell,"image",renderTables);
+            im.onclick=()=>pickImageInto(cell,"image",renderTables,imgBox);
             imgBox.appendChild(im);
           }else{
             const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="\u753b\u50cf";
-            drop.onclick=()=>pickImageInto(cell,"image",renderTables);
+            drop.onclick=()=>pickImageInto(cell,"image",renderTables,imgBox);
             imgBox.appendChild(drop);
           }
           enableImageDrop(imgBox, cell, "image", renderTables);
@@ -1371,14 +1371,14 @@ function toggleSectionRakumart(){
 }
 
 /* obj[key] に画像を取り込む（メインライバル/仕入先 共通）。cb で再描画 */
-function pickImageInto(obj, key, cb){
+function pickImageInto(obj, key, cb, containerEl){
   // 閲覧モード中はクリック→ファイル選択を抑止（ドロップだけ受け付ける）
   if(isViewmode()) return;
   const input = document.createElement("input");
   input.type="file"; input.accept="image/*";
   input.onchange = ()=>{
     const file = input.files[0]; if(!file) return;
-    handleImageFile(file, obj, key, cb);
+    handleImageFile(file, obj, key, cb, containerEl);
   };
   input.click();
 }
@@ -1389,8 +1389,39 @@ function isViewmode(){
   return !!(m && m.classList.contains("is-viewmode"));
 }
 
+/* ---------- アップロード中オーバーレイ（スピナー＋経過秒） ---------- */
+function showUploadOverlay(el){
+  if(!el) return null;
+  // 既存があれば消す
+  el.querySelectorAll(".upload-overlay").forEach(n=>n.remove());
+  const ov = document.createElement("div");
+  ov.className = "upload-overlay";
+  ov.innerHTML = `<div class="up-spin"></div><div class="up-sec">0.0s</div>`;
+  el.appendChild(ov);
+  const start = performance.now();
+  const sec = ov.querySelector(".up-sec");
+  const timer = setInterval(()=>{
+    const t = (performance.now() - start) / 1000;
+    sec.textContent = t.toFixed(1) + "s";
+  }, 100);
+  return {
+    el: ov,
+    stop: (finalText)=>{
+      clearInterval(timer);
+      const t = (performance.now() - start) / 1000;
+      if(finalText){
+        sec.textContent = finalText + " " + t.toFixed(1) + "s";
+        // 結果は0.8秒ほど表示してから消す
+        setTimeout(()=>ov.remove(), 800);
+      }else{
+        ov.remove();
+      }
+    }
+  };
+}
+
 // ファイルを受け取って obj[key] に登録（アップロード or プレビュー）
-async function handleImageFile(file, obj, key, cb){
+async function handleImageFile(file, obj, key, cb, containerEl){
   if(!file || !file.type || !file.type.startsWith("image/")){
     setStatus("⚠️ 画像ファイルをドロップしてください"); return;
   }
@@ -1416,13 +1447,19 @@ async function handleImageFile(file, obj, key, cb){
     setStatus("⚠️ GitHub未設定のため、この画像は保存されません（リロードで消えます）。⚙️設定からPAT等を入力してください");
     return;
   }
+  // 該当画像エリアの上にスピナー＋経過秒オーバーレイ表示
+  const overlay = showUploadOverlay(containerEl);
   setStatus("画像アップロード中…");
   try{
     const filename = await uploadImage(file);
     obj[key]=filename; obj.imageIsDataUrl=false;
+    if(overlay) overlay.stop("✅");
     finish();
     if(!viewmode) setStatus("✅ 画像アップロード完了");
-  }catch(e){ setStatus("❌ 画像アップロード失敗: "+e.message); }
+  }catch(e){
+    if(overlay) overlay.stop("❌");
+    setStatus("❌ 画像アップロード失敗: "+e.message);
+  }
 }
 
 // 要素にドラッグ&ドロップで画像登録できるようにする
@@ -1432,7 +1469,7 @@ function enableImageDrop(el, obj, key, cb){
   el.addEventListener("drop", e=>{
     e.preventDefault(); e.stopPropagation(); el.classList.remove("drag-over");
     const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-    if(file) handleImageFile(file, obj, key, cb);
+    if(file) handleImageFile(file, obj, key, cb, el);  // ドロップ先要素を渡す
   });
 }
 
@@ -2153,11 +2190,11 @@ function renderSuppliersInto(container, items){
       if(s.image){
         const im=document.createElement("img"); im.src=s.imageIsDataUrl?s.image:imgUrl(s.image);
         im.className="supplier-preview"; im.title="クリック／ドロップで差し替え";
-        im.onclick=()=>pickImageInto(s,"image", ()=>renderSuppliersInto(container, items));
+        im.onclick=()=>pickImageInto(s,"image", ()=>renderSuppliersInto(container, items), imgBox);
         imgBox.appendChild(im);
       }else{
         const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="仕入先画像<br>クリック／ドロップ";
-        drop.onclick=()=>pickImageInto(s,"image", ()=>renderSuppliersInto(container, items));
+        drop.onclick=()=>pickImageInto(s,"image", ()=>renderSuppliersInto(container, items), imgBox);
         imgBox.appendChild(drop);
       }
       enableImageDrop(imgBox, s, "image", ()=>renderSuppliersInto(container, items));
@@ -2238,11 +2275,11 @@ function renderTableInto(container, block){
         if(cell.image){
           const im=document.createElement("img"); im.src=cell.imageIsDataUrl?cell.image:imgUrl(cell.image);
           im.className="tbl-img"; im.title="\u30af\u30ea\u30c3\u30af\uff0f\u30c9\u30ed\u30c3\u30d7\u3067\u5dee\u3057\u66ff\u3048";
-          im.onclick=()=>pickImageInto(cell,"image",rerender);
+          im.onclick=()=>pickImageInto(cell,"image",rerender,imgBox);
           imgBox.appendChild(im);
         }else{
           const drop=document.createElement("div"); drop.className="img-drop"; drop.innerHTML="\u753b\u50cf";
-          drop.onclick=()=>pickImageInto(cell,"image",rerender);
+          drop.onclick=()=>pickImageInto(cell,"image",rerender,imgBox);
           imgBox.appendChild(drop);
         }
         enableImageDrop(imgBox, cell, "image", rerender);
