@@ -634,3 +634,7 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 /* 商品名列を中央寄せ */
 .col-name-cell{text-align:center}
 .col-name-cell .list-edit-input{text-align:center}
+
+/* ステータス管理：番号ピッカーで狭くなる名前入力欄を確保するため横幅を広げる */
+.modal.modal-status{width:620px;max-width:95vw}
+.modal-status .cat-label-input{flex:1;min-width:240px}
