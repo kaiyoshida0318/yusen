@@ -486,3 +486,24 @@ tbody td{font-size:13px}
 
 /* オーバーレイが描画されるためには、画像コンテナにposition:relativeが必要 */
 .entry-image,.supplier-image,.tbl-img-box{position:relative}
+
+/* ヘッダーのGitHub保存進行中インジケーター */
+.gh-progress{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 14px;border:1px solid var(--border);border-radius:8px;
+  background:#fff8e8;color:#a36a00;font-size:12px;font-weight:600;
+}
+.gh-progress.done{background:#e8f5ec;color:#2d7a4d;border-color:#bfe0cf}
+.gh-progress.error{background:#fdecec;color:#a13030;border-color:#f1bcbc}
+.gh-progress .gh-spin{
+  width:14px;height:14px;border:2px solid rgba(0,0,0,.12);border-top-color:currentColor;
+  border-radius:50%;animation:upspin .8s linear infinite;display:inline-block;flex:0 0 14px;
+}
+.gh-progress.done .gh-spin{
+  border:none;width:14px;height:14px;background:transparent;
+  animation:none;
+}
+.gh-progress.done .gh-spin::before{content:"✓";display:block;font-size:14px;line-height:1;color:#2d7a4d;font-weight:700;text-align:center}
+.gh-progress.error .gh-spin{animation:none;border:none}
+.gh-progress.error .gh-spin::before{content:"✗";display:block;font-size:14px;line-height:1;color:#a13030;font-weight:700;text-align:center}
+.gh-progress .gh-sec{font-variant-numeric:tabular-nums;opacity:.8}
