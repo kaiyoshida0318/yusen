@@ -644,3 +644,8 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .col-card-controls .col-width-input{flex:0 0 84px;width:84px}
 .col-card-controls .col-align-sel,
 .col-card-controls .col-wrap-sel{flex:1;min-width:104px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:12px;background:#fff;color:var(--text);cursor:pointer}
+
+/* 項目管理：タイトル揃え／データ揃えのラベル付きグループ */
+.col-align-group{display:flex;align-items:center;gap:4px;flex:1;min-width:132px;margin:0}
+.col-ctrl-label{font-size:11px;color:var(--muted);flex:0 0 auto}
+.col-align-group .col-align-sel{flex:1;min-width:56px}
