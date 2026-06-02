@@ -668,15 +668,69 @@
       "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-24-03-01.jpg",
       "name": "汗取りパッド",
       "expectedSales": 4,
-      "rivalRakuten": [],
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/e-monoplus/sw20/"
+      ],
       "rivalAmazon": [],
-      "rankingUrls": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/weekly/304079/"
+      ],
       "freeNote": "",
       "category": "rakuten",
       "status": "working",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [
+        {
+          "columns": [
+            {
+              "type": "image"
+            },
+            {
+              "type": "text"
+            }
+          ],
+          "header": [
+            "画像",
+            ""
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "image": "img_mpw1v77u_121.webp"
+                },
+                {
+                  "text": "https://item.rakuten.co.jp/e-monoplus/sw20/",
+                  "url": "https://item.rakuten.co.jp/e-monoplus/sw20/"
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mpw1w23o_940.webp"
+                },
+                {
+                  "text": "https://item.rakuten.co.jp/le-cure/im-1063980/",
+                  "url": "https://item.rakuten.co.jp/le-cure/im-1063980/"
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mpw1w6ar_425.webp"
+                },
+                {
+                  "text": "https://item.rakuten.co.jp/imagination/s-a-sheet/",
+                  "url": "https://item.rakuten.co.jp/imagination/s-a-sheet/"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "date": "2026-06-01",
