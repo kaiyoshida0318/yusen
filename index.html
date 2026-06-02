@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.42.0">
+<link rel="stylesheet" href="style.css?v=1.43.0">
 </head>
 <body>
 <div class="sticky-top">
@@ -24,6 +24,7 @@
       <button class="btn btn-ghost" id="btnManageCats">📂 カテゴリ管理</button>
       <button class="btn btn-ghost" id="btnManageStatus">📋 ステータス管理</button>
       <button class="btn btn-ghost" id="btnSettings">⚙️ 設定</button>
+      <button class="btn btn-ghost" id="btnHeaderLog">📜 ログ</button>
       <div class="gh-progress" id="ghProgress" hidden>
         <span class="gh-spin"></span>
         <span class="gh-text"></span>
@@ -95,12 +96,21 @@
           <input type="text" id="fName" placeholder="商品名など">
         </label>
 
-        <div class="rival-col" style="margin-bottom:14px">
-          <div class="rival-col-head">
-            <span class="rival-col-ttl">ランキングURL</span>
-            <button type="button" class="btn btn-ghost btn-sm" id="btnAddRanking">＋ 追加</button>
+        <div class="rival-cols" style="margin-bottom:14px">
+          <div class="rival-col">
+            <div class="rival-col-head">
+              <span class="rival-col-ttl">ランキングURL</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnAddRanking">＋ 追加</button>
+            </div>
+            <div id="rankingList"></div>
           </div>
-          <div id="rankingList"></div>
+          <div class="rival-col">
+            <div class="rival-col-head">
+              <span class="rival-col-ttl">自社URL</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnAddCompany">＋ 追加</button>
+            </div>
+            <div id="companyList"></div>
+          </div>
         </div>
 
         <div class="rival-cols">
@@ -248,6 +258,6 @@
   <button class="btn btn-primary" id="btnResizeDone">完了</button>
 </div>
 
-<script src="app.js?v=1.42.0"></script>
+<script src="app.js?v=1.43.0"></script>
 </body>
 </html>
