@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.42.0";
+const VERSION = "1.43.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -192,6 +192,7 @@ function migrate(data){
     }
     if(!Array.isArray(r.rivalAmazon)) r.rivalAmazon = [];
     if(!Array.isArray(r.rankingUrls)) r.rankingUrls = [];
+    if(!Array.isArray(r.companyUrls)) r.companyUrls = [];
     if(typeof r.freeNote !== "string") r.freeNote = ""; // 自由記入欄（リンク含むHTMLを保持）
     if(typeof r.category !== "string") r.category = "";
     if(typeof r.status !== "string") r.status = "";
@@ -964,6 +965,9 @@ function openEntry(editIndex, mode){
   // ランキングURL（最低1行）
   entry.rankingUrls = row && Array.isArray(row.rankingUrls) ? row.rankingUrls.slice() : [];
   while(entry.rankingUrls.length < 1) entry.rankingUrls.push("");
+  // 自社URL（最低1行）
+  entry.companyUrls = row && Array.isArray(row.companyUrls) ? row.companyUrls.slice() : [];
+  while(entry.companyUrls.length < 1) entry.companyUrls.push("");
   // 自由記入欄
   entry.freeNote = row ? (row.freeNote||"") : "";
   entry.image = row ? (row.image||"") : "";
@@ -1037,6 +1041,7 @@ function openEntry(editIndex, mode){
   renderEntryImage();
   renderRivals();
   renderRanking();
+  renderCompany();
   renderBlocks();
   // 入力済みフラグ初期化（キャンセル確認用にこの後の編集を検知）
   entrySnapshot = isEdit ? null : snapshotEntry();
@@ -1120,13 +1125,14 @@ function snapshotEntry(){
   collectBlocksIntoEntry();
   const name = (document.getElementById("fName")?.value || "").trim();
   const ranking = (entry.rankingUrls||[]).map(u=>(u||"").trim()).filter(Boolean);
+  const company = (entry.companyUrls||[]).map(u=>(u||"").trim()).filter(Boolean);
   const rivR = (entry.rivalRakuten||[]).map(u=>(u||"").trim()).filter(Boolean);
   const rivA = (entry.rivalAmazon||[]).map(u=>(u||"").trim()).filter(Boolean);
   const rak = (entry.rakumart||[]).filter(r=>(r.text||"").trim()||(r.url||"").trim());
   const sup = (entry.suppliers||[]).filter(s=>(s.url||"").trim()||(s.memo||"").trim()||(s.image||""));
   const note = (entry.freeNote||"").replace(/<[^>]*>/g,"").trim();
   return JSON.stringify({
-    name, ranking, rivR, rivA,
+    name, ranking, company, rivR, rivA,
     image: entry.image||"",
     rakLen: rak.length, supLen: sup.length,
     tblLen: (entry.tables||[]).length,
@@ -1227,6 +1233,28 @@ function renderRanking(){
 function addRanking(){
   entry.rankingUrls.push("");
   renderRanking();
+}
+
+// 自社URL（複数）
+function renderCompany(){
+  const wrap = document.getElementById("companyList");
+  if(!wrap) return;
+  wrap.innerHTML = "";
+  entry.companyUrls.forEach((url, idx)=>{
+    const rowEl = document.createElement("div"); rowEl.className="rival-row";
+    const inp = document.createElement("input");
+    inp.type="text"; inp.placeholder="https://..."; inp.value=url;
+    inp.oninput = e=>{ entry.companyUrls[idx] = e.target.value; };
+    const rm = document.createElement("button");
+    rm.type="button"; rm.className="rival-del"; rm.textContent="×"; rm.title="この欄を削除";
+    rm.onclick = ()=>{ entry.companyUrls.splice(idx,1); if(entry.companyUrls.length===0) entry.companyUrls.push(""); renderCompany(); };
+    rowEl.append(inp, rm);
+    wrap.appendChild(rowEl);
+  });
+}
+function addCompany(){
+  entry.companyUrls.push("");
+  renderCompany();
 }
 
 // 自由記入欄（リンク貼り付け対応のリッチテキスト、複数行OK）
@@ -1878,6 +1906,7 @@ function saveEntry(keepOpen){
     if(!Array.isArray(entry.rivalRakuten)) entry.rivalRakuten = [];
     if(!Array.isArray(entry.rivalAmazon))  entry.rivalAmazon  = [];
     if(!Array.isArray(entry.rankingUrls))  entry.rankingUrls  = [];
+    if(!Array.isArray(entry.companyUrls))  entry.companyUrls  = [];
     if(!Array.isArray(entry.rakumart))     entry.rakumart     = [];
     if(!Array.isArray(entry.suppliers))    entry.suppliers    = [];
     if(!Array.isArray(entry.tables))       entry.tables       = [];
@@ -1899,6 +1928,7 @@ function saveEntry(keepOpen){
       rivalRakuten: entry.rivalRakuten.map(u=>(u||"").trim()).filter(u=>u),
       rivalAmazon:  entry.rivalAmazon.map(u=>(u||"").trim()).filter(u=>u),
       rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
+      companyUrls:  (entry.companyUrls||[]).map(u=>(u||"").trim()).filter(u=>u),
       freeNote:     entry.freeNote || "",
       category: (fCat && fCat.value) || "",
       status:   (fSt  && fSt.value)  || "",
@@ -2096,8 +2126,8 @@ async function saveToGitHub(){
       // 実行中に追加呼び出しがあった場合、最新の state でもう一度保存
       if(saveToGitHubPending){
         saveToGitHubPending = false;
-        // 即座にではなく、ステータスメッセージを少し見せてから
-        setTimeout(()=>{ saveToGitHub(); }, 100);
+        // 即座にではなく、競合を避けるため少し待ってから最新stateで再保存
+        setTimeout(()=>{ saveToGitHub(); }, 300);
       }
     }
   })();
@@ -2121,8 +2151,8 @@ async function putDataJson(){
   logInfo("putDataJson: PUT開始", { sha: dataSha });
   let res = await doPut();
   logInfo("putDataJson: PUT結果", { status: res.status, ok: res.ok });
-  // SHA不一致の場合は最大4回までリトライ（指数バックオフ）
-  for(let attempt=0; attempt<4 && !res.ok; attempt++){
+  // SHA不一致の場合は最大6回までリトライ（指数バックオフ）
+  for(let attempt=0; attempt<6 && !res.ok; attempt++){
     let info = {};
     try{ info = await res.clone().json(); }catch(_){}
     const msg = info.message || ("HTTP "+res.status);
@@ -2554,6 +2584,10 @@ function bindUI(){
   document.getElementById("btnAddRivalR").onclick = ()=>addRival("rivalRakuten");
   document.getElementById("btnAddRivalA").onclick = ()=>addRival("rivalAmazon");
   document.getElementById("btnAddRanking").onclick = addRanking;
+  const btnAddCompany = document.getElementById("btnAddCompany");
+  if(btnAddCompany) btnAddCompany.onclick = addCompany;
+  const btnHeaderLog = document.getElementById("btnHeaderLog");
+  if(btnHeaderLog) btnHeaderLog.onclick = openLogModal;
   bindFreeNote();
   // 項目追加メニュー
   const btnAddBlock = document.getElementById("btnAddBlock");
@@ -3076,9 +3110,13 @@ function renderTableInto(container, block){
       tr.appendChild(td);
     });
     const tdDel = document.createElement("td"); tdDel.className="tbl-rowdel-cell";
+    const rowCtrl = document.createElement("div"); rowCtrl.className="tbl-row-ctrl";
+    const ins = document.createElement("button"); ins.type="button"; ins.className="tbl-rowins"; ins.textContent="\uff0b"; ins.title="\u3053\u306e\u884c\u306e\u4e0a\u306b1\u884c\u8ffd\u52a0";
+    ins.onclick = ()=>{ tbl.rows.splice(ri, 0, { cells: tbl.columns.map(c=> c.type==="image"?{image:"",imageIsDataUrl:false}:{text:"",url:""}) }); rerender(); };
     const rd = document.createElement("button"); rd.type="button"; rd.className="tbl-rowdel"; rd.textContent="\u00d7"; rd.title="\u3053\u306e\u884c\u3092\u524a\u9664";
     rd.onclick = ()=>{ tbl.rows.splice(ri,1); rerender(); };
-    tdDel.appendChild(rd);
+    rowCtrl.append(ins, rd);
+    tdDel.appendChild(rowCtrl);
     tr.appendChild(tdDel);
     table.appendChild(tr);
   });
