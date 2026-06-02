@@ -649,3 +649,8 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .col-align-group{display:flex;align-items:center;gap:4px;flex:1;min-width:132px;margin:0}
 .col-ctrl-label{font-size:11px;color:var(--muted);flex:0 0 auto}
 .col-align-group .col-align-sel{flex:1;min-width:56px}
+
+/* 表：行の挿入＋削除を縦に並べるコントロール */
+.tbl-row-ctrl{display:flex;flex-direction:column;gap:4px;align-items:center}
+.tbl-rowins{background:none;border:none;color:var(--green);font-size:15px;cursor:pointer;line-height:1}
+.tbl-rowins:hover{color:#2d7a4d}
