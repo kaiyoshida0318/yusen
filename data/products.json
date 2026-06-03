@@ -140,7 +140,8 @@
           ]
         }
       ],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-05-28",
@@ -179,7 +180,8 @@
         }
       ],
       "tables": [],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-05-29",
@@ -338,7 +340,8 @@
           ]
         }
       ],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-05-28",
@@ -360,7 +363,8 @@
       ],
       "suppliers": [],
       "tables": [],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -382,7 +386,8 @@
       ],
       "suppliers": [],
       "tables": [],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -401,7 +406,8 @@
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -435,7 +441,8 @@
         }
       ],
       "tables": [],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -463,7 +470,8 @@
         }
       ],
       "tables": [],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -511,7 +519,8 @@
         }
       ],
       "tables": [],
-      "expectedSales": 0
+      "expectedSales": 0,
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -523,10 +532,11 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "working",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -541,7 +551,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -556,7 +567,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -571,7 +583,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -586,7 +599,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -601,7 +615,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -616,7 +631,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -631,7 +647,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -646,7 +663,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -661,7 +679,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -730,7 +749,8 @@
             }
           ]
         }
-      ]
+      ],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -745,7 +765,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -760,7 +781,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     },
     {
       "date": "2026-06-01",
@@ -775,7 +797,8 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "companyUrls": []
     }
   ],
   "categories": [
