@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.43.0";
+const VERSION = "1.43.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -862,9 +862,15 @@ function createCustomSelect(opts){
   };
   const positionMenu = ()=>{
     const r = btn.getBoundingClientRect();
-    menu.style.left = r.left + "px";
+    // 幅はボタン幅を下限にしつつ、内容に合わせて広げる（CSSの width:max-content）
+    menu.style.minWidth = r.width + "px";
     menu.style.top = (r.bottom + 4) + "px";
-    menu.style.width = r.width + "px";
+    menu.style.left = r.left + "px";
+    // 画面右にはみ出す場合は左へずらす
+    const mw = menu.offsetWidth;
+    if(r.left + mw > window.innerWidth - 8){
+      menu.style.left = Math.max(8, window.innerWidth - 8 - mw) + "px";
+    }
     // 下に入りきらない場合は上に出す
     const menuH = menu.offsetHeight || 200;
     if(r.bottom + 4 + menuH > window.innerHeight){
