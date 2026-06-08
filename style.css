@@ -654,3 +654,7 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .tbl-row-ctrl{display:flex;flex-direction:column;gap:4px;align-items:center}
 .tbl-rowins{background:none;border:none;color:var(--green);font-size:15px;cursor:pointer;line-height:1}
 .tbl-rowins:hover{color:#2d7a4d}
+
+/* カスタムドロップダウン：メニューは内容幅で広げ、項目ラベルを省略しない */
+.cs-menu{width:max-content;max-width:380px}
+.cs-menu .cs-opt .cs-lbl{overflow:visible;text-overflow:clip;white-space:nowrap}
