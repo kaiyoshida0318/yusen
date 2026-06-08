@@ -799,6 +799,24 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": []
+    },
+    {
+      "date": "2026-06-08",
+      "image": "img_mq4wblmi_333.webp",
+      "name": "ピンバッジ留め具",
+      "expectedSales": 5,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/yukaiya/10001326/"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "s_mpuyvtej",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
