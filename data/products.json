@@ -855,7 +855,12 @@
       "freeNote": "",
       "category": "new",
       "status": "buy",
-      "rakumart": [],
+      "rakumart": [
+        {
+          "text": "2026061714363571-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026061714363571-2147"
+        }
+      ],
       "suppliers": [],
       "tables": []
     }
