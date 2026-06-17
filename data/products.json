@@ -448,12 +448,14 @@
       "date": "2026-06-01",
       "image": "img_mput6cbb_333.webp",
       "name": "マグネット式　シリコンバンド",
+      "expectedSales": 0,
       "rivalRakuten": [
         "https://item.rakuten.co.jp/kei-onlineshop2023/70001755/"
       ],
       "rivalAmazon": [],
       "rankingUrls": [],
-      "freeNote": "",
+      "companyUrls": [],
+      "freeNote": "時計ベルト 20mm 22mm 腕時計 ベルト 時計ベルト交換 時計バンド 交換 替えベルト シリコン ラバー マグネット おしゃれ レディース メンズ プレゼント<div>マグネット式 シリコン 時計バンド 防水対応 スマートウォッチ用 交換ベルト 20mm 22mm Galaxy Watch4/5/6 2サイズ 磁石ストラップ 12色 スポーツ ビジネス アウトドア 簡単調整 耐汗 洗える 軽量設計 ぴったりフィット</div>",
       "category": "new",
       "status": "working",
       "rakumart": [
@@ -469,9 +471,7 @@
           "memo": ""
         }
       ],
-      "tables": [],
-      "expectedSales": 0,
-      "companyUrls": []
+      "tables": []
     },
     {
       "date": "2026-06-01",
