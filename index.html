@@ -3,261 +3,177 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>優先順位決定くん</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
-<link rel="apple-touch-icon" href="favicon.png">
+<title>ヤフショ画像くん</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.43.1">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=0.8.1">
 </head>
 <body>
+
 <div class="sticky-top">
-<header class="app-header">
-  <div class="header-inner">
-    <img class="logo-img" src="logo.png" alt="優先順位決定くん" height="40">
-    <div class="header-actions">
-      <span class="version" id="version">v1.0.0</span>
-      <button class="btn btn-ghost" id="btnListEdit">✏️ 商品名・月商編集</button>
-      <button class="btn btn-ghost" id="btnManageCols">📐 項目管理</button>
-      <button class="btn btn-ghost" id="btnManageCats">📂 カテゴリ管理</button>
-      <button class="btn btn-ghost" id="btnManageStatus">📋 ステータス管理</button>
-      <button class="btn btn-ghost" id="btnSettings">⚙️ 設定</button>
-      <button class="btn btn-ghost" id="btnHeaderLog">📜 ログ</button>
-      <div class="gh-progress" id="ghProgress" hidden>
-        <span class="gh-spin"></span>
-        <span class="gh-text"></span>
-        <span class="gh-sec">0.0s</span>
+  <header class="app-header">
+    <div class="header-inner">
+      <img class="logo-img" src="logo1.png" alt="ヤフショ画像くん">
+      <div class="header-actions">
+        <span class="version" id="version">v0.8.1</span>
+        <button class="btn btn-ghost" id="btnCols">📐 項目管理</button>
+        <button class="btn btn-ghost" id="btnCats">📂 カテゴリ管理</button>
+        <button class="btn btn-ghost" id="btnStatus">📋 ステータス管理</button>
+        <button class="btn btn-ghost" id="btnSettings">⚙️ 設定</button>
+        <button class="btn btn-ghost" id="btnLog">📜 ログ</button>
+        <span class="gh-progress" id="ghProgress" hidden><span class="gh-spin"></span><span id="ghText"></span></span>
+        <button class="btn btn-red" id="btnSave">💾 GitHubに保存</button>
       </div>
-      <button class="btn btn-primary" id="btnSave">💾 GitHubに保存</button>
     </div>
-  </div>
-</header>
-
-<main class="container container-top">
-  <nav class="cat-tabs" id="catTabs"></nav>
-  <nav class="status-tabs" id="statusTabs"></nav>
-
-  <div class="toolbar">
-    <span class="status" id="status"></span>
-  </div>
-</main>
+  </header>
 </div>
 
-<main class="container">
-  <div class="table-wrap">
-    <table id="grid">
-      <thead id="gridHead"></thead>
-      <tbody id="gridBody"></tbody>
-    </table>
+<!-- フィルタ帯 -->
+<div class="console">
+  <!-- 1段目：カテゴリ系 ＋ 右側アクション -->
+  <div class="frow frow-cat" id="catRow">
+    <button class="pill on"><span class="ic">📊</span>全体<span class="cnt" id="cntAllCat">0</span></button>
+    <button class="pill"><span class="tag-badge tb-new">NEW</span>新規<span class="cnt">0</span></button>
+    <button class="pill"><span class="tag-badge tb-r">R</span>楽天あり<span class="cnt">0</span></button>
+    <button class="pill"><span class="tag-badge tb-y">Y</span>ヤフショ済<span class="cnt">0</span></button>
+    <button class="pill"><span class="tag-badge tb-q">?</span>未設定<span class="cnt">0</span></button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-sm" id="btnBulkDel">🗑 一括削除</button>
+    <button class="btn btn-green-line btn-sm" id="btnAddRow">＋ 行だけ</button>
+    <button class="btn btn-green" id="btnAdd">＋ 新規作成</button>
   </div>
-</main>
 
-<!-- 登録モーダル -->
-<div class="modal-overlay" id="entryModal" hidden>
-  <div class="modal modal-entry">
-    <div class="entry-topbar">
-      <h2 id="entryTitle">新規作成</h2>
-      <div class="modal-actions modal-actions-top">
-        <button class="btn btn-ghost viewmode-only" data-act="close-view">閉じる</button>
-        <button class="btn btn-ghost editmode-only" data-act="cancel">キャンセル</button>
-        <button class="btn btn-ghost editmode-only" data-act="save">保存</button>
-        <button class="btn btn-primary editmode-only" data-act="saveclose">保存して閉じる</button>
-      </div>
+  <!-- 2段目：ステータス -->
+  <div class="frow frow-status" id="statusRow">
+    <button class="spill on">全体<span class="cnt" id="cntAllStatus">0</span></button>
+    <button class="spill"><span class="num n-gray">1</span>未着手<span class="cnt">0</span></button>
+    <button class="spill"><span class="num n-orange">2</span>作成中<span class="cnt">0</span></button>
+    <button class="spill"><span class="num n-blue">3</span>確認待ち<span class="cnt">0</span></button>
+    <button class="spill"><span class="num n-green">4</span>完了<span class="cnt">0</span></button>
+    <button class="spill"><span class="num" style="background:#c8ccd2">?</span>未設定<span class="cnt">0</span></button>
+  </div>
+</div>
+
+<!-- テーブル（列はあとで） -->
+<div class="table-wrap">
+  <div class="table-shell">
+    <div class="table-scroll">
+      <table id="grid" style="display:none">
+        <thead><tr>
+          <th>日付</th><th>楽天画像</th><th>Yahoo画像</th><th>商品名</th>
+          <th>予想月商</th><th>カテゴリ</th><th>ヤフショURL</th><th>楽天URL</th><th></th>
+        </tr></thead>
+        <tbody id="gridBody"></tbody>
+      </table>
     </div>
-    <div class="entry-body">
-      <div class="entry-left">
-        <div class="entry-img-label">メインライバル画像</div>
-        <div class="entry-image" id="entryImageBox">
-          <div class="img-drop" id="entryImageDrop">画像を選択</div>
-        </div>
-        <div class="entry-image-url-slot" id="entryImageUrlSlot"></div>
-        <div class="entry-left-meta">
-          <label>日付
-            <input type="date" id="fDate">
-          </label>
-          <label>予想月商
-            <div class="sales-input-wrap">
-              <input type="number" id="fExpectedSales" min="0" step="0.1" placeholder="0">
-              <span class="sales-unit">万円</span>
-            </div>
-          </label>
-          <label>カテゴリ
-            <select id="fCategory"></select>
-          </label>
-          <label>ステータス
-            <select id="fStatus"></select>
-          </label>
-        </div>
-      </div>
-      <div class="entry-right">
-        <label>商品名
-          <input type="text" id="fName" placeholder="商品名など">
-        </label>
-
-        <div class="rival-cols" style="margin-bottom:14px">
-          <div class="rival-col">
-            <div class="rival-col-head">
-              <span class="rival-col-ttl">ランキングURL</span>
-              <button type="button" class="btn btn-ghost btn-sm" id="btnAddRanking">＋ 追加</button>
-            </div>
-            <div id="rankingList"></div>
-          </div>
-          <div class="rival-col">
-            <div class="rival-col-head">
-              <span class="rival-col-ttl">自社URL</span>
-              <button type="button" class="btn btn-ghost btn-sm" id="btnAddCompany">＋ 追加</button>
-            </div>
-            <div id="companyList"></div>
-          </div>
-        </div>
-
-        <div class="rival-cols">
-          <div class="rival-col">
-            <div class="rival-col-head">
-              <span class="rival-col-ttl">楽天ライバルURL</span>
-              <button type="button" class="btn btn-ghost btn-sm" id="btnAddRivalR">＋ 追加</button>
-            </div>
-            <div id="rivalRakutenList"></div>
-          </div>
-          <div class="rival-col">
-            <div class="rival-col-head">
-              <span class="rival-col-ttl">AmazonライバルURL</span>
-              <button type="button" class="btn btn-ghost btn-sm" id="btnAddRivalA">＋ 追加</button>
-            </div>
-            <div id="rivalAmazonList"></div>
-          </div>
-        </div>
-
-        <div id="blocksArea"></div>
-        <div class="add-block-wrap">
-          <button type="button" class="btn-add-block" id="btnAddBlock">＋ 項目を追加</button>
-          <div class="add-block-menu" id="addBlockMenu" hidden>
-            <button type="button" class="add-block-opt" data-block="rakumart">🛒 ラクマート</button>
-            <button type="button" class="add-block-opt" data-block="supplier">🏭 仕入先（中国輸入元）</button>
-            <button type="button" class="add-block-opt" data-block="table">📋 表</button>
-            <button type="button" class="add-block-opt" data-block="freenote">📝 自由記入欄</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-actions modal-actions-bottom editmode-only">
-      <button class="btn btn-danger" data-act="delete" id="btnDeleteEntry">🗑 この項目を削除する</button>
-      <span class="actions-spacer"></span>
-      <button class="btn btn-ghost" data-act="cancel">キャンセル</button>
-      <button class="btn btn-ghost" data-act="save">保存</button>
-      <button class="btn btn-primary" data-act="saveclose">保存して閉じる</button>
+    <div class="shell-empty" id="emptyState">
+      <div class="lead">まだ商品がありません</div>
+      <p>「＋ 新規作成」から商品を登録すると、ここに一覧で表示されます。</p>
     </div>
   </div>
 </div>
 
-<!-- 設定モーダル -->
-<div class="modal-overlay" id="settingsModal" hidden>
-  <div class="modal">
+<!-- 新規作成/編集モーダル -->
+<div class="overlay" id="editModal" hidden>
+  <div class="sheet sheet-form">
+    <div class="form-topbar">
+      <h2 id="edTitle">新規作成</h2>
+      <div class="topbar-actions">
+        <button class="btn btn-line" data-close="editModal">キャンセル</button>
+        <button class="btn btn-line" id="btnSaveStay">保存</button>
+        <button class="btn btn-red" id="btnSaveClose">保存して閉じる</button>
+      </div>
+    </div>
+    <div class="form-body">
+      <!-- 上段：楽天画像／Yahoo画像／基本情報 -->
+      <div class="form-top">
+        <div class="img-col">
+          <div class="fld-label"><span class="tag-badge tb-r">R</span>楽天メイン画像</div>
+          <div class="img-box" id="imgRakuten"><div class="img-drop">画像を選択<br><small>クリック / ドラッグ＆ドロップ</small></div></div>
+          <input type="file" accept="image/*" hidden>
+          <div class="img-url-row"><input type="text" placeholder="またはURLを貼り付け（http://…）"><button class="btn btn-line btn-sm apply-img">適用</button></div>
+        </div>
+
+        <div class="img-col">
+          <div class="fld-label"><span class="tag-badge tb-y">Y</span>Yahooメイン画像</div>
+          <div class="img-box" id="imgYahoo"><div class="img-drop">画像を選択<br><small>クリック / ドラッグ＆ドロップ</small></div></div>
+          <input type="file" accept="image/*" hidden>
+          <div class="img-url-row"><input type="text" placeholder="またはURLを貼り付け（http://…）"><button class="btn btn-line btn-sm apply-img">適用</button></div>
+        </div>
+
+        <div class="meta-col">
+          <label class="fld">日付<input type="date" id="fDate"></label>
+          <label class="fld">予想月商
+            <span class="num-wrap"><input type="number" id="fSales" min="0" placeholder="0"><span class="unit">万円</span></span>
+          </label>
+          <label class="fld">カテゴリ
+            <select id="fCategory"><option>単一商品</option><option>複数商品</option></select>
+          </label>
+        </div>
+      </div>
+
+      <!-- 下段：商品名＋URL -->
+      <div class="form-bottom">
+        <label class="fld">商品名<input type="text" id="fName" placeholder="商品名"></label>
+
+        <div class="url-block url-main">
+          <div class="url-head">
+            <span class="url-ttl"><span class="tag-badge tb-y">Y</span>ヤフショURL（メイン）</span>
+            <button class="btn btn-line btn-sm" data-addurl="urlYahoo">＋ 追加</button>
+          </div>
+          <div class="url-list" id="urlYahoo">
+            <div class="url-row"><input type="text" placeholder="https://store.shopping.yahoo.co.jp/…"><button class="url-del">×</button></div>
+          </div>
+        </div>
+
+        <div class="url-block">
+          <div class="url-head">
+            <span class="url-ttl"><span class="tag-badge tb-r">R</span>楽天URL</span>
+            <button class="btn btn-line btn-sm" data-addurl="urlRakuten">＋ 追加</button>
+          </div>
+          <div class="url-list" id="urlRakuten">
+            <div class="url-row"><input type="text" placeholder="https://item.rakuten.co.jp/…"><button class="url-del">×</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ミニモーダル群 -->
+<div class="overlay" id="settingsModal" hidden>
+  <div class="mini">
     <h2>GitHub設定</h2>
-    <p class="hint">PATを入力するだけでOK。入力情報はこのブラウザ内（localStorage）にのみ保存されます。</p>
-    <label>Personal Access Token (PAT)
-      <input type="password" id="cfgPat" placeholder="github_pat_xxxx">
-    </label>
-    <button type="button" class="btn-toggle-advanced" id="btnToggleAdvSettings">▶ 詳細設定（オーナー／リポジトリ／ブランチ）</button>
-    <div id="advSettings" hidden>
-      <label>オーナー（ユーザー名）
-        <input type="text" id="cfgOwner" placeholder="kaiyoshida0318" value="kaiyoshida0318">
-      </label>
-      <label>リポジトリ名
-        <input type="text" id="cfgRepo" placeholder="yusen" value="yusen">
-      </label>
-      <label>ブランチ
-        <input type="text" id="cfgBranch" placeholder="main" value="main">
-      </label>
+    <p class="hint">PATを入力するだけでOK。入力情報はこのブラウザ内（localStorage）にのみ保存されます。保存・画像アップロードにはリポジトリへの書き込み権限が必要です。</p>
+    <label>Personal Access Token (PAT)<input type="password" id="cfgPat" placeholder="github_pat_xxxx"></label>
+    <button type="button" class="adv-toggle" id="btnAdv">▶ 詳細設定（オーナー／リポジトリ／ブランチ）</button>
+    <div id="advBox" hidden>
+      <label>オーナー（ユーザー名）<input type="text" id="cfgOwner" value="kaiyoshida0318"></label>
+      <label>リポジトリ名<input type="text" id="cfgRepo" value="yafusho-gazo"></label>
+      <label>ブランチ<input type="text" id="cfgBranch" value="main"></label>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="btnViewLog">📋 ログを表示</button>
-      <span class="actions-spacer"></span>
-      <button class="btn btn-ghost" id="btnCloseSettings">閉じる</button>
-      <button class="btn btn-primary" id="btnSaveSettings">保存</button>
-    </div>
+    <div class="acts"><span class="sp"></span><button class="btn btn-ghost" data-close="settingsModal">閉じる</button><button class="btn btn-red" id="btnSaveSettings">保存</button></div>
   </div>
 </div>
-
-<!-- ログ表示モーダル -->
-<div class="modal-overlay" id="logModal" hidden>
-  <div class="modal modal-log">
-    <h2>📋 アプリログ</h2>
-    <p class="hint">最新のステータス・GitHub保存・画像アップロード等のログです。エラー報告のときにコピーしてください（最大500件）。</p>
-    <textarea id="logArea" readonly></textarea>
-    <div class="modal-actions">
-      <button class="btn btn-danger" id="btnClearLog">🗑 クリア</button>
-      <span class="actions-spacer"></span>
-      <button class="btn btn-ghost" id="btnCopyLog">📋 コピー</button>
-      <button class="btn btn-ghost" id="btnCloseLog">閉じる</button>
-    </div>
+<div class="overlay" id="logModal" hidden>
+  <div class="mini">
+    <h2>📜 アプリログ</h2>
+    <p class="hint">GitHub保存・画像アップロード等のログです。</p>
+    <textarea readonly>[起動] ヤフショ画像くん v0.8.1</textarea>
+    <div class="acts"><span class="sp"></span><button class="btn btn-ghost" data-close="logModal">閉じる</button></div>
   </div>
 </div>
-
-<!-- 項目管理モーダル -->
-<div class="modal-overlay" id="colModal" hidden>
-  <div class="modal modal-col">
-    <h2>📐 項目管理</h2>
-    <p class="hint">左が「表示中」、右が「非表示」の項目です。「非表示にする →」「← 表示する」で切り替えられます。表示中の項目は幅(px)やテキストの折り返しも設定できます。この設定はこの端末にのみ保存されます（GitHubには同期しません）。</p>
-    <div class="col-cols">
-      <div class="col-col col-col-visible">
-        <div class="col-col-head">✅ 表示中</div>
-        <div id="colListVisible" class="col-list"></div>
-      </div>
-      <div class="col-col col-col-hidden">
-        <div class="col-col-head">🚫 非表示</div>
-        <div id="colListHidden" class="col-list"></div>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="btnResetCols">🔄 デフォルトに戻す</button>
-      <button class="btn btn-ghost" id="btnDragResize">↔ ドラッグで幅調整</button>
-      <span class="actions-spacer"></span>
-      <button class="btn btn-ghost" id="btnCloseCols">閉じる</button>
-    </div>
-  </div>
+<div class="overlay" id="colModal" hidden>
+  <div class="mini"><h2>📐 項目管理</h2><p class="hint">表に表示する列を管理します（後で実装）。</p><p class="hint" style="text-align:center;padding:24px 0">（準備中）</p><div class="acts"><span class="sp"></span><button class="btn btn-ghost" data-close="colModal">閉じる</button></div></div>
+</div>
+<div class="overlay" id="catModal" hidden>
+  <div class="mini"><h2>カテゴリ管理</h2><p class="hint">1段目のカテゴリを管理します（後で実装）。</p><p class="hint" style="text-align:center;padding:24px 0">（準備中）</p><div class="acts"><span class="sp"></span><button class="btn btn-ghost" data-close="catModal">閉じる</button></div></div>
+</div>
+<div class="overlay" id="statusModal" hidden>
+  <div class="mini"><h2>ステータス管理</h2><p class="hint">2段目のステータスを管理します（後で実装）。</p><p class="hint" style="text-align:center;padding:24px 0">（準備中）</p><div class="acts"><span class="sp"></span><button class="btn btn-ghost" data-close="statusModal">閉じる</button></div></div>
 </div>
 
-<!-- カテゴリ管理モーダル -->
-<div class="modal-overlay" id="catModal" hidden>
-  <div class="modal">
-    <h2>カテゴリ管理</h2>
-    <p class="hint">タブとして表示されるカテゴリを管理します。並び替え・名前変更・絵文字変更・削除ができます。</p>
-    <div class="cat-add-row">
-      <input type="text" id="newCatLabel" placeholder="新しいカテゴリ名">
-      <button class="btn btn-primary" id="btnAddCat">追加</button>
-    </div>
-    <div id="catList" class="cat-list"></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="btnCloseCat">閉じる</button>
-    </div>
-  </div>
-</div>
-
-<!-- ステータス管理モーダル -->
-<div class="modal-overlay" id="statusModal" hidden>
-  <div class="modal modal-status">
-    <h2>ステータス管理</h2>
-    <p class="hint">進捗ステータス（下段タブ）を管理します。並び替え・名前変更・追加・削除ができます。</p>
-    <div class="cat-add-row">
-      <input type="text" id="newStatusLabel" placeholder="新しいステータス名">
-      <button class="btn btn-primary" id="btnAddStatus">追加</button>
-    </div>
-    <div id="statusList" class="cat-list"></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="btnCloseStatus">閉じる</button>
-    </div>
-  </div>
-</div>
-
-<!-- 列幅ドラッグ調整モードのフローティングバー -->
-<div class="resize-bar" id="resizeBar" hidden>
-  <span class="resize-bar-text">↔ 列の境界をドラッグして幅を調整できます</span>
-  <button class="btn btn-primary" id="btnResizeDone">完了</button>
-</div>
-
-<script src="app.js?v=1.43.1"></script>
+<script src="app.js?v=0.8.1"></script>
 </body>
 </html>
