@@ -835,6 +835,24 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-06-17",
+      "image": "https://shop.r10s.jp/umiwo/cabinet/photo7/0358_11.jpg",
+      "name": "バンドクリップ",
+      "expectedSales": 10,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/umiwo/0358/"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
