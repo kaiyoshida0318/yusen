@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.43.2";
+const VERSION = "1.43.3";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -2116,8 +2116,11 @@ async function saveToGitHub(){
         }else{
           if(prog) prog.update("データ保存中…");
         }
-        // 直前に最新SHAを取り直す（他の場所で更新されている場合に備える）
-        await fetchDataSha();
+        // ★直前に無条件でSHAを取り直さない。
+        //   前回保存で得た正しいSHA（dataSha）をそのまま使う。
+        //   毎回取り直すと、古いキャッシュ値で正しいSHAを潰して逆に競合を招くため。
+        //   dataSha が無いとき（初回など）だけ取得する。
+        if(!dataSha) await fetchDataSha();
         await putDataJson();
         setStatus("✅ GitHubに保存しました");
         if(prog) prog.success("GitHubに保存しました");
@@ -2144,6 +2147,8 @@ async function saveToGitHub(){
 async function putDataJson(){
   const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${DATA_PATH}`;
   const content = b64encode(JSON.stringify(state, null, 2));
+  // 既存ファイルの更新には sha が必須。手元に無ければ取得する。
+  if(!dataSha) await fetchDataSha();
   const doPut = async ()=>{
     const body = { message:`update ${DATA_PATH}`, content, branch:cfg.branch };
     if(dataSha) body.sha = dataSha;
@@ -2231,21 +2236,23 @@ async function uploadDataUrlImagesInState(){
 
 async function fetchDataSha(){
   try{
-    // GitHub API / ブラウザ / CDN のキャッシュで古いSHAが返るのを防ぐ
-    // （キャッシュバスター＋no-store＋no-cache）。これをしないと競合後の
-    // 「最新SHA取り直し」が古い値を返し、何度PUTしても409で弾かれ続ける。
+    // キャッシュバスター＋no-store で古いSHAを避ける。
+    // ※ Cache-Control ヘッダーは付けない（CORSプリフライトで失敗しSHAがnullになるため）。
     const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${DATA_PATH}?ref=${cfg.branch}&_=${Date.now()}`;
     const res = await fetch(url, {
       method:"GET",
       cache:"no-store",
       headers:{
         Authorization:`token ${cfg.pat}`,
-        Accept:"application/vnd.github+json",
-        "Cache-Control":"no-cache"
+        Accept:"application/vnd.github+json"
       }
     });
-    if(res.ok){ dataSha = (await res.json()).sha; } else dataSha = null;
-  }catch(e){ dataSha = null; }
+    if(res.ok){
+      const j = await res.json();
+      if(j && j.sha) dataSha = j.sha; // 成功時のみ更新
+    }
+    // 取得失敗時は dataSha を変更しない（nullで上書きして422を誘発しないため）
+  }catch(e){ /* 失敗時も既存の dataSha を保持 */ }
 }
 
 async function loadFromGitHub(){
