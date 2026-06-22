@@ -871,8 +871,12 @@
       "expectedSales": 2,
       "rivalRakuten": [],
       "rivalAmazon": [],
-      "rankingUrls": [],
-      "companyUrls": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/weekly/214821/"
+      ],
+      "companyUrls": [
+        "https://item.rakuten.co.jp/yukaiya/10001325/"
+      ],
       "freeNote": "",
       "category": "rakuten",
       "status": "working",
