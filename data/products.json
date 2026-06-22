@@ -869,14 +869,12 @@
       "image": "https://shop.r10s.jp/yukaiya/cabinet/si/si-26a-01-b-01.jpg",
       "name": "耳ツボ　スティック",
       "expectedSales": 2,
-      "rivalRakuten": [
-        "https://ranking.rakuten.co.jp/weekly/214821/"
-      ],
+      "rivalRakuten": [],
       "rivalAmazon": [],
       "rankingUrls": [],
       "companyUrls": [],
       "freeNote": "",
-      "category": "rakuten",
+      "category": "",
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
@@ -895,36 +893,21 @@
           ],
           "header": [
             "画像",
-            "",
-            ""
+            "ランキング",
+            "レビュー数"
           ],
           "rows": [
             {
               "cells": [
                 {
-                  "image": "img_mqol88u8_0.webp"
+                  "image": "img_mqolc6m2_746.webp"
                 },
                 {
-                  "text": "5位",
+                  "text": "5",
                   "url": ""
                 },
                 {
-                  "text": "",
-                  "url": ""
-                }
-              ]
-            },
-            {
-              "cells": [
-                {
-                  "image": "img_mqol8c9w_990.webp"
-                },
-                {
-                  "text": "9位",
-                  "url": ""
-                },
-                {
-                  "text": "",
+                  "text": "911",
                   "url": ""
                 }
               ]
@@ -932,14 +915,14 @@
             {
               "cells": [
                 {
-                  "image": "img_mqol914s_508.webp"
+                  "image": "img_mqolc96k_763.webp"
                 },
                 {
-                  "text": "12位",
+                  "text": "9",
                   "url": ""
                 },
                 {
-                  "text": "",
+                  "text": "40",
                   "url": ""
                 }
               ]
@@ -947,14 +930,29 @@
             {
               "cells": [
                 {
-                  "image": "img_mqol96nh_843.webp"
+                  "image": "img_mqolc44n_531.webp"
                 },
                 {
-                  "text": "29位",
+                  "text": "12",
                   "url": ""
                 },
                 {
-                  "text": "",
+                  "text": "34",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mqolbzq2_533.webp"
+                },
+                {
+                  "text": "29",
+                  "url": ""
+                },
+                {
+                  "text": "6",
                   "url": ""
                 }
               ]
