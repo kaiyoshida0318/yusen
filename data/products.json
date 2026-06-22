@@ -869,7 +869,9 @@
       "image": "https://shop.r10s.jp/yukaiya/cabinet/si/si-26a-01-b-01.jpg",
       "name": "耳ツボ　スティック",
       "expectedSales": 2,
-      "rivalRakuten": [],
+      "rivalRakuten": [
+        "https://ranking.rakuten.co.jp/weekly/214821/"
+      ],
       "rivalAmazon": [],
       "rankingUrls": [],
       "companyUrls": [],
@@ -878,7 +880,88 @@
       "status": "s_mpuyvtej",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [
+        {
+          "columns": [
+            {
+              "type": "image"
+            },
+            {
+              "type": "text"
+            },
+            {
+              "type": "text"
+            }
+          ],
+          "header": [
+            "画像",
+            "",
+            ""
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "image": "img_mqol88u8_0.webp"
+                },
+                {
+                  "text": "5位",
+                  "url": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mqol8c9w_990.webp"
+                },
+                {
+                  "text": "9位",
+                  "url": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mqol914s_508.webp"
+                },
+                {
+                  "text": "12位",
+                  "url": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_mqol96nh_843.webp"
+                },
+                {
+                  "text": "29位",
+                  "url": ""
+                },
+                {
+                  "text": "",
+                  "url": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ],
   "categories": [
