@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.43.1";
+const VERSION = "1.43.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -2157,8 +2157,8 @@ async function putDataJson(){
   logInfo("putDataJson: PUT開始", { sha: dataSha });
   let res = await doPut();
   logInfo("putDataJson: PUT結果", { status: res.status, ok: res.ok });
-  // SHA不一致の場合は最大6回までリトライ（指数バックオフ）
-  for(let attempt=0; attempt<6 && !res.ok; attempt++){
+  // SHA不一致の場合は最大8回までリトライ（短めの待機。SHA取得はキャッシュ無効化済み）
+  for(let attempt=0; attempt<8 && !res.ok; attempt++){
     let info = {};
     try{ info = await res.clone().json(); }catch(_){}
     const msg = info.message || ("HTTP "+res.status);
@@ -2171,7 +2171,7 @@ async function putDataJson(){
     if(!looksLikeShaMismatch){
       throw new Error(msg);
     }
-    const wait = 500 * Math.pow(2, attempt); // 500ms, 1s, 2s, 4s
+    const wait = Math.min(2500, 500 + 300 * attempt); // 500ms→最大2.5sの短い待機
     setStatus(`⚠️ 競合検出。最新版に追従して再保存中…(${attempt+1}回目, ${wait}ms待機)`);
     await new Promise(r=>setTimeout(r, wait));
     await fetchDataSha();
@@ -2231,8 +2231,19 @@ async function uploadDataUrlImagesInState(){
 
 async function fetchDataSha(){
   try{
-    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${DATA_PATH}?ref=${cfg.branch}`;
-    const res = await fetch(url, { headers:{ Authorization:`token ${cfg.pat}`, Accept:"application/vnd.github+json" } });
+    // GitHub API / ブラウザ / CDN のキャッシュで古いSHAが返るのを防ぐ
+    // （キャッシュバスター＋no-store＋no-cache）。これをしないと競合後の
+    // 「最新SHA取り直し」が古い値を返し、何度PUTしても409で弾かれ続ける。
+    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${DATA_PATH}?ref=${cfg.branch}&_=${Date.now()}`;
+    const res = await fetch(url, {
+      method:"GET",
+      cache:"no-store",
+      headers:{
+        Authorization:`token ${cfg.pat}`,
+        Accept:"application/vnd.github+json",
+        "Cache-Control":"no-cache"
+      }
+    });
     if(res.ok){ dataSha = (await res.json()).sha; } else dataSha = null;
   }catch(e){ dataSha = null; }
 }
