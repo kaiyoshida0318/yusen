@@ -964,6 +964,28 @@
           ]
         }
       ]
+    },
+    {
+      "date": "2026-06-26",
+      "image": "https://image.rakuten.co.jp/yukaiya/cabinet/ih/ih-24-05-01.jpg",
+      "name": "電動爪切り",
+      "expectedSales": 0,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/ptandkey/nf01/"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/daily/208247/"
+      ],
+      "companyUrls": [
+        "https://item.rakuten.co.jp/yukaiya/10001285/"
+      ],
+      "freeNote": "ライバルの売上がかなり高いから、さくっと勝ちにいくのを考えたい",
+      "category": "",
+      "status": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
