@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.49.1";
+const VERSION = "1.49.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -341,36 +341,37 @@ function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
 
 /* ---------- カテゴリタブ ---------- */
 function renderTabs(){
-  // 上段：カテゴリ絞り込みタブは非表示（機能ボタンのみ残す）。currentCatは常にall。
+  // 上段のカテゴリ絞り込みタブは非表示（機能ボタンはYahoo行の右端へ移動）
   const wrap = document.getElementById("catTabs");
   wrap.innerHTML = "";
   currentCat = "all";
-  // 末尾に 一括削除 ＋行だけ ＋新規作成ボタン
-  const bulkBtn = document.createElement("button");
-  bulkBtn.className = "cat-tab cat-bulk" + (selectMode ? " active" : "");
-  bulkBtn.title = "複数選んで一括削除";
-  bulkBtn.innerHTML = selectMode
-    ? `<span class="cat-icon">✖</span><span class="cat-label">選択をやめる</span>`
-    : `<span class="cat-icon">🗑</span><span class="cat-label">一括削除</span>`;
-  bulkBtn.onclick = ()=>{
-    selectMode = !selectMode;
-    selectedRows = {};
-    if(selectMode && listEditMode){ listEditMode = false; updateListEditBtn(); }
-    render();
+
+  // 一括削除／行だけ／新規作成 ボタンを生成（Yahoo行の右端に配置する）
+  const buildFuncButtons = ()=>{
+    const frag = document.createDocumentFragment();
+    const bulkBtn = document.createElement("button");
+    bulkBtn.className = "cat-tab cat-bulk func-btn" + (selectMode ? " active" : "");
+    bulkBtn.title = "複数選んで一括削除";
+    bulkBtn.innerHTML = selectMode
+      ? `<span class="cat-icon">✖</span><span class="cat-label">選択をやめる</span>`
+      : `<span class="cat-icon">🗑</span><span class="cat-label">一括削除</span>`;
+    bulkBtn.onclick = ()=>{
+      selectMode = !selectMode;
+      selectedRows = {};
+      if(selectMode && listEditMode){ listEditMode = false; updateListEditBtn(); }
+      render();
+    };
+    const quickBtn = document.createElement("button");
+    quickBtn.className = "cat-tab cat-quick func-btn"; quickBtn.title = "行だけ追加（後で編集）";
+    quickBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">行だけ</span>`;
+    quickBtn.onclick = addQuickRow;
+    const newBtn = document.createElement("button");
+    newBtn.className = "cat-tab cat-new func-btn"; newBtn.title = "新規作成";
+    newBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">新規作成</span>`;
+    newBtn.onclick = ()=>openEntry(-1);
+    frag.append(bulkBtn, quickBtn, newBtn);
+    return frag;
   };
-  wrap.appendChild(bulkBtn);
-
-  const quickBtn = document.createElement("button");
-  quickBtn.className = "cat-tab cat-quick"; quickBtn.title = "行だけ追加（後で編集）";
-  quickBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">行だけ</span>`;
-  quickBtn.onclick = addQuickRow;
-  wrap.appendChild(quickBtn);
-
-  const newBtn = document.createElement("button");
-  newBtn.className = "cat-tab cat-new"; newBtn.title = "新規作成";
-  newBtn.innerHTML = `<span class="cat-icon">＋</span><span class="cat-label">新規作成</span>`;
-  newBtn.onclick = ()=>openEntry(-1);
-  wrap.appendChild(newBtn);
 
   // 軸切替タブは廃止（3軸を縦3行で同時表示するため）
   const awrap = document.getElementById("axisTabs");
@@ -409,6 +410,12 @@ function renderTabs(){
         tab.onclick = ()=>{ currentStatusByAxis[def.axis] = s.id; render(); };
         rowEl.appendChild(tab);
       });
+      // Yahoo行の右端に 一括削除／行だけ／新規作成 を配置
+      if(def.axis==="yahoo"){
+        const spacer = document.createElement("span"); spacer.className = "func-spacer";
+        rowEl.appendChild(spacer);
+        rowEl.appendChild(buildFuncButtons());
+      }
       swrap.appendChild(rowEl);
     });
 
