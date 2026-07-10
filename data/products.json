@@ -824,7 +824,8 @@
       "doneDate": ""
     },
     {
-      "date": "2026-06-08",
+      "date": "2026-01-05",
+      "doneDate": "2026-02-05",
       "image": "img_mq4wcx47_11.webp",
       "name": "ピンバッジ留め具",
       "expectedSales": 5,
@@ -839,8 +840,7 @@
       "status": "done",
       "rakumart": [],
       "suppliers": [],
-      "tables": [],
-      "doneDate": ""
+      "tables": []
     },
     {
       "date": "2026-06-17",
