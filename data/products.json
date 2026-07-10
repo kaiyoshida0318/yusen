@@ -142,7 +142,9 @@
       ],
       "expectedSales": 0,
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-05-28",
@@ -183,7 +185,9 @@
       "tables": [],
       "expectedSales": 0,
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-05-29",
@@ -344,7 +348,9 @@
       ],
       "expectedSales": 0,
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-05-28",
@@ -368,7 +374,9 @@
       "tables": [],
       "expectedSales": 0,
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -392,7 +400,9 @@
       "tables": [],
       "expectedSales": 0,
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -413,7 +423,9 @@
       "tables": [],
       "expectedSales": 0,
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -449,7 +461,9 @@
       "tables": [],
       "expectedSales": 0,
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -479,7 +493,9 @@
           "memo": ""
         }
       ],
-      "tables": []
+      "tables": [],
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -495,7 +511,7 @@
       ],
       "freeNote": "",
       "category": "new",
-      "status": "working",
+      "status": "arrived",
       "rakumart": [
         {
           "text": "2026052617212895-2147",
@@ -529,7 +545,9 @@
       "tables": [],
       "expectedSales": 0,
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "r_new",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -546,7 +564,9 @@
       "status": "done",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -563,7 +583,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -580,7 +602,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -597,7 +621,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -614,7 +640,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -631,7 +659,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -648,7 +678,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -665,7 +697,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -682,7 +716,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -699,7 +735,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -770,7 +808,9 @@
             }
           ]
         }
-      ]
+      ],
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -787,7 +827,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -804,7 +846,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-01",
@@ -821,7 +865,9 @@
       "suppliers": [],
       "tables": [],
       "companyUrls": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-01-05",
@@ -840,7 +886,9 @@
       "status": "done",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-17",
@@ -864,7 +912,9 @@
       ],
       "suppliers": [],
       "tables": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-17",
@@ -888,7 +938,9 @@
       ],
       "suppliers": [],
       "tables": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-22",
@@ -990,7 +1042,9 @@
             }
           ]
         }
-      ]
+      ],
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-26",
@@ -1013,7 +1067,9 @@
       "status": "done",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-06-26",
@@ -1032,7 +1088,9 @@
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-07-09",
@@ -1051,7 +1109,9 @@
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "doneDate": ""
+      "doneDate": "",
+      "rakutenStatus": "",
+      "yahooStatus": ""
     },
     {
       "date": "2026-07-10",
@@ -1072,7 +1132,9 @@
       "status": "buy",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "rakutenStatus": "",
+      "yahooStatus": ""
     }
   ],
   "categories": [
@@ -1134,5 +1196,49 @@
     }
   ],
   "_statusMigV2": true,
-  "_statusMigV3": true
+  "_statusMigV3": true,
+  "rakutenStatuses": [
+    {
+      "id": "r_pre",
+      "label": "制作前"
+    },
+    {
+      "id": "r_new",
+      "label": "新規制作予定"
+    },
+    {
+      "id": "r_renew",
+      "label": "リニューアル必要"
+    },
+    {
+      "id": "r_none",
+      "label": "不要"
+    }
+  ],
+  "yahooStatuses": [
+    {
+      "id": "y_pre",
+      "label": "制作前"
+    },
+    {
+      "id": "y_new",
+      "label": "新規制作予定"
+    },
+    {
+      "id": "y_new_multi",
+      "label": "新規制作予定-複数枚"
+    },
+    {
+      "id": "y_renew",
+      "label": "リニューアル必要"
+    },
+    {
+      "id": "y_renew_multi",
+      "label": "リニューアル必要-複数枚"
+    },
+    {
+      "id": "y_none",
+      "label": "不要"
+    }
+  ]
 }
