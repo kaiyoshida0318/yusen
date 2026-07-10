@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.45.0";
+const VERSION = "1.46.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -93,7 +93,8 @@ const DEFAULT_STATUSES = [
   { id:"prearrive", label:"到着前",             icon:"num:3" },
   { id:"arrived",   label:"到着分",             icon:"num:4" },
   { id:"renewal",   label:"リニューアル検討分", icon:"num:4" },
-  { id:"working",   label:"制作着手中",         icon:"num:5" },
+  { id:"nextup",    label:"次やる候補",         icon:"num:5" },
+  { id:"working",   label:"制作着手中",         icon:"num:6" },
   { id:"done",      label:"完了分" },
 ];
 const ALL_STATUS = { id:"all", label:"全体" }; // 全件表示の特別タブ
@@ -171,12 +172,12 @@ function migrate(data){
     data.statuses = DEFAULT_STATUSES.slice();
   }
   // 既定ステータスに番号ロゴが未設定なら補完（icon未定義のものだけ）
-  const DEF_STATUS_ICON = { buy:"num:1", bought:"num:2", prearrive:"num:3", arrived:"num:4", renewal:"num:4", working:"num:5" };
+  const DEF_STATUS_ICON = { buy:"num:1", bought:"num:2", prearrive:"num:3", arrived:"num:4", renewal:"num:4", nextup:"num:5", working:"num:6" };
   data.statuses.forEach(s=>{
     if(typeof s.icon === "undefined" && DEF_STATUS_ICON[s.id]) s.icon = DEF_STATUS_ICON[s.id];
     // ラベル先頭の番号文字（①②③④）を削除（バッジと二重表示になるため）
     if(typeof s.label === "string"){
-      s.label = s.label.replace(/^[①②③④⑤]\s*/, "").trim();
+      s.label = s.label.replace(/^[①②③④⑤⑥]\s*/, "").trim();
     }
   });
   // ステータス構成の刷新（買付前/買付済の分割・番号振り直し・制作着手中=5）。一度だけ実行。
@@ -192,7 +193,7 @@ function migrate(data){
     ];
     // 旧id→ラベル（先頭番号は除去済み）
     const oldLabelById = {};
-    (data.statuses || []).forEach(s=>{ oldLabelById[s.id] = (s.label || "").replace(/^[①②③④⑤]\s*/, "").trim(); });
+    (data.statuses || []).forEach(s=>{ oldLabelById[s.id] = (s.label || "").replace(/^[①②③④⑤⑥]\s*/, "").trim(); });
     // ラベル→新id（旧ラベルの揺れも吸収）
     const labelToNewId = {
       "買付前":"buy", "買付済":"bought", "買付前・済":"buy", "買付":"buy",
@@ -215,6 +216,22 @@ function migrate(data){
     });
     data.statuses = NEW_STATUSES;
     data._statusMigV2 = true;
+  }
+  // ステータス構成の再更新（「次やる候補」を5に追加・制作着手中を6へ）。一度だけ実行。
+  if(!data._statusMigV3){
+    data.statuses = [
+      { id:"buy",       label:"買付前",             icon:"num:1" },
+      { id:"bought",    label:"買付済",             icon:"num:2" },
+      { id:"prearrive", label:"到着前",             icon:"num:3" },
+      { id:"arrived",   label:"到着分",             icon:"num:4" },
+      { id:"renewal",   label:"リニューアル検討分", icon:"num:4" },
+      { id:"nextup",    label:"次やる候補",         icon:"num:5" },
+      { id:"working",   label:"制作着手中",         icon:"num:6" },
+      { id:"done",      label:"完了分" },
+    ];
+    // 既存の各行のステータス割り当ては id を維持するのでそのまま有効
+    // （nextup は新規なので割り当て0からスタート）
+    data._statusMigV3 = true;
   }
   data.rows.forEach(r=>{
     if(typeof r.expectedSales !== "number") r.expectedSales = 0;
@@ -339,7 +356,7 @@ function renderTabs(){
     [ALL_STATUS, NONE_STATUS, ...state.statuses].forEach(s=>{
       const tab = document.createElement("button");
       tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===currentStatus ? " active" : "");
-      tab.innerHTML = `<span class="status-ico">${statusIconHtml(s.icon)}</span><span class="cat-label">${escapeHtml((s.label||"").replace(/^[①②③④⑤]\s*/,""))}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
+      tab.innerHTML = `<span class="status-ico">${statusIconHtml(s.icon)}</span><span class="cat-label">${escapeHtml((s.label||"").replace(/^[①②③④⑤⑥]\s*/,""))}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
       tab.onclick = ()=>{ currentStatus = s.id; render(); };
       swrap.appendChild(tab);
     });
@@ -477,8 +494,9 @@ const STATUS_NUM_COLORS = {
   3: "#d98324", // 橙
   4: "#8257c9", // 紫
   5: "#c0392b", // 赤
+  6: "#0e7c8a", // 濃青緑
 };
-function isNumIcon(icon){ return typeof icon==="string" && /^num:[1-5]$/.test(icon); }
+function isNumIcon(icon){ return typeof icon==="string" && /^num:[1-6]$/.test(icon); }
 function statusNumSvg(icon){
   const n = parseInt(icon.split(":")[1], 10);
   const color = STATUS_NUM_COLORS[n] || "#7a756d";
@@ -493,7 +511,7 @@ function statusIconHtml(icon){
   return "";
 }
 // 番号のテキスト記号（option用、SVG不可な場所で使う）
-const NUM_CHARS = { 1:"①", 2:"②", 3:"③", 4:"④", 5:"⑤" };
+const NUM_CHARS = { 1:"①", 2:"②", 3:"③", 4:"④", 5:"⑤", 6:"⑥" };
 function statusNumChar(icon){
   if(!isNumIcon(icon)) return "";
   return NUM_CHARS[parseInt(icon.split(":")[1],10)] || "";
@@ -754,7 +772,7 @@ function render(){
       { value:"", label:"— 未設定 —", iconHtml:"" },
       ...state.statuses.map(st=>({
         value: st.id,
-        label: (st.label||"").replace(/^[①②③④⑤]\s*/, ""),
+        label: (st.label||"").replace(/^[①②③④⑤⑥]\s*/, ""),
         iconHtml: isNumIcon(st.icon) ? statusNumSvg(st.icon) : ""
       }))
     ];
@@ -2579,7 +2597,7 @@ function renderStatusManager(){
     const row = document.createElement("div"); row.className = "cat-row";
     // 番号ロゴ選択（なし/1/2/3/4）
     const numWrap = document.createElement("div"); numWrap.className = "status-num-picker";
-    [null,1,2,3,4,5].forEach(n=>{
+    [null,1,2,3,4,5,6].forEach(n=>{
       const btn = document.createElement("button");
       btn.type = "button"; btn.className = "status-num-opt";
       const val = n===null ? "" : ("num:"+n);
@@ -2591,10 +2609,10 @@ function renderStatusManager(){
     });
     const labelInp = document.createElement("input");
     labelInp.type = "text";
-    labelInp.value = (s.label||"").replace(/^[①②③④⑤]\s*/,"");
+    labelInp.value = (s.label||"").replace(/^[①②③④⑤⑥]\s*/,"");
     labelInp.className = "cat-label-input";
     labelInp.onchange = ()=>{
-      const cleaned = labelInp.value.replace(/^[①②③④⑤]\s*/, "").trim();
+      const cleaned = labelInp.value.replace(/^[①②③④⑤⑥]\s*/, "").trim();
       s.label = cleaned || s.label;
       labelInp.value = s.label;
       persistLocal(); renderTabs();
