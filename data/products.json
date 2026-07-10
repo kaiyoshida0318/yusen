@@ -141,7 +141,8 @@
         }
       ],
       "expectedSales": 0,
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-05-28",
@@ -181,7 +182,8 @@
       ],
       "tables": [],
       "expectedSales": 0,
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-05-29",
@@ -341,7 +343,8 @@
         }
       ],
       "expectedSales": 0,
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-05-28",
@@ -364,7 +367,8 @@
       "suppliers": [],
       "tables": [],
       "expectedSales": 0,
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -387,7 +391,8 @@
       "suppliers": [],
       "tables": [],
       "expectedSales": 0,
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -407,7 +412,8 @@
       "suppliers": [],
       "tables": [],
       "expectedSales": 0,
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -442,7 +448,8 @@
       ],
       "tables": [],
       "expectedSales": 0,
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -471,7 +478,8 @@
           "memo": ""
         }
       ],
-      "tables": []
+      "tables": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -520,7 +528,8 @@
       ],
       "tables": [],
       "expectedSales": 0,
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -536,7 +545,8 @@
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -548,11 +558,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -564,11 +575,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -580,11 +592,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -596,11 +609,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -612,11 +626,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -628,11 +643,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -644,11 +660,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -660,11 +677,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -676,14 +694,16 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
+      "doneDate": "2026-06-01",
       "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-24-03-01.jpg",
       "name": "汗取りパッド",
       "expectedSales": 4,
@@ -694,6 +714,7 @@
       "rankingUrls": [
         "https://ranking.rakuten.co.jp/weekly/304079/"
       ],
+      "companyUrls": [],
       "freeNote": "",
       "category": "rakuten",
       "status": "done",
@@ -749,8 +770,7 @@
             }
           ]
         }
-      ],
-      "companyUrls": []
+      ]
     },
     {
       "date": "2026-06-01",
@@ -762,11 +782,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -778,11 +799,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-01",
@@ -794,11 +816,12 @@
       "rankingUrls": [],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
       "tables": [],
-      "companyUrls": []
+      "companyUrls": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-08",
@@ -816,7 +839,8 @@
       "status": "done",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-17",
@@ -839,7 +863,8 @@
         }
       ],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-17",
@@ -862,7 +887,8 @@
         }
       ],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-22",
@@ -963,7 +989,8 @@
             }
           ]
         }
-      ]
+      ],
+      "doneDate": ""
     },
     {
       "date": "2026-06-26",
@@ -985,7 +1012,8 @@
       "status": "done",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "doneDate": ""
     },
     {
       "date": "2026-06-26",
@@ -1000,10 +1028,11 @@
       ],
       "freeNote": "",
       "category": "rakuten",
-      "status": "s_mpuyvtej",
+      "status": "renewal",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "doneDate": ""
     },
     {
       "date": "2026-07-09",
@@ -1021,7 +1050,8 @@
       "status": "buy",
       "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "doneDate": ""
     }
   ],
   "categories": [
@@ -1044,32 +1074,38 @@
   "statuses": [
     {
       "id": "buy",
-      "label": "買付前・済",
+      "label": "買付前",
       "icon": "num:1"
+    },
+    {
+      "id": "bought",
+      "label": "買付済",
+      "icon": "num:2"
     },
     {
       "id": "prearrive",
       "label": "到着前",
-      "icon": "num:2"
+      "icon": "num:3"
     },
     {
       "id": "arrived",
       "label": "到着分",
-      "icon": "num:3"
+      "icon": "num:4"
     },
     {
-      "id": "s_mpuyvtej",
+      "id": "renewal",
       "label": "リニューアル検討分",
-      "icon": "num:3"
+      "icon": "num:4"
     },
     {
       "id": "working",
       "label": "制作着手中",
-      "icon": "num:4"
+      "icon": "num:5"
     },
     {
       "id": "done",
       "label": "完了分"
     }
-  ]
+  ],
+  "_statusMigV2": true
 }
