@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.52.0";
+const VERSION = "1.52.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -577,20 +577,10 @@ const STATUS_NUM_COLORS = {
   5: "#c0392b", // 赤
   6: "#0e7c8a", // 濃青緑
 };
-// 番号バッジで選べる色（3色）。icon "num:N.C"(C=1..3)で指定。無指定はSTATUS_NUM_COLORS（既存互換）
-const NUM_COLOR_PALETTE = ["#3f9b6e", "#2f6fb0", "#d98324"]; // 緑・青・橙
-function isNumIcon(icon){ return typeof icon==="string" && /^num:[1-6](\.[1-3])?$/.test(icon); }
-// icon("num:1" or "num:1.2")から表示数字と色を取り出す
-function parseNumIcon(icon){
-  const body = icon.slice(4);
-  const dot = body.indexOf(".");
-  const n = parseInt(dot>=0 ? body.slice(0,dot) : body, 10);
-  const c = dot>=0 ? parseInt(body.slice(dot+1),10) : 0; // 0=無指定（既存色）
-  const color = c>=1 ? (NUM_COLOR_PALETTE[c-1] || STATUS_NUM_COLORS[n]) : (STATUS_NUM_COLORS[n] || "#7a756d");
-  return { n, c, color };
-}
+function isNumIcon(icon){ return typeof icon==="string" && /^num:[1-6]$/.test(icon); }
 function statusNumSvg(icon){
-  const { n, color } = parseNumIcon(icon);
+  const n = parseInt(icon.split(":")[1], 10);
+  const color = STATUS_NUM_COLORS[n] || "#7a756d";
   return `<svg class="status-num" viewBox="0 0 20 20" aria-label="${n}" role="img">`
     + `<circle cx="10" cy="10" r="9" fill="${color}"/>`
     + `<text x="10" y="14.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="#fff">${n}</text>`
@@ -602,14 +592,23 @@ function statusIconHtml(icon){
   if(isTxtIcon(icon)) return statusTxtBadge(icon);
   return "";
 }
-// 文字バッジ（txt:OK / txt:NG / txt:SKIP など）
+// 文字バッジ（txt:OK / txt:NG / txt:SKIP など）。色は "txt:LABEL@C"(C=1..) で指定、無指定は既定色
 const TXT_PRESETS = ["OK","NG","SKIP","保留","済"];
 const TXT_COLORS = { "OK":"#3f9b6e", "NG":"#c0392b", "SKIP":"#7a756d", "保留":"#d98324", "済":"#2f6fb0" };
+const TXT_COLOR_PALETTE = ["#3f9b6e", "#c0392b", "#d98324", "#2f6fb0", "#7a756d"]; // 緑・赤・橙・青・グレー
 function isTxtIcon(icon){ return typeof icon==="string" && /^txt:.+/.test(icon); }
+// "txt:SKIP" or "txt:SKIP@2" → { label, c(0=無指定), color }
+function parseTxtIcon(icon){
+  const body = icon.slice(4);
+  const at = body.indexOf("@");
+  const label = at>=0 ? body.slice(0,at) : body;
+  const c = at>=0 ? parseInt(body.slice(at+1),10) : 0;
+  const color = c>=1 ? (TXT_COLOR_PALETTE[c-1] || TXT_COLORS[label] || "#7a756d") : (TXT_COLORS[label] || "#7a756d");
+  return { label, c, color };
+}
 function statusTxtBadge(icon){
-  const t = icon.slice(4);
-  const color = TXT_COLORS[t] || "#7a756d";
-  return `<span class="status-txt-badge" style="background:${color}">${escapeHtml(t)}</span>`;
+  const { label, color } = parseTxtIcon(icon);
+  return `<span class="status-txt-badge" style="background:${color}">${escapeHtml(label)}</span>`;
 }
 // 番号のテキスト記号（option用、SVG不可な場所で使う）
 const NUM_CHARS = { 1:"①", 2:"②", 3:"③", 4:"④", 5:"⑤", 6:"⑥" };
@@ -2746,46 +2745,46 @@ function renderStatusManager(){
     const row = document.createElement("div"); row.className = "cat-row";
     if(info.hasIcon){
       const pickCol = document.createElement("div"); pickCol.className = "status-pick-col";
-      // 番号ロゴ選択（なし/1〜6）＋文字バッジ（OK/NG/SKIP/保留/済）
+      // 番号ロゴ選択（なし/1〜6・色固定）＋文字バッジ（OK/NG/SKIP/保留/済）
       const numWrap = document.createElement("div"); numWrap.className = "status-num-picker";
-      const curNum = isNumIcon(s.icon) ? parseNumIcon(s.icon).n : null;
-      const curColorIdx = isNumIcon(s.icon) ? parseNumIcon(s.icon).c : 0;
+      const curTxt = isTxtIcon(s.icon) ? parseTxtIcon(s.icon) : null;
+      const applyIcon = (val)=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); render(); };
       [null,1,2,3,4,5,6].forEach(n=>{
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "status-num-opt";
         if(n===null){
           if(!s.icon) btn.classList.add("selected");
           btn.textContent = "—"; btn.title = "なし"; btn.classList.add("status-num-none");
-          btn.onclick = ()=>{ s.icon = ""; persistLocal(); renderStatusManager(); renderTabs(); };
+          btn.onclick = ()=>applyIcon("");
         }else{
-          if(curNum===n) btn.classList.add("selected");
-          btn.innerHTML = statusNumSvg("num:"+n); btn.title = n+"番";
-          // 番号クリック時は現在の色バリアントを維持（無指定なら無指定のまま）
-          btn.onclick = ()=>{ s.icon = curColorIdx>=1 ? `num:${n}.${curColorIdx}` : ("num:"+n); persistLocal(); renderStatusManager(); renderTabs(); };
+          const val = "num:"+n;
+          if((s.icon||"")===val) btn.classList.add("selected");
+          btn.innerHTML = statusNumSvg(val); btn.title = n+"番";
+          btn.onclick = ()=>applyIcon(val);
         }
         numWrap.appendChild(btn);
       });
       TXT_PRESETS.forEach(t=>{
-        const val = "txt:"+t;
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "status-num-opt status-txt-opt";
-        if((s.icon||"")===val) btn.classList.add("selected");
-        btn.innerHTML = statusTxtBadge(val);
+        if(curTxt && curTxt.label===t) btn.classList.add("selected");
+        btn.innerHTML = statusTxtBadge("txt:"+t);
         btn.title = t;
-        btn.onclick = ()=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); };
+        // 文字バッジを選ぶと既定色（色指定なし）にする。色はチップで変更
+        btn.onclick = ()=>applyIcon("txt:"+t);
         numWrap.appendChild(btn);
       });
       pickCol.appendChild(numWrap);
-      // 番号選択中なら色チップ（3色）を表示
-      if(curNum!==null){
+      // 文字バッジ選択中なら色チップを表示
+      if(curTxt){
         const crow = document.createElement("div"); crow.className = "status-color-row";
         const clbl = document.createElement("span"); clbl.className = "status-color-lbl"; clbl.textContent = "色:";
         crow.appendChild(clbl);
-        NUM_COLOR_PALETTE.forEach((col, ci)=>{
+        TXT_COLOR_PALETTE.forEach((col, ci)=>{
           const chip = document.createElement("button");
-          chip.type = "button"; chip.className = "status-color-chip" + (curColorIdx===ci+1 ? " selected" : "");
+          chip.type = "button"; chip.className = "status-color-chip" + (curTxt.c===ci+1 ? " selected" : "");
           chip.style.background = col; chip.title = "この色にする";
-          chip.onclick = ()=>{ s.icon = `num:${curNum}.${ci+1}`; persistLocal(); renderStatusManager(); renderTabs(); };
+          chip.onclick = ()=>applyIcon(`txt:${curTxt.label}@${ci+1}`);
           crow.appendChild(chip);
         });
         pickCol.appendChild(crow);
@@ -2800,14 +2799,14 @@ function renderStatusManager(){
       const cleaned = labelInp.value.replace(/^[①②③④⑤⑥]\s*/, "").trim();
       s.label = cleaned || s.label;
       labelInp.value = s.label;
-      persistLocal(); renderTabs();
+      persistLocal(); renderTabs(); render();
     };
     const up = document.createElement("button"); up.className="cat-mv"; up.textContent="▲";
     up.disabled = idx===0;
-    up.onclick = ()=>{ if(idx>0){ [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
+    up.onclick = ()=>{ if(idx>0){ [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]]; persistLocal(); renderStatusManager(); renderTabs(); render(); } };
     const dn = document.createElement("button"); dn.className="cat-mv"; dn.textContent="▼";
     dn.disabled = idx===arr.length-1;
-    dn.onclick = ()=>{ if(idx<arr.length-1){ [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
+    dn.onclick = ()=>{ if(idx<arr.length-1){ [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]]; persistLocal(); renderStatusManager(); renderTabs(); render(); } };
     const del = document.createElement("button"); del.className="cat-del"; del.textContent="🗑";
     del.title = "この状態を削除（割り当て済みは「未設定」になります）";
     del.onclick = ()=>{
@@ -2830,7 +2829,7 @@ function addStatus(){
   const id = info.idPrefix + Date.now().toString(36);
   info.list.push({ id, label });
   inp.value = "";
-  persistLocal(); renderStatusManager(); renderTabs();
+  persistLocal(); renderStatusManager(); renderTabs(); render();
 }
 
 /* ---------- 設定モーダル ---------- */
