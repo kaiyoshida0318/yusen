@@ -892,6 +892,7 @@
     },
     {
       "date": "2026-06-22",
+      "doneDate": "2026-07-10",
       "image": "https://shop.r10s.jp/yukaiya/cabinet/si/si-26a-01-b-01.jpg",
       "name": "耳ツボ　スティック",
       "expectedSales": 2,
@@ -989,8 +990,7 @@
             }
           ]
         }
-      ],
-      "doneDate": ""
+      ]
     },
     {
       "date": "2026-06-26",
@@ -1098,14 +1098,20 @@
       "icon": "num:4"
     },
     {
+      "id": "nextup",
+      "label": "次やる候補",
+      "icon": "num:5"
+    },
+    {
       "id": "working",
       "label": "制作着手中",
-      "icon": "num:5"
+      "icon": "num:6"
     },
     {
       "id": "done",
       "label": "完了分"
     }
   ],
-  "_statusMigV2": true
+  "_statusMigV2": true,
+  "_statusMigV3": true
 }
