@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.47.0";
+const VERSION = "1.47.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -234,6 +234,13 @@ function migrate(data){
     // （nextup は新規なので割り当て0からスタート）
     data._statusMigV3 = true;
   }
+  // 標準ステータス「次やる候補」が state.statuses に無ければ補完（移行フラグに関係なく毎回）
+  if(Array.isArray(data.statuses) && !data.statuses.some(s=>s.id==="nextup")){
+    const idx = data.statuses.findIndex(s=>s.id==="renewal");
+    const item = { id:"nextup", label:"次やる候補", icon:"num:5" };
+    if(idx>=0) data.statuses.splice(idx+1, 0, item);
+    else data.statuses.push(item);
+  }
   data.rows.forEach(r=>{
     if(typeof r.expectedSales !== "number") r.expectedSales = 0;
     if(typeof r.doneDate !== "string") r.doneDate = "";
@@ -357,7 +364,16 @@ function renderTabs(){
     [ALL_STATUS, NONE_STATUS, ...state.statuses, ALL_FULL_STATUS].forEach(s=>{
       const tab = document.createElement("button");
       tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===currentStatus ? " active" : "");
-      tab.innerHTML = `<span class="status-ico">${statusIconHtml(s.icon)}</span><span class="cat-label">${escapeHtml((s.label||"").replace(/^[①②③④⑤⑥]\s*/,""))}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
+      let labelHtml;
+      if(s.id==="all"){
+        // 「①-⑥全体」：①=番号1の色、⑥=番号6の色で表示
+        labelHtml = `<span class="allnum" style="color:${STATUS_NUM_COLORS[1]}">①</span>-<span class="allnum" style="color:${STATUS_NUM_COLORS[6]}">⑥</span>全体`;
+      }else if(s.id==="allfull" || s.id==="none"){
+        labelHtml = escapeHtml(s.label); // 特別タブは番号除去しない
+      }else{
+        labelHtml = escapeHtml((s.label||"").replace(/^[①②③④⑤⑥]\s*/,""));
+      }
+      tab.innerHTML = `<span class="status-ico">${statusIconHtml(s.icon)}</span><span class="cat-label">${labelHtml}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
       tab.onclick = ()=>{ currentStatus = s.id; render(); };
       swrap.appendChild(tab);
     });
