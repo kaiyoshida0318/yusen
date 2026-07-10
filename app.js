@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.52.6";
+const VERSION = "1.53.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -121,6 +121,18 @@ const DEFAULT_YAHOO_STATUSES = [
 let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice(), rakutenStatuses: DEFAULT_RAKUTEN_STATUSES.slice(), yahooStatuses: DEFAULT_YAHOO_STATUSES.slice() };
 let cfg = { pat:"", owner:"kaiyoshida0318", repo:"yusen", branch:"main" };
 let dataSha = null;
+let appReady = false;         // 初期化完了フラグ（初期ロード中は自動保存しない）
+let ghDirty = false;          // GitHub未反映の変更があるか
+let autoSaveTimer = null;     // 自動保存のデバウンス
+let suppressAutoSave = false; // GitHub読込直後など、自動保存を一時抑制
+// 変更が起きたら未保存フラグを立て、少し待ってから自動でGitHub保存
+function markDirty(){ ghDirty = true; scheduleAutoSave(); }
+function scheduleAutoSave(){
+  if(!appReady || suppressAutoSave) return;
+  if(!(cfg.pat && cfg.owner && cfg.repo)) return; // GitHub未設定なら自動保存しない
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(()=>{ saveToGitHub().catch(()=>{}); }, 800);
+}
 let currentCat = "all"; // 現在選択中のカテゴリID（上段）
 let statusMgrAxis = "status"; // ステータス管理モーダルで編集中の軸
 // 3軸それぞれの絞り込み選択（全部AND条件）。"all"はその軸で絞らない
@@ -155,6 +167,11 @@ function init(){
   loadFromGitHub();
   updateStickyHeight();
   window.addEventListener("resize", updateStickyHeight);
+  appReady = true;
+  // 未保存（GitHub未反映）の変更があるままページを閉じようとしたら確認する
+  window.addEventListener("beforeunload", (e)=>{
+    if(ghDirty){ e.preventDefault(); e.returnValue = ""; return ""; }
+  });
 }
 
 // 上部固定領域の高さを CSS 変数として設定（テーブルヘッダや本文の余白に使う）
@@ -295,6 +312,7 @@ function migrate(data){
 function persistLocal(){
   try{
     localStorage.setItem(LS_DATA, JSON.stringify(state));
+    if(appReady && !suppressAutoSave) markDirty();
   }catch(e){
     // localStorage は通常5MB。容量超過時は DataURL 画像を抜いた軽量版で再試行
     if(e && (e.name==="QuotaExceededError" || /quota/i.test(e.message||""))){
@@ -302,6 +320,7 @@ function persistLocal(){
         const slim = stripDataUrlImages(state);
         localStorage.setItem(LS_DATA, JSON.stringify(slim));
         setStatus("⚠️ ローカル保存の容量を超えたため、画像データURLは保存しませんでした（メモリ上は保持。GitHubに保存すれば画像も反映されます）");
+        if(appReady && !suppressAutoSave) markDirty();
         return;
       }catch(e2){
         console.error("persistLocal slim failed:", e2);
@@ -2324,6 +2343,7 @@ async function saveToGitHub(){
         if(!dataSha) await fetchDataSha();
         await putDataJson();
         setStatus("✅ GitHubに保存しました");
+        ghDirty = false;
         if(prog) prog.success("GitHubに保存しました");
       }catch(e){
         const msg = "❌ 保存失敗: "+(e && e.message ? e.message : e);
@@ -2463,7 +2483,11 @@ async function loadFromGitHub(){
     const res = await fetch(raw);
     if(res.ok){
       const data = await res.json();
-      if(data && Array.isArray(data.rows)){ state = migrate(data); persistLocal(); render(); }
+      if(data && Array.isArray(data.rows)){
+        suppressAutoSave = true;
+        state = migrate(data); persistLocal(); render();
+        suppressAutoSave = false;
+      }
     }
   }catch(e){ /* 初回はファイルが無いので無視 */ }
 }
