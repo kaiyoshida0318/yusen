@@ -401,7 +401,7 @@
       "expectedSales": 0,
       "companyUrls": [],
       "doneDate": "",
-      "rakutenStatus": "",
+      "rakutenStatus": "r_pre",
       "yahooStatus": "y_mremf1lq"
     },
     {
@@ -424,7 +424,7 @@
       "expectedSales": 0,
       "companyUrls": [],
       "doneDate": "",
-      "rakutenStatus": "",
+      "rakutenStatus": "r_pre",
       "yahooStatus": "y_mremf1lq"
     },
     {
@@ -462,7 +462,7 @@
       "expectedSales": 0,
       "companyUrls": [],
       "doneDate": "",
-      "rakutenStatus": "",
+      "rakutenStatus": "r_pre",
       "yahooStatus": "y_mremf1lq"
     },
     {
@@ -903,7 +903,7 @@
       "companyUrls": [],
       "freeNote": "",
       "category": "new",
-      "status": "buy",
+      "status": "bought",
       "rakumart": [
         {
           "text": "2026061714291228-2147",
@@ -929,7 +929,7 @@
       "companyUrls": [],
       "freeNote": "",
       "category": "new",
-      "status": "buy",
+      "status": "bought",
       "rakumart": [
         {
           "text": "2026061714363571-2147",
