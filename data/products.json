@@ -1090,7 +1090,7 @@
       "tables": [],
       "doneDate": "",
       "rakutenStatus": "",
-      "yahooStatus": "y_mremf1lq"
+      "yahooStatus": "y_none"
     },
     {
       "date": "2026-07-09",
@@ -1192,7 +1192,8 @@
     },
     {
       "id": "done",
-      "label": "完了分"
+      "label": "完了分",
+      "icon": "txt:OK"
     }
   ],
   "_statusMigV2": true,
@@ -1215,7 +1216,8 @@
     },
     {
       "id": "r_none",
-      "label": "不要"
+      "label": "不要",
+      "icon": "txt:SKIP"
     }
   ],
   "yahooStatuses": [
@@ -1246,11 +1248,13 @@
     },
     {
       "id": "y_mremf1lq",
-      "label": "一旦なしで"
+      "label": "一旦なしで",
+      "icon": "txt:SKIP"
     },
     {
       "id": "y_none",
-      "label": "不要"
+      "label": "不要",
+      "icon": "txt:SKIP"
     }
   ]
 }
