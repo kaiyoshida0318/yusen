@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.52.1";
+const VERSION = "1.52.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -593,8 +593,8 @@ function statusIconHtml(icon){
   return "";
 }
 // 文字バッジ（txt:OK / txt:NG / txt:SKIP など）。色は "txt:LABEL@C"(C=1..) で指定、無指定は既定色
-const TXT_PRESETS = ["OK","NG","SKIP","保留","済"];
-const TXT_COLORS = { "OK":"#3f9b6e", "NG":"#c0392b", "SKIP":"#7a756d", "保留":"#d98324", "済":"#2f6fb0" };
+const TXT_PRESETS = ["OK","NG","SKIP","保留","済","★","◎","○","△","✓"];
+const TXT_COLORS = { "OK":"#3f9b6e", "NG":"#c0392b", "SKIP":"#7a756d", "保留":"#d98324", "済":"#2f6fb0", "★":"#f0a500", "◎":"#3f9b6e", "○":"#2f6fb0", "△":"#d98324", "✓":"#3f9b6e" };
 const TXT_COLOR_PALETTE = ["#3f9b6e", "#c0392b", "#d98324", "#2f6fb0", "#7a756d"]; // 緑・赤・橙・青・グレー
 function isTxtIcon(icon){ return typeof icon==="string" && /^txt:.+/.test(icon); }
 // "txt:SKIP" or "txt:SKIP@2" → { label, c(0=無指定), color }
