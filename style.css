@@ -708,3 +708,10 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 /* 状態管理の番号/文字ピッカーは折り返し可 */
 .status-num-picker{flex-wrap:wrap}
 .status-txt-opt{width:auto;min-width:42px;padding:3px 6px}
+
+/* 番号バッジの色選択 */
+.status-pick-col{display:flex;flex-direction:column;gap:4px;flex:0 0 auto}
+.status-color-row{display:flex;align-items:center;gap:5px;padding-left:2px}
+.status-color-lbl{font-size:11px;color:var(--muted)}
+.status-color-chip{width:20px;height:20px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border);cursor:pointer;padding:0}
+.status-color-chip.selected{border-color:#fff;box-shadow:0 0 0 2px var(--text)}
