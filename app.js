@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.48.0";
+const VERSION = "1.49.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -123,9 +123,9 @@ let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAUL
 let cfg = { pat:"", owner:"kaiyoshida0318", repo:"yusen", branch:"main" };
 let dataSha = null;
 let currentCat = "all"; // 現在選択中のカテゴリID（上段）
-let statusAxis = "status"; // 絞り込みに使う状態軸: "status"(商品状態) | "rakuten" | "yahoo"
 let statusMgrAxis = "status"; // ステータス管理モーダルで編集中の軸
-let currentStatus = "all"; // 現在選択中のステータスID（下段）
+// 3軸それぞれの絞り込み選択（全部AND条件）。"all"はその軸で絞らない
+let currentStatusByAxis = { status:"all", rakuten:"all", yahoo:"all" };
 let dateSort = "desc";   // 日付ソート初期値は降順（新しい日付が上）: "none" | "asc" | "desc"
 let pendingStatus = {};  // 一覧でのステータス保留変更 { rowIndex: newStatusId }
 let pendingCat = {};     // 一覧でのカテゴリ保留変更 { rowIndex: newCatId }
@@ -385,74 +385,75 @@ function renderTabs(){
   newBtn.onclick = ()=>openEntry(-1);
   wrap.appendChild(newBtn);
 
-  // 軸切替タブ（商品状態 / 楽天 / Yahoo）
+  // 軸切替タブは廃止（3軸を縦3行で同時表示するため）
   const awrap = document.getElementById("axisTabs");
-  if(awrap){
-    awrap.innerHTML = "";
-    [{id:"status",label:"商品状態"},{id:"rakuten",label:"楽天"},{id:"yahoo",label:"Yahoo"}].forEach(a=>{
-      const b = document.createElement("button");
-      b.className = "axis-tab" + (a.id===statusAxis ? " active" : "");
-      b.textContent = a.label;
-      b.onclick = ()=>{ statusAxis = a.id; currentStatus = "all"; render(); };
-      awrap.appendChild(b);
-    });
-  }
+  if(awrap) awrap.innerHTML = "";
 
-  // 下段：進捗ステータス（現在の軸に応じて選択肢が変わる）
+  // 下段：状態・楽天・Yahoo を縦3行で表示。各行で選択肢を選んで絞り込む（AND）
   const swrap = document.getElementById("statusTabs");
   if(swrap){
     swrap.innerHTML = "";
-    const axisStatuses = statusAxis==="rakuten" ? state.rakutenStatuses
-                       : statusAxis==="yahoo"   ? state.yahooStatuses
-                       : state.statuses;
-    // 先頭の「全体」タブ：商品状態軸は①-⑥全体＋全件、他軸は単純な全体
-    const leadAll = statusAxis==="status" ? ALL_STATUS : { id:"all", label:"全体" };
-    const tabDefs = statusAxis==="status"
-      ? [ALL_STATUS, NONE_STATUS, ...axisStatuses, ALL_FULL_STATUS]
-      : [leadAll, NONE_STATUS, ...axisStatuses];
-    tabDefs.forEach(s=>{
-      const tab = document.createElement("button");
-      tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===currentStatus ? " active" : "");
-      let labelHtml;
-      if(s.id==="all" && statusAxis==="status"){
-        // 「①-⑥全体」：①=番号1の色、⑥=番号6の色で表示
-        labelHtml = `<span class="allnum" style="color:${STATUS_NUM_COLORS[1]}">①</span>-<span class="allnum" style="color:${STATUS_NUM_COLORS[6]}">⑥</span>全体`;
-      }else if(s.id==="all" || s.id==="allfull" || s.id==="none"){
-        labelHtml = escapeHtml(s.label); // 特別タブは番号除去しない
-      }else{
-        labelHtml = escapeHtml((s.label||"").replace(/^[①②③④⑤⑥]\s*/,""));
-      }
-      tab.innerHTML = `<span class="status-ico">${statusIconHtml(s.icon)}</span><span class="cat-label">${labelHtml}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
-      tab.onclick = ()=>{ currentStatus = s.id; render(); };
-      swrap.appendChild(tab);
+    const axisDefs = [
+      { axis:"status",  rowLabel:"状態",  list:state.statuses,        hasIcon:true  },
+      { axis:"rakuten", rowLabel:"楽天",  list:state.rakutenStatuses, hasIcon:false },
+      { axis:"yahoo",   rowLabel:"Yahoo", list:state.yahooStatuses,   hasIcon:false },
+    ];
+    axisDefs.forEach(def=>{
+      const rowEl = document.createElement("div"); rowEl.className = "status-row";
+      const rl = document.createElement("span"); rl.className = "status-row-label"; rl.textContent = def.rowLabel;
+      rowEl.appendChild(rl);
+      const cur = currentStatusByAxis[def.axis];
+      const tabs = def.axis==="status"
+        ? [ALL_STATUS, NONE_STATUS, ...def.list, ALL_FULL_STATUS]
+        : [{ id:"all", label:"全体" }, NONE_STATUS, ...def.list];
+      tabs.forEach(s=>{
+        const tab = document.createElement("button");
+        tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===cur ? " active" : "");
+        let labelHtml;
+        if(s.id==="all" && def.axis==="status"){
+          labelHtml = `<span class="allnum" style="color:${STATUS_NUM_COLORS[1]}">①</span>-<span class="allnum" style="color:${STATUS_NUM_COLORS[6]}">⑥</span>全体`;
+        }else if(s.id==="all" || s.id==="allfull" || s.id==="none"){
+          labelHtml = escapeHtml(s.label);
+        }else{
+          labelHtml = escapeHtml((s.label||"").replace(/^[①②③④⑤⑥]\s*/,""));
+        }
+        const icon = def.hasIcon ? statusIconHtml(s.icon) : "";
+        tab.innerHTML = `<span class="status-ico">${icon}</span><span class="cat-label">${labelHtml}</span><span class="cat-count">${countForStatusAxisTab(def.axis, s.id)}</span>`;
+        tab.onclick = ()=>{ currentStatusByAxis[def.axis] = s.id; render(); };
+        rowEl.appendChild(tab);
+      });
+      swrap.appendChild(rowEl);
     });
-    // 保留中のステータス／カテゴリ変更があるとき、右端にクリア・反映ボタン
+
+    // 保留中の変更・一括削除の操作行（3行の下）
     const nS = Object.keys(pendingStatus).length;
     const nC = Object.keys(pendingCat).length;
     const n = nS + nC;
-    if(n>0){
-      const clearBtn = document.createElement("button");
-      clearBtn.className = "status-clear-btn";
-      clearBtn.textContent = "クリア";
-      clearBtn.title = "保留中の変更をすべて取り消す";
-      clearBtn.onclick = ()=>{ pendingStatus = {}; pendingCat = {}; render(); };
-      const applyBtn = document.createElement("button");
-      applyBtn.className = "status-apply-btn";
-      applyBtn.textContent = `🔄 反映（${n}件）`;
-      applyBtn.onclick = applyPendingChanges;
-      swrap.append(clearBtn, applyBtn);
-    }
-    // 選択モードで1件以上選択中なら、一括削除実行ボタン
-    if(selectMode){
-      const cnt = Object.keys(selectedRows).length;
-      const delBtn = document.createElement("button");
-      delBtn.className = "status-bulkdel-btn";
-      delBtn.textContent = `🗑 選択した行を削除（${cnt}件）`;
-      delBtn.disabled = cnt===0;
-      delBtn.onclick = deleteSelectedRows;
-      // クリア・反映が無いときは左マージンautoで右寄せ
-      if(n===0) delBtn.style.marginLeft = "auto";
-      swrap.append(delBtn);
+    if(n>0 || selectMode){
+      const opRow = document.createElement("div"); opRow.className = "status-op-row";
+      if(n>0){
+        const clearBtn = document.createElement("button");
+        clearBtn.className = "status-clear-btn";
+        clearBtn.textContent = "クリア";
+        clearBtn.title = "保留中の変更をすべて取り消す";
+        clearBtn.onclick = ()=>{ pendingStatus = {}; pendingCat = {}; render(); };
+        const applyBtn = document.createElement("button");
+        applyBtn.className = "status-apply-btn";
+        applyBtn.textContent = `🔄 反映（${n}件）`;
+        applyBtn.onclick = applyPendingChanges;
+        opRow.append(clearBtn, applyBtn);
+      }
+      if(selectMode){
+        const cnt = Object.keys(selectedRows).length;
+        const delBtn = document.createElement("button");
+        delBtn.className = "status-bulkdel-btn";
+        delBtn.textContent = `🗑 選択した行を削除（${cnt}件）`;
+        delBtn.disabled = cnt===0;
+        delBtn.onclick = deleteSelectedRows;
+        if(n===0) delBtn.style.marginLeft = "auto";
+        opRow.append(delBtn);
+      }
+      swrap.appendChild(opRow);
     }
   }
   // タブが描画されたあと、固定領域の高さを更新
@@ -465,27 +466,41 @@ function catMatch(rowCat, sel){
   if(sel==="none") return !rowCat;
   return rowCat===sel;
 }
-// 現在の絞り込み軸に対応する行のステータス値を返す
-function rowStatusForAxis(r){
-  if(statusAxis==="rakuten") return r.rakutenStatus || "";
-  if(statusAxis==="yahoo")   return r.yahooStatus || "";
+// 指定軸に対応する行のステータス値
+function rowStatusOf(r, axis){
+  if(axis==="rakuten") return r.rakutenStatus || "";
+  if(axis==="yahoo")   return r.yahooStatus || "";
   return r.status || "";
 }
-function statusMatch(rowStatus, sel){
-  if(sel==="allfull") return true;            // 全件（完了分も含む）
-  if(sel==="all") return statusAxis==="status" ? rowStatus!=="done" : true; // 商品状態軸は完了分除外、他軸は全部
+// 指定軸での絞り込みマッチ判定
+function statusMatchAxis(rowStatus, sel, axis){
+  if(sel==="allfull") return true;
+  if(sel==="all") return axis==="status" ? rowStatus!=="done" : true; // 商品状態のみ完了分除外
   if(sel==="none") return !rowStatus;
   return rowStatus===sel;
 }
-function countForCat(id){
-  return state.rows.filter(r=> catMatch(r.category, id) && statusMatch(rowStatusForAxis(r), currentStatus)).length;
+// 3軸すべての現在選択にマッチするか（AND）
+function rowMatchesAllAxes(r){
+  return statusMatchAxis(rowStatusOf(r,"status"),  currentStatusByAxis.status,  "status")
+      && statusMatchAxis(rowStatusOf(r,"rakuten"), currentStatusByAxis.rakuten, "rakuten")
+      && statusMatchAxis(rowStatusOf(r,"yahoo"),   currentStatusByAxis.yahoo,   "yahoo");
 }
-// 下段カウント: 現在の上段カテゴリ絞り込みを反映
-function countForStatus(id){
-  return state.rows.filter(r=> catMatch(r.category, currentCat) && statusMatch(rowStatusForAxis(r), id)).length;
+function countForCat(id){
+  return state.rows.filter(r=> catMatch(r.category, id) && rowMatchesAllAxes(r)).length;
+}
+// あるタブ(axis,id)のカウント：他の2軸は現在選択、対象軸はidで判定
+function countForStatusAxisTab(axis, id){
+  return state.rows.filter(r=>{
+    if(!catMatch(r.category, currentCat)) return false;
+    for(const ax of ["status","rakuten","yahoo"]){
+      const sel = ax===axis ? id : currentStatusByAxis[ax];
+      if(!statusMatchAxis(rowStatusOf(r,ax), sel, ax)) return false;
+    }
+    return true;
+  }).length;
 }
 function filteredRows(){
-  let arr = state.rows.map((r,i)=>({r,i})).filter(x=> catMatch(x.r.category, currentCat) && statusMatch(rowStatusForAxis(x.r), currentStatus));
+  let arr = state.rows.map((r,i)=>({r,i})).filter(x=> catMatch(x.r.category, currentCat) && rowMatchesAllAxes(x.r));
   if(dateSort!=="none"){
     arr = arr.slice().sort((a,b)=>{
       const da = a.r.date || "", db = b.r.date || "";
@@ -613,7 +628,7 @@ function addQuickRow(){
     expectedSales: 0,
     rivalRakuten: [], rivalAmazon: [], rankingUrls: [], freeNote: "",
     category: ((currentCat==="all"||currentCat==="none") ? "" : currentCat),
-    status: ((currentStatus==="all"||currentStatus==="none") ? "" : currentStatus),
+    status: ((currentStatusByAxis.status==="all"||currentStatusByAxis.status==="none"||currentStatusByAxis.status==="allfull") ? "" : currentStatusByAxis.status),
     rakumart: [], tables: [], suppliers: [],
   });
   persistLocal(); render();
@@ -1212,10 +1227,11 @@ function openEntry(editIndex, mode){
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
   entry.category = row ? (row.category||"") : ((currentCat==="all"||currentCat==="none") ? "" : currentCat);
   // ステータス: 編集時はその値、新規時は現在の下段タブ（"all"の場合は未設定）
-  entry.status = row ? (row.status||"") : ((currentStatus==="all"||currentStatus==="none") ? "" : currentStatus);
-  // 楽天・Yahoo 状態（軸で絞り込み中ならその値を新規初期値に）
-  entry.rakutenStatus = row ? (row.rakutenStatus||"") : ((statusAxis==="rakuten" && currentStatus!=="all" && currentStatus!=="none") ? currentStatus : "");
-  entry.yahooStatus   = row ? (row.yahooStatus||"")   : ((statusAxis==="yahoo"   && currentStatus!=="all" && currentStatus!=="none") ? currentStatus : "");
+  const axisInit = (axisSel)=> (axisSel==="all"||axisSel==="none"||axisSel==="allfull") ? "" : axisSel;
+  entry.status = row ? (row.status||"") : axisInit(currentStatusByAxis.status);
+  // 楽天・Yahoo 状態（その軸で特定の値に絞り込み中なら新規初期値に）
+  entry.rakutenStatus = row ? (row.rakutenStatus||"") : axisInit(currentStatusByAxis.rakuten);
+  entry.yahooStatus   = row ? (row.yahooStatus||"")   : axisInit(currentStatusByAxis.yahoo);
   // 新規作成時はセクションを閉じておく（必要なものだけ開いて使う）。編集時は展開。
   sectionCollapsed = isEdit ? { rakumart:false, suppliers:false, tables:false } : { rakumart:true, suppliers:true, tables:true };
   renderCatSelect();
@@ -2781,7 +2797,7 @@ function renderStatusManager(){
       if(!confirm(`「${s.label}」を削除しますか？\n割り当て済みの商品は「未設定」になります（商品自体は消えません）。`)) return;
       state.rows.forEach(r=>{ if(r[info.rowField]===s.id) r[info.rowField]=""; });
       arr.splice(idx,1);
-      if(currentStatus===s.id) currentStatus="all";
+      if(currentStatusByAxis[statusMgrAxis]===s.id) currentStatusByAxis[statusMgrAxis]="all";
       persistLocal(); renderStatusManager(); render();
     };
     row.append(labelInp, up, dn, del);
