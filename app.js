@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.44.0";
+const VERSION = "1.45.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -15,6 +15,7 @@ const LS_DATA = "yusen_data_v1";
 
 const COLUMNS = [
   { key:"date",   label:"日付" },
+  { key:"doneDate", label:"完了日付" },
   { key:"image",  label:"画像" },
   { key:"name",   label:"商品名" },
   { key:"expectedSales", label:"予想月商" },
@@ -217,6 +218,7 @@ function migrate(data){
   }
   data.rows.forEach(r=>{
     if(typeof r.expectedSales !== "number") r.expectedSales = 0;
+    if(typeof r.doneDate !== "string") r.doneDate = "";
     if(!Array.isArray(r.suppliers)){
       r.suppliers = [];
       if(r.supply){ r.suppliers.push({ image:"", url:r.supply, memo:"" }); delete r.supply; }
@@ -574,6 +576,7 @@ function render(){
       }
     }else{
       if(c.key==="image") th.className="col-image";
+      if(c.key==="doneDate") th.className="col-date";
       if(c.key==="expectedSales") th.className="col-exp-sales";
       if(c.key==="actions") th.className="col-actions";
       if(c.key==="catSel") th.className="col-catsel";
@@ -618,6 +621,11 @@ function render(){
     const tdDate = document.createElement("td");
     tdDate.className="col-date"; tdDate.textContent = row.date || "";
     trb.appendChild(tdDate);
+
+    // 完了日付（日付の右・画像の左）
+    const tdDone = document.createElement("td");
+    tdDone.className="col-date"; tdDone.textContent = row.doneDate || "";
+    trb.appendChild(tdDone);
 
     // 画像列: メインライバル画像 + 仕入先画像の先頭2枚
     const tdImg = document.createElement("td");
@@ -1000,6 +1008,8 @@ function openEntry(editIndex, mode){
 
   let row = isEdit ? state.rows[editIndex] : null;
   document.getElementById("fDate").value  = row ? (row.date||today()) : today();
+  const fDoneEl = document.getElementById("fDoneDate");
+  if(fDoneEl) fDoneEl.value = row ? (row.doneDate||"") : "";
   document.getElementById("fName").value  = row ? (row.name||"") : "";
   const fExp = document.getElementById("fExpectedSales");
   if(fExp) fExp.value = (row && (row.expectedSales!=null)) ? String(row.expectedSales) : "";
@@ -1958,6 +1968,7 @@ function saveEntry(keepOpen){
     if(!Array.isArray(entry.tables))       entry.tables       = [];
     const fName = document.getElementById("fName");
     const fDate = document.getElementById("fDate");
+    const fDone = document.getElementById("fDoneDate");
     const fCat  = document.getElementById("fCategory");
     const fSt   = document.getElementById("fStatus");
     const fExp  = document.getElementById("fExpectedSales");
@@ -1968,6 +1979,7 @@ function saveEntry(keepOpen){
     }
     const row = {
       date:  (fDate && fDate.value) || today(),
+      doneDate: (fDone && fDone.value) || "",
       image: entry.image || "",
       name:  fName ? fName.value.trim() : "",
       expectedSales,
