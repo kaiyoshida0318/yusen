@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.49.2";
+const VERSION = "1.49.3";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -24,7 +24,6 @@ const COLUMNS = [
   { key:"rivalA", label:"Amazonライバル" },
   { key:"rakumart", label:"ラクマート" },
   { key:"supply", label:"仕入先" },
-  { key:"catSel", label:"カテゴリ" },
   { key:"statusSel", label:"商品状態" },
   { key:"rakutenSel", label:"楽天" },
   { key:"yahooSel", label:"Yahoo" },
@@ -874,35 +873,6 @@ function render(){
     });
     tdStatus.appendChild(statusSel);
 
-    // カテゴリ変更ドロップダウン（カスタム：色付きバッジ表示）
-    const tdCat = document.createElement("td");
-    tdCat.className="col-catsel";
-    const pendingC = (ri in pendingCat) ? pendingCat[ri] : row.category;
-    const catItems = [
-      { value:"", label:"— 未分類 —", iconHtml:"" },
-      ...state.categories.map(c=>({
-        value: c.id,
-        label: c.label,
-        iconHtml: (isLogoIcon(c.icon) || isLetterIcon(c.icon)) ? logoSvg(c.icon) : (c.icon ? `<span class="cs-emoji">${escapeHtml(c.icon)}</span>` : "")
-      }))
-    ];
-    const catSel = createCustomSelect({
-      items: catItems,
-      value: pendingC || "",
-      placeholder: "— 未分類 —",
-      pending: (pendingC !== row.category) && (ri in pendingCat),
-      onChange: (v)=>{
-        if(v === (row.category||"")){
-          delete pendingCat[ri];
-        }else{
-          pendingCat[ri] = v;
-        }
-        catSel.classList.toggle("cs-pending", (ri in pendingCat));
-        renderTabs();
-      }
-    });
-    tdCat.appendChild(catSel);
-
     // 楽天・Yahoo 状態ドロップダウン（即時反映。GitHubは手動保存）
     const makeAxisCell = (axisKey, statusList)=>{
       const td = document.createElement("td");
@@ -926,8 +896,7 @@ function render(){
     const tdRakuten = makeAxisCell("rakutenStatus", state.rakutenStatuses);
     const tdYahoo   = makeAxisCell("yahooStatus", state.yahooStatuses);
 
-    // 左からカテゴリ・商品状態・楽天・Yahoo・操作（COLUMNS順に一致させる）
-    trb.appendChild(tdCat);
+    // 商品状態・楽天・Yahoo・操作（COLUMNS順に一致させる）
     trb.appendChild(tdStatus);
     trb.appendChild(tdRakuten);
     trb.appendChild(tdYahoo);
@@ -1317,6 +1286,7 @@ function renderAxisSelect(selId, statusList, currentVal){
 
 function renderCatSelect(){
   const sel = document.getElementById("fCategory");
+  if(!sel) return;
   sel.innerHTML = "";
   const opt0 = document.createElement("option");
   opt0.value = ""; opt0.textContent = "— 未分類 —";
@@ -2145,7 +2115,7 @@ function saveEntry(keepOpen){
       rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
       companyUrls:  (entry.companyUrls||[]).map(u=>(u||"").trim()).filter(u=>u),
       freeNote:     entry.freeNote || "",
-      category: (fCat && fCat.value) || "",
+      category: (fCat && fCat.value) || (entry.category || ""),
       status:   (fSt  && fSt.value)  || "",
       rakutenStatus: (fRak && fRak.value) || "",
       yahooStatus:   (fYah && fYah.value) || "",
