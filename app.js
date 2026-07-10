@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.49.3";
+const VERSION = "1.50.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -381,9 +381,9 @@ function renderTabs(){
   if(swrap){
     swrap.innerHTML = "";
     const axisDefs = [
-      { axis:"status",  rowLabel:"状態",  list:state.statuses,        hasIcon:true  },
-      { axis:"rakuten", rowLabel:"楽天",  list:state.rakutenStatuses, hasIcon:false },
-      { axis:"yahoo",   rowLabel:"Yahoo", list:state.yahooStatuses,   hasIcon:false },
+      { axis:"status",  rowLabel:"状態",  list:state.statuses,        hasIcon:true },
+      { axis:"rakuten", rowLabel:"楽天",  list:state.rakutenStatuses, hasIcon:true },
+      { axis:"yahoo",   rowLabel:"Yahoo", list:state.yahooStatuses,   hasIcon:true },
     ];
     axisDefs.forEach(def=>{
       const rowEl = document.createElement("div"); rowEl.className = "status-row";
@@ -880,7 +880,7 @@ function render(){
       const cur = row[axisKey] || "";
       const items = [
         { value:"", label:"— 未設定 —", iconHtml:"" },
-        ...statusList.map(st=>({ value: st.id, label: st.label||"", iconHtml:"" }))
+        ...statusList.map(st=>({ value: st.id, label: st.label||"", iconHtml: isNumIcon(st.icon) ? statusNumSvg(st.icon) : "" }))
       ];
       const sel = createCustomSelect({
         items,
@@ -2702,8 +2702,8 @@ function openStatusManager(){
 function closeStatusManager(){ document.getElementById("statusModal").hidden = true; }
 
 function statusAxisInfo(axis){
-  if(axis==="rakuten") return { list: state.rakutenStatuses, rowField:"rakutenStatus", hasIcon:false, idPrefix:"r_" };
-  if(axis==="yahoo")   return { list: state.yahooStatuses,   rowField:"yahooStatus",   hasIcon:false, idPrefix:"y_" };
+  if(axis==="rakuten") return { list: state.rakutenStatuses, rowField:"rakutenStatus", hasIcon:true, idPrefix:"r_" };
+  if(axis==="yahoo")   return { list: state.yahooStatuses,   rowField:"yahooStatus",   hasIcon:true, idPrefix:"y_" };
   return { list: state.statuses, rowField:"status", hasIcon:true, idPrefix:"s_" };
 }
 function renderStatusManager(){
@@ -2847,7 +2847,8 @@ function bindUI(){
   const btnListEdit = document.getElementById("btnListEdit");
   if(btnListEdit){ btnListEdit.onclick = toggleListEditMode; updateListEditBtn(); }
   document.getElementById("btnSettings").onclick = openSettings;
-  document.getElementById("btnManageCats").onclick = openCatManager;
+  const _btnManageCats = document.getElementById("btnManageCats");
+  if(_btnManageCats) _btnManageCats.onclick = openCatManager;
   document.getElementById("btnManageCols").onclick = openColManager;
   document.getElementById("btnCloseCols").onclick = closeColManager;
   document.getElementById("btnResetCols").onclick = resetColCfg;
