@@ -1093,27 +1093,6 @@
       "yahooStatus": "y_mremf1lq"
     },
     {
-      "date": "2026-07-09",
-      "image": "img_mrcthwuq_595.png",
-      "name": "顔ツボ押し",
-      "expectedSales": 0,
-      "rivalRakuten": [],
-      "rivalAmazon": [
-        "https://www.amazon.co.jp/LONNEA-%E3%82%AF%E3%82%B9%E3%83%86%E3%83%B3%E3%83%AC%E3%82%B9-%E3%82%B9%E3%83%86%E3%83%B3%E3%83%AC%E3%82%B9%E9%8B%BC-%E7%BE%8E%E9%A1%94%E3%82%B9%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF-%E6%8C%87%E5%9C%A7%E6%A3%92%EF%BC%88%E3%83%96%E3%83%A9%E3%83%83%E3%82%AF%E5%8F%8E%E7%B4%8D%E3%83%90%E3%83%83%E3%82%B0%EF%BC%89/dp/B0F2S4YL7L/ref=sr_1_23?crid=37ZC9J2Y34EHM&dib=eyJ2IjoiMSJ9.7Rw0dXRHS2vJcFplOa7PR_AVPYRmd92jMX1LLhr179sPlcKNd1Y7VdOh8XNF7YDofiBe2x_8FNXivjVCcs34I0qArQYC6AqVh4OdVxYLqutib1YTa6dQ0oCa2EF8w6DUMeeirz2lHlRm-IrFz9p00IWW32sijhE06N3sdwmifowtmA_ywLs-rknMqJ6nbIlWKK3R411aFhybQXHuK3kO_L9jujuZN2WP7dpjV_A5r-3aBhDmVk6tBIG2I3h9VR_ysKz5KPvEMK1qP27SrkPCAsKS-A5HF5Lr3Fa-RpNPBKg.0fbXU2b72TK7s4EoJG8v9nG5Yf-Khj4W3KH-P-2ZGCQ&dib_tag=se&keywords=%E3%83%84%E3%83%9C%E6%8A%BC%E3%81%97%E6%A3%92&qid=1783559596&sprefix=%2Caps%2C379&sr=8-23"
-      ],
-      "rankingUrls": [],
-      "companyUrls": [],
-      "freeNote": "",
-      "category": "new",
-      "status": "buy",
-      "rakumart": [],
-      "suppliers": [],
-      "tables": [],
-      "doneDate": "",
-      "rakutenStatus": "",
-      "yahooStatus": "y_mremf1lq"
-    },
-    {
       "date": "2026-07-10",
       "doneDate": "",
       "image": "img_mredi5wj_32.jpg",
@@ -1130,16 +1109,11 @@
       "freeNote": "",
       "category": "new",
       "status": "buy",
-      "rakutenStatus": "",
-      "yahooStatus": "y_mremf1lq",
-      "rakumart": [
-        {
-          "text": "2026071017123731-2147",
-          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026071017123731-2147"
-        }
-      ],
+      "rakumart": [],
       "suppliers": [],
-      "tables": []
+      "tables": [],
+      "rakutenStatus": "",
+      "yahooStatus": "y_mremf1lq"
     }
   ],
   "categories": [
