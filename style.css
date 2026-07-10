@@ -668,3 +668,22 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 /* 「①-⑥全体」タブの番号は太字。アクティブ時は白で見やすく */
 .status-tab .allnum{font-weight:700}
 .status-tab.active .allnum{color:#fff !important}
+
+/* 状態軸の切替タブ（グローバルメニュー：商品状態/楽天/Yahoo） */
+.axis-tabs{display:flex;gap:6px;margin:0 0 8px;padding:0 0 8px;border-bottom:1px solid var(--border)}
+.axis-tab{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 16px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.axis-tab:hover{border-color:var(--accent);color:var(--accent)}
+.axis-tab.active{background:var(--text);border-color:var(--text);color:#fff}
+.container-top .axis-tabs{margin:0 0 6px;padding:0 0 6px}
+
+/* 編集モーダル：商品状態/楽天/Yahoo の縦3行エリア */
+.entry-status-axes{width:320px;margin-top:12px;border-top:1px solid var(--border);padding-top:12px}
+.status-axes-ttl{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px}
+.entry-status-axes label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px}
+.entry-status-axes select{width:100%;margin-top:5px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:inherit;color:var(--text);background:#fff;box-sizing:border-box}
+
+/* 状態管理モーダル：軸切替タブ */
+.status-mgr-axes{display:flex;gap:6px;margin-bottom:10px}
+.status-mgr-axis{flex:1;background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.status-mgr-axis:hover{border-color:var(--accent);color:var(--accent)}
+.status-mgr-axis.active{background:var(--accent);border-color:var(--accent);color:#fff}
