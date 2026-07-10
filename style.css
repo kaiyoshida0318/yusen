@@ -687,3 +687,9 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .status-mgr-axis{flex:1;background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
 .status-mgr-axis:hover{border-color:var(--accent);color:var(--accent)}
 .status-mgr-axis.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* グローバルメニュー：状態・楽天・Yahoo を縦3行で表示 */
+.status-tabs{flex-direction:column;align-items:stretch;gap:6px}
+.status-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.status-row-label{flex:0 0 54px;font-size:12px;font-weight:700;color:var(--text);text-align:right;padding-right:6px}
+.status-op-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px;padding-left:60px}
