@@ -453,6 +453,7 @@
     },
     {
       "date": "2026-06-01",
+      "doneDate": "2026-06-26",
       "image": "img_mput6cbb_333.webp",
       "name": "マグネット式　シリコンバンド",
       "expectedSales": 0,
@@ -478,8 +479,7 @@
           "memo": ""
         }
       ],
-      "tables": [],
-      "doneDate": ""
+      "tables": []
     },
     {
       "date": "2026-06-01",
