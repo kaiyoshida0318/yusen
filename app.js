@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.46.1";
+const VERSION = "1.46.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -645,19 +645,15 @@ function render(){
     tdDone.className="col-date"; tdDone.textContent = row.doneDate || "";
     trb.appendChild(tdDone);
 
-    // 画像列: メインライバル画像 + 仕入先画像の先頭2枚
+    // 画像列: メインライバル画像のみ
     const tdImg = document.createElement("td");
     tdImg.className="col-image";
     const imgWrap = document.createElement("div"); imgWrap.className="img-cell-multi";
-    const imgs = [];
-    if(row.image) imgs.push(row.image);
-    (row.suppliers||[]).forEach(s=>{ if(s.image) imgs.push(s.image); });
-    const top2 = imgs.slice(0,2);
-    if(top2.length===0){
+    if(row.image){
+      const im=document.createElement("img"); im.src=imgUrl(row.image); imgWrap.appendChild(im);
+    }else{
       const span=document.createElement("span"); span.className="muted"; span.textContent="—";
       imgWrap.appendChild(span);
-    }else{
-      top2.forEach(fn=>{ const im=document.createElement("img"); im.src=imgUrl(fn); imgWrap.appendChild(im); });
     }
     tdImg.appendChild(imgWrap);
     trb.appendChild(tdImg);
