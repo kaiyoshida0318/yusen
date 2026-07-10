@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.51.2";
+const VERSION = "1.52.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -577,10 +577,20 @@ const STATUS_NUM_COLORS = {
   5: "#c0392b", // 赤
   6: "#0e7c8a", // 濃青緑
 };
-function isNumIcon(icon){ return typeof icon==="string" && /^num:[1-6]$/.test(icon); }
+// 番号バッジで選べる色（3色）。icon "num:N.C"(C=1..3)で指定。無指定はSTATUS_NUM_COLORS（既存互換）
+const NUM_COLOR_PALETTE = ["#3f9b6e", "#2f6fb0", "#d98324"]; // 緑・青・橙
+function isNumIcon(icon){ return typeof icon==="string" && /^num:[1-6](\.[1-3])?$/.test(icon); }
+// icon("num:1" or "num:1.2")から表示数字と色を取り出す
+function parseNumIcon(icon){
+  const body = icon.slice(4);
+  const dot = body.indexOf(".");
+  const n = parseInt(dot>=0 ? body.slice(0,dot) : body, 10);
+  const c = dot>=0 ? parseInt(body.slice(dot+1),10) : 0; // 0=無指定（既存色）
+  const color = c>=1 ? (NUM_COLOR_PALETTE[c-1] || STATUS_NUM_COLORS[n]) : (STATUS_NUM_COLORS[n] || "#7a756d");
+  return { n, c, color };
+}
 function statusNumSvg(icon){
-  const n = parseInt(icon.split(":")[1], 10);
-  const color = STATUS_NUM_COLORS[n] || "#7a756d";
+  const { n, color } = parseNumIcon(icon);
   return `<svg class="status-num" viewBox="0 0 20 20" aria-label="${n}" role="img">`
     + `<circle cx="10" cy="10" r="9" fill="${color}"/>`
     + `<text x="10" y="14.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="#fff">${n}</text>`
@@ -2735,16 +2745,24 @@ function renderStatusManager(){
   arr.forEach((s, idx)=>{
     const row = document.createElement("div"); row.className = "cat-row";
     if(info.hasIcon){
+      const pickCol = document.createElement("div"); pickCol.className = "status-pick-col";
       // 番号ロゴ選択（なし/1〜6）＋文字バッジ（OK/NG/SKIP/保留/済）
       const numWrap = document.createElement("div"); numWrap.className = "status-num-picker";
+      const curNum = isNumIcon(s.icon) ? parseNumIcon(s.icon).n : null;
+      const curColorIdx = isNumIcon(s.icon) ? parseNumIcon(s.icon).c : 0;
       [null,1,2,3,4,5,6].forEach(n=>{
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "status-num-opt";
-        const val = n===null ? "" : ("num:"+n);
-        if((s.icon||"")===val) btn.classList.add("selected");
-        if(n===null){ btn.textContent = "—"; btn.title = "なし"; btn.classList.add("status-num-none"); }
-        else { btn.innerHTML = statusNumSvg("num:"+n); btn.title = n+"番"; }
-        btn.onclick = ()=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); };
+        if(n===null){
+          if(!s.icon) btn.classList.add("selected");
+          btn.textContent = "—"; btn.title = "なし"; btn.classList.add("status-num-none");
+          btn.onclick = ()=>{ s.icon = ""; persistLocal(); renderStatusManager(); renderTabs(); };
+        }else{
+          if(curNum===n) btn.classList.add("selected");
+          btn.innerHTML = statusNumSvg("num:"+n); btn.title = n+"番";
+          // 番号クリック時は現在の色バリアントを維持（無指定なら無指定のまま）
+          btn.onclick = ()=>{ s.icon = curColorIdx>=1 ? `num:${n}.${curColorIdx}` : ("num:"+n); persistLocal(); renderStatusManager(); renderTabs(); };
+        }
         numWrap.appendChild(btn);
       });
       TXT_PRESETS.forEach(t=>{
@@ -2757,7 +2775,22 @@ function renderStatusManager(){
         btn.onclick = ()=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); };
         numWrap.appendChild(btn);
       });
-      row.appendChild(numWrap);
+      pickCol.appendChild(numWrap);
+      // 番号選択中なら色チップ（3色）を表示
+      if(curNum!==null){
+        const crow = document.createElement("div"); crow.className = "status-color-row";
+        const clbl = document.createElement("span"); clbl.className = "status-color-lbl"; clbl.textContent = "色:";
+        crow.appendChild(clbl);
+        NUM_COLOR_PALETTE.forEach((col, ci)=>{
+          const chip = document.createElement("button");
+          chip.type = "button"; chip.className = "status-color-chip" + (curColorIdx===ci+1 ? " selected" : "");
+          chip.style.background = col; chip.title = "この色にする";
+          chip.onclick = ()=>{ s.icon = `num:${curNum}.${ci+1}`; persistLocal(); renderStatusManager(); renderTabs(); };
+          crow.appendChild(chip);
+        });
+        pickCol.appendChild(crow);
+      }
+      row.appendChild(pickCol);
     }
     const labelInp = document.createElement("input");
     labelInp.type = "text";
