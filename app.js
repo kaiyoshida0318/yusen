@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.46.0";
+const VERSION = "1.46.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -930,17 +930,27 @@ function createCustomSelect(opts){
     const r = btn.getBoundingClientRect();
     // 幅はボタン幅を下限にしつつ、内容に合わせて広げる（CSSの width:max-content）
     menu.style.minWidth = r.width + "px";
-    menu.style.top = (r.bottom + 4) + "px";
     menu.style.left = r.left + "px";
+    // メニューの自然な高さを測るため一旦制限を外す
+    menu.style.maxHeight = "none";
+    const naturalH = menu.scrollHeight;
+    const margin = 8;
+    const spaceBelow = window.innerHeight - r.bottom - margin;
+    const spaceAbove = r.top - margin;
+    if(spaceBelow >= naturalH || spaceBelow >= spaceAbove){
+      // 下に出す（入りきらない分はスクロール）
+      menu.style.top = (r.bottom + 4) + "px";
+      menu.style.maxHeight = Math.max(120, spaceBelow) + "px";
+    }else{
+      // 上に出す（入りきらない分はスクロール）
+      const h = Math.min(naturalH, spaceAbove);
+      menu.style.top = Math.max(margin, r.top - 4 - h) + "px";
+      menu.style.maxHeight = Math.max(120, spaceAbove) + "px";
+    }
     // 画面右にはみ出す場合は左へずらす
     const mw = menu.offsetWidth;
-    if(r.left + mw > window.innerWidth - 8){
-      menu.style.left = Math.max(8, window.innerWidth - 8 - mw) + "px";
-    }
-    // 下に入りきらない場合は上に出す
-    const menuH = menu.offsetHeight || 200;
-    if(r.bottom + 4 + menuH > window.innerHeight){
-      menu.style.top = Math.max(8, r.top - 4 - menuH) + "px";
+    if(r.left + mw > window.innerWidth - margin){
+      menu.style.left = Math.max(margin, window.innerWidth - margin - mw) + "px";
     }
   };
   const openMenu = ()=>{
