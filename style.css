@@ -636,7 +636,8 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .col-name-cell .list-edit-input{text-align:center}
 
 /* ステータス管理：番号ピッカーで狭くなる名前入力欄を確保するため横幅を広げる */
-.modal.modal-status{width:620px;max-width:95vw}
+.modal.modal-status{width:1200px;max-width:95vw;max-height:88vh;overflow-y:auto}
+.modal-status .cat-list{max-height:none}
 .modal-status .cat-label-input{flex:1;min-width:240px}
 
 /* 項目管理：揃えドロップダウン追加に伴うコントロール調整 */
