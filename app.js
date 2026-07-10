@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.52.4";
+const VERSION = "1.52.5";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -409,14 +409,15 @@ function renderTabs(){
         tab.onclick = ()=>{ currentStatusByAxis[def.axis] = s.id; render(); };
         rowEl.appendChild(tab);
       });
-      // Yahoo行の右端に 一括削除／行だけ／新規作成 を配置
-      if(def.axis==="yahoo"){
-        const spacer = document.createElement("span"); spacer.className = "func-spacer";
-        rowEl.appendChild(spacer);
-        rowEl.appendChild(buildFuncButtons());
-      }
       swrap.appendChild(rowEl);
     });
+
+    // 3行の下に機能ボタン行（一番右に 一括削除／行だけ／新規作成）
+    const funcRow = document.createElement("div"); funcRow.className = "status-func-row";
+    const funcSpacer = document.createElement("span"); funcSpacer.className = "func-spacer";
+    funcRow.appendChild(funcSpacer);
+    funcRow.appendChild(buildFuncButtons());
+    swrap.appendChild(funcRow);
 
     // 保留中の変更・一括削除の操作行（3行の下）
     const nS = Object.keys(pendingStatus).length;
