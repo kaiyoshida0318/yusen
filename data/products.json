@@ -1130,11 +1130,16 @@
       "freeNote": "",
       "category": "new",
       "status": "buy",
-      "rakumart": [],
-      "suppliers": [],
-      "tables": [],
       "rakutenStatus": "",
-      "yahooStatus": "y_mremf1lq"
+      "yahooStatus": "y_mremf1lq",
+      "rakumart": [
+        {
+          "text": "2026071017123731-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026071017123731-2147"
+        }
+      ],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
