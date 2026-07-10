@@ -664,3 +664,7 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .entry-left-meta .meta-imgurl .img-url-row{margin-top:0}
 .entry-left-meta .meta-imgurl .img-url-input{font-size:10px;padding:5px 7px}
 .entry-left-meta .meta-imgurl .img-url-go{font-size:10px;padding:5px 8px}
+
+/* 「①-⑥全体」タブの番号は太字。アクティブ時は白で見やすく */
+.status-tab .allnum{font-weight:700}
+.status-tab.active .allnum{color:#fff !important}
