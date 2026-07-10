@@ -658,3 +658,9 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 /* カスタムドロップダウン：メニューは内容幅で広げ、項目ラベルを省略しない */
 .cs-menu{width:max-content;max-width:380px}
 .cs-menu .cs-opt .cs-lbl{overflow:visible;text-overflow:clip;white-space:nowrap}
+
+/* モーダル左メタ内に画像URL欄を配置（少し小さめ） */
+.entry-left-meta .entry-image-url-slot{width:100%;margin-top:5px}
+.entry-left-meta .meta-imgurl .img-url-row{margin-top:0}
+.entry-left-meta .meta-imgurl .img-url-input{font-size:10px;padding:5px 7px}
+.entry-left-meta .meta-imgurl .img-url-go{font-size:10px;padding:5px 8px}
