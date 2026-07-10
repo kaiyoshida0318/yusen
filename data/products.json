@@ -866,7 +866,7 @@
       "tables": [],
       "companyUrls": [],
       "doneDate": "",
-      "rakutenStatus": "",
+      "rakutenStatus": "r_renew",
       "yahooStatus": "y_mremf1lq"
     },
     {
@@ -1089,8 +1089,8 @@
       "suppliers": [],
       "tables": [],
       "doneDate": "",
-      "rakutenStatus": "",
-      "yahooStatus": "y_none"
+      "rakutenStatus": "r_renew",
+      "yahooStatus": "y_mremf1lq"
     },
     {
       "date": "2026-07-09",
