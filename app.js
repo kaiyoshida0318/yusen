@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.50.0";
+const VERSION = "1.51.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -586,10 +586,20 @@ function statusNumSvg(icon){
     + `<text x="10" y="14.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="#fff">${n}</text>`
     + `</svg>`;
 }
-// ステータスのアイコンHTML（番号ロゴ。未設定は空）
+// ステータスのアイコンHTML（番号ロゴ or 文字バッジ。未設定は空）
 function statusIconHtml(icon){
   if(isNumIcon(icon)) return statusNumSvg(icon);
+  if(isTxtIcon(icon)) return statusTxtBadge(icon);
   return "";
+}
+// 文字バッジ（txt:OK / txt:NG / txt:SKIP など）
+const TXT_PRESETS = ["OK","NG","SKIP","保留","済"];
+const TXT_COLORS = { "OK":"#3f9b6e", "NG":"#c0392b", "SKIP":"#7a756d", "保留":"#d98324", "済":"#2f6fb0" };
+function isTxtIcon(icon){ return typeof icon==="string" && /^txt:.+/.test(icon); }
+function statusTxtBadge(icon){
+  const t = icon.slice(4);
+  const color = TXT_COLORS[t] || "#7a756d";
+  return `<span class="status-txt-badge" style="background:${color}">${escapeHtml(t)}</span>`;
 }
 // 番号のテキスト記号（option用、SVG不可な場所で使う）
 const NUM_CHARS = { 1:"①", 2:"②", 3:"③", 4:"④", 5:"⑤", 6:"⑥" };
@@ -852,7 +862,7 @@ function render(){
       ...state.statuses.map(st=>({
         value: st.id,
         label: (st.label||"").replace(/^[①②③④⑤⑥]\s*/, ""),
-        iconHtml: isNumIcon(st.icon) ? statusNumSvg(st.icon) : ""
+        iconHtml: statusIconHtml(st.icon)
       }))
     ];
     const statusSel = createCustomSelect({
@@ -880,7 +890,7 @@ function render(){
       const cur = row[axisKey] || "";
       const items = [
         { value:"", label:"— 未設定 —", iconHtml:"" },
-        ...statusList.map(st=>({ value: st.id, label: st.label||"", iconHtml: isNumIcon(st.icon) ? statusNumSvg(st.icon) : "" }))
+        ...statusList.map(st=>({ value: st.id, label: st.label||"", iconHtml: statusIconHtml(st.icon) }))
       ];
       const sel = createCustomSelect({
         items,
@@ -2725,15 +2735,25 @@ function renderStatusManager(){
   arr.forEach((s, idx)=>{
     const row = document.createElement("div"); row.className = "cat-row";
     if(info.hasIcon){
-      // 番号ロゴ選択（なし/1〜6）※商品状態のみ
+      // 番号ロゴ選択（なし/1〜6）＋文字バッジ（OK/NG/SKIP/保留/済）
       const numWrap = document.createElement("div"); numWrap.className = "status-num-picker";
       [null,1,2,3,4,5,6].forEach(n=>{
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "status-num-opt";
         const val = n===null ? "" : ("num:"+n);
         if((s.icon||"")===val) btn.classList.add("selected");
-        if(n===null){ btn.textContent = "—"; btn.title = "番号なし"; btn.classList.add("status-num-none"); }
+        if(n===null){ btn.textContent = "—"; btn.title = "なし"; btn.classList.add("status-num-none"); }
         else { btn.innerHTML = statusNumSvg("num:"+n); btn.title = n+"番"; }
+        btn.onclick = ()=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); };
+        numWrap.appendChild(btn);
+      });
+      TXT_PRESETS.forEach(t=>{
+        const val = "txt:"+t;
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "status-num-opt status-txt-opt";
+        if((s.icon||"")===val) btn.classList.add("selected");
+        btn.innerHTML = statusTxtBadge(val);
+        btn.title = t;
         btn.onclick = ()=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); };
         numWrap.appendChild(btn);
       });
