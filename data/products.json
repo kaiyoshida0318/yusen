@@ -994,6 +994,7 @@
     },
     {
       "date": "2026-06-26",
+      "doneDate": "2026-07-08",
       "image": "https://image.rakuten.co.jp/yukaiya/cabinet/ih/ih-24-05-01.jpg",
       "name": "電動爪切り　ih-24-05",
       "expectedSales": 0,
@@ -1012,8 +1013,7 @@
       "status": "done",
       "rakumart": [],
       "suppliers": [],
-      "tables": [],
-      "doneDate": ""
+      "tables": []
     },
     {
       "date": "2026-06-26",
