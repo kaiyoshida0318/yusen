@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.52.6">
+<link rel="stylesheet" href="style.css?v=1.53.0">
 </head>
 <body>
 <div class="sticky-top">
@@ -20,8 +20,8 @@
     <div class="header-actions">
       <span class="version" id="version">v1.0.0</span>
       <button class="btn btn-ghost" id="btnListEdit">✏️ 商品名・月商編集</button>
-      <button class="btn btn-ghost" id="btnManageCols">📐 項目管理</button>
-      <button class="btn btn-ghost" id="btnManageStatus">📋 状態管理</button>
+      <button class="btn btn-ghost" id="btnManageCols">📐 列名管理</button>
+      <button class="btn btn-ghost" id="btnManageStatus">📋 項目管理</button>
       <button class="btn btn-ghost" id="btnSettings">⚙️ 設定</button>
       <button class="btn btn-ghost" id="btnHeaderLog">📜 ログ</button>
       <div class="gh-progress" id="ghProgress" hidden>
@@ -209,7 +209,7 @@
 <!-- 項目管理モーダル -->
 <div class="modal-overlay" id="colModal" hidden>
   <div class="modal modal-col">
-    <h2>📐 項目管理</h2>
+    <h2>📐 列名管理</h2>
     <p class="hint">左が「表示中」、右が「非表示」の項目です。「非表示にする →」「← 表示する」で切り替えられます。表示中の項目は幅(px)やテキストの折り返しも設定できます。この設定はこの端末にのみ保存されます（GitHubには同期しません）。</p>
     <div class="col-cols">
       <div class="col-col col-col-visible">
@@ -249,7 +249,7 @@
 <!-- ステータス管理モーダル -->
 <div class="modal-overlay" id="statusModal" hidden>
   <div class="modal modal-status">
-    <h2>状態管理</h2>
+    <h2>項目管理</h2>
     <p class="hint">「商品状態 / 楽天 / Yahoo」の3つの状態を管理します。上の切替で対象を選び、並び替え・名前変更・追加・削除ができます。</p>
     <div class="cat-add-row">
       <input type="text" id="newStatusLabel" placeholder="新しい状態名">
@@ -268,6 +268,6 @@
   <button class="btn btn-primary" id="btnResizeDone">完了</button>
 </div>
 
-<script src="app.js?v=1.52.6"></script>
+<script src="app.js?v=1.53.0"></script>
 </body>
 </html>
