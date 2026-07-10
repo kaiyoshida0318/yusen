@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1.47.2">
+<link rel="stylesheet" href="style.css?v=1.48.0">
 </head>
 <body>
 <div class="sticky-top">
@@ -37,6 +37,7 @@
 
 <main class="container container-top">
   <nav class="cat-tabs" id="catTabs"></nav>
+  <nav class="axis-tabs" id="axisTabs"></nav>
   <nav class="status-tabs" id="statusTabs"></nav>
 
   <div class="toolbar">
@@ -88,11 +89,20 @@
           <label>完了日付
             <input type="date" id="fDoneDate">
           </label>
-          <label>カテゴリ
+          <label class="meta-full">カテゴリ
             <select id="fCategory"></select>
           </label>
-          <label>ステータス
+        </div>
+        <div class="entry-status-axes">
+          <div class="status-axes-ttl">状態</div>
+          <label>商品状態
             <select id="fStatus"></select>
+          </label>
+          <label>楽天
+            <select id="fRakutenStatus"></select>
+          </label>
+          <label>Yahoo
+            <select id="fYahooStatus"></select>
           </label>
         </div>
       </div>
@@ -244,10 +254,10 @@
 <!-- ステータス管理モーダル -->
 <div class="modal-overlay" id="statusModal" hidden>
   <div class="modal modal-status">
-    <h2>ステータス管理</h2>
-    <p class="hint">進捗ステータス（下段タブ）を管理します。並び替え・名前変更・追加・削除ができます。</p>
+    <h2>状態管理</h2>
+    <p class="hint">「商品状態 / 楽天 / Yahoo」の3つの状態を管理します。上の切替で対象を選び、並び替え・名前変更・追加・削除ができます。</p>
     <div class="cat-add-row">
-      <input type="text" id="newStatusLabel" placeholder="新しいステータス名">
+      <input type="text" id="newStatusLabel" placeholder="新しい状態名">
       <button class="btn btn-primary" id="btnAddStatus">追加</button>
     </div>
     <div id="statusList" class="cat-list"></div>
@@ -263,6 +273,6 @@
   <button class="btn btn-primary" id="btnResizeDone">完了</button>
 </div>
 
-<script src="app.js?v=1.47.2"></script>
+<script src="app.js?v=1.48.0"></script>
 </body>
 </html>
