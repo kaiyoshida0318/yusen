@@ -1193,7 +1193,7 @@
     {
       "id": "done",
       "label": "完了分",
-      "icon": "txt:OK"
+      "icon": "txt:済"
     }
   ],
   "_statusMigV2": true,
@@ -1212,7 +1212,12 @@
     {
       "id": "r_renew",
       "label": "リニューアル必要",
-      "icon": "num:2"
+      "icon": "num:3"
+    },
+    {
+      "id": "r_mreo5165",
+      "label": "完了分",
+      "icon": "txt:済"
     },
     {
       "id": "r_none",
@@ -1234,17 +1239,22 @@
     {
       "id": "y_new_multi",
       "label": "新規制作予定-複数枚",
-      "icon": "num:2"
+      "icon": "num:3"
     },
     {
       "id": "y_renew",
       "label": "リニューアル必要",
-      "icon": "num:2"
+      "icon": "num:4"
     },
     {
       "id": "y_renew_multi",
       "label": "リニューアル必要-複数枚",
-      "icon": "num:2"
+      "icon": "num:5"
+    },
+    {
+      "id": "y_mreo58aj",
+      "label": "完了分",
+      "icon": "txt:済"
     },
     {
       "id": "y_mremf1lq",
