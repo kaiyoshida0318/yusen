@@ -525,7 +525,7 @@ tbody td{font-size:13px}
 .cs-btn:hover{border-color:#bbb}
 .cs-wrap.cs-open .cs-btn{border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,90,55,.15)}
 .cs-wrap.cs-pending .cs-btn{background:#fff4e3;border-color:#f0b969;color:#8a4b00}
-.cs-ico{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex:0 0 18px}
+.cs-ico{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;flex:0 0 auto}
 .cs-ico:empty{display:none}
 .cs-ico svg{width:18px;height:18px;display:block}
 .cs-ico .cs-emoji{font-size:14px;line-height:1}
@@ -544,7 +544,7 @@ tbody td{font-size:13px}
 }
 .cs-opt:hover{background:var(--row-alt)}
 .cs-opt.cs-selected{background:#fdf0ec;color:var(--accent);font-weight:600}
-.cs-opt .cs-ico{width:20px;height:20px;flex:0 0 20px}
+.cs-opt .cs-ico{min-width:20px;height:20px;flex:0 0 auto}
 .cs-opt .cs-ico svg{width:20px;height:20px}
 
 /* ログモーダル */
