@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.46.2";
+const VERSION = "1.47.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -97,7 +97,8 @@ const DEFAULT_STATUSES = [
   { id:"working",   label:"制作着手中",         icon:"num:6" },
   { id:"done",      label:"完了分" },
 ];
-const ALL_STATUS = { id:"all", label:"全体" }; // 全件表示の特別タブ
+const ALL_STATUS = { id:"all", label:"①-⑥全体" }; // 完了分を除いた行を表示
+const ALL_FULL_STATUS = { id:"allfull", label:"全件" }; // 完了分も含む全件
 const NONE_STATUS = { id:"none", label:"未設定" }; // 未設定の行を表示
 
 let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice() };
@@ -353,7 +354,7 @@ function renderTabs(){
   const swrap = document.getElementById("statusTabs");
   if(swrap){
     swrap.innerHTML = "";
-    [ALL_STATUS, NONE_STATUS, ...state.statuses].forEach(s=>{
+    [ALL_STATUS, NONE_STATUS, ...state.statuses, ALL_FULL_STATUS].forEach(s=>{
       const tab = document.createElement("button");
       tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===currentStatus ? " active" : "");
       tab.innerHTML = `<span class="status-ico">${statusIconHtml(s.icon)}</span><span class="cat-label">${escapeHtml((s.label||"").replace(/^[①②③④⑤⑥]\s*/,""))}</span><span class="cat-count">${countForStatus(s.id)}</span>`;
@@ -400,7 +401,8 @@ function catMatch(rowCat, sel){
   return rowCat===sel;
 }
 function statusMatch(rowStatus, sel){
-  if(sel==="all") return true;
+  if(sel==="allfull") return true;            // 全件（完了分も含む）
+  if(sel==="all") return rowStatus!=="done";  // ①-⑥全体（完了分は除く）
   if(sel==="none") return !rowStatus;
   return rowStatus===sel;
 }
