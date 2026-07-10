@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.47.2";
+const VERSION = "1.48.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -25,7 +25,9 @@ const COLUMNS = [
   { key:"rakumart", label:"ラクマート" },
   { key:"supply", label:"仕入先" },
   { key:"catSel", label:"カテゴリ" },
-  { key:"statusSel", label:"ステータス" },
+  { key:"statusSel", label:"商品状態" },
+  { key:"rakutenSel", label:"楽天" },
+  { key:"yahooSel", label:"Yahoo" },
   { key:"actions", label:"操作" },
 ];
 
@@ -101,10 +103,28 @@ const ALL_STATUS = { id:"all", label:"①-⑥全体" }; // 完了分を除いた
 const ALL_FULL_STATUS = { id:"allfull", label:"全件" }; // 完了分も含む全件
 const NONE_STATUS = { id:"none", label:"未設定" }; // 未設定の行を表示
 
-let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice() };
+// 楽天・Yahoo の制作状態（それぞれ編集・追加可能）
+const DEFAULT_RAKUTEN_STATUSES = [
+  { id:"r_pre",   label:"制作前" },
+  { id:"r_new",   label:"新規制作予定" },
+  { id:"r_renew", label:"リニューアル必要" },
+  { id:"r_none",  label:"不要" },
+];
+const DEFAULT_YAHOO_STATUSES = [
+  { id:"y_pre",         label:"制作前" },
+  { id:"y_new",         label:"新規制作予定" },
+  { id:"y_new_multi",   label:"新規制作予定-複数枚" },
+  { id:"y_renew",       label:"リニューアル必要" },
+  { id:"y_renew_multi", label:"リニューアル必要-複数枚" },
+  { id:"y_none",        label:"不要" },
+];
+
+let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice(), rakutenStatuses: DEFAULT_RAKUTEN_STATUSES.slice(), yahooStatuses: DEFAULT_YAHOO_STATUSES.slice() };
 let cfg = { pat:"", owner:"kaiyoshida0318", repo:"yusen", branch:"main" };
 let dataSha = null;
 let currentCat = "all"; // 現在選択中のカテゴリID（上段）
+let statusAxis = "status"; // 絞り込みに使う状態軸: "status"(商品状態) | "rakuten" | "yahoo"
+let statusMgrAxis = "status"; // ステータス管理モーダルで編集中の軸
 let currentStatus = "all"; // 現在選択中のステータスID（下段）
 let dateSort = "desc";   // 日付ソート初期値は降順（新しい日付が上）: "none" | "asc" | "desc"
 let pendingStatus = {};  // 一覧でのステータス保留変更 { rowIndex: newStatusId }
@@ -156,7 +176,7 @@ function loadData(){
   let saved = null;
   try{ saved = JSON.parse(localStorage.getItem(LS_DATA)); }catch(e){}
   if(saved && Array.isArray(saved.rows)){ state = migrate(saved); persistLocal(); return; }
-  state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice() };
+  state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice(), rakutenStatuses: DEFAULT_RAKUTEN_STATUSES.slice(), yahooStatuses: DEFAULT_YAHOO_STATUSES.slice() };
 }
 // 旧データ（supply文字列・categoriesなし）を新スキーマに変換
 function migrate(data){
@@ -171,6 +191,12 @@ function migrate(data){
   });
   if(!Array.isArray(data.statuses) || data.statuses.length===0){
     data.statuses = DEFAULT_STATUSES.slice();
+  }
+  if(!Array.isArray(data.rakutenStatuses) || data.rakutenStatuses.length===0){
+    data.rakutenStatuses = DEFAULT_RAKUTEN_STATUSES.slice();
+  }
+  if(!Array.isArray(data.yahooStatuses) || data.yahooStatuses.length===0){
+    data.yahooStatuses = DEFAULT_YAHOO_STATUSES.slice();
   }
   // 既定ステータスに番号ロゴが未設定なら補完（icon未定義のものだけ）
   const DEF_STATUS_ICON = { buy:"num:1", bought:"num:2", prearrive:"num:3", arrived:"num:4", renewal:"num:4", nextup:"num:5", working:"num:6" };
@@ -262,6 +288,8 @@ function migrate(data){
     if(typeof r.freeNote !== "string") r.freeNote = ""; // 自由記入欄（リンク含むHTMLを保持）
     if(typeof r.category !== "string") r.category = "";
     if(typeof r.status !== "string") r.status = "";
+    if(typeof r.rakutenStatus !== "string") r.rakutenStatus = "";
+    if(typeof r.yahooStatus !== "string") r.yahooStatus = "";
   });
   return data;
 }
@@ -357,18 +385,39 @@ function renderTabs(){
   newBtn.onclick = ()=>openEntry(-1);
   wrap.appendChild(newBtn);
 
-  // 下段：進捗ステータス
+  // 軸切替タブ（商品状態 / 楽天 / Yahoo）
+  const awrap = document.getElementById("axisTabs");
+  if(awrap){
+    awrap.innerHTML = "";
+    [{id:"status",label:"商品状態"},{id:"rakuten",label:"楽天"},{id:"yahoo",label:"Yahoo"}].forEach(a=>{
+      const b = document.createElement("button");
+      b.className = "axis-tab" + (a.id===statusAxis ? " active" : "");
+      b.textContent = a.label;
+      b.onclick = ()=>{ statusAxis = a.id; currentStatus = "all"; render(); };
+      awrap.appendChild(b);
+    });
+  }
+
+  // 下段：進捗ステータス（現在の軸に応じて選択肢が変わる）
   const swrap = document.getElementById("statusTabs");
   if(swrap){
     swrap.innerHTML = "";
-    [ALL_STATUS, NONE_STATUS, ...state.statuses, ALL_FULL_STATUS].forEach(s=>{
+    const axisStatuses = statusAxis==="rakuten" ? state.rakutenStatuses
+                       : statusAxis==="yahoo"   ? state.yahooStatuses
+                       : state.statuses;
+    // 先頭の「全体」タブ：商品状態軸は①-⑥全体＋全件、他軸は単純な全体
+    const leadAll = statusAxis==="status" ? ALL_STATUS : { id:"all", label:"全体" };
+    const tabDefs = statusAxis==="status"
+      ? [ALL_STATUS, NONE_STATUS, ...axisStatuses, ALL_FULL_STATUS]
+      : [leadAll, NONE_STATUS, ...axisStatuses];
+    tabDefs.forEach(s=>{
       const tab = document.createElement("button");
       tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===currentStatus ? " active" : "");
       let labelHtml;
-      if(s.id==="all"){
+      if(s.id==="all" && statusAxis==="status"){
         // 「①-⑥全体」：①=番号1の色、⑥=番号6の色で表示
         labelHtml = `<span class="allnum" style="color:${STATUS_NUM_COLORS[1]}">①</span>-<span class="allnum" style="color:${STATUS_NUM_COLORS[6]}">⑥</span>全体`;
-      }else if(s.id==="allfull" || s.id==="none"){
+      }else if(s.id==="all" || s.id==="allfull" || s.id==="none"){
         labelHtml = escapeHtml(s.label); // 特別タブは番号除去しない
       }else{
         labelHtml = escapeHtml((s.label||"").replace(/^[①②③④⑤⑥]\s*/,""));
@@ -416,21 +465,27 @@ function catMatch(rowCat, sel){
   if(sel==="none") return !rowCat;
   return rowCat===sel;
 }
+// 現在の絞り込み軸に対応する行のステータス値を返す
+function rowStatusForAxis(r){
+  if(statusAxis==="rakuten") return r.rakutenStatus || "";
+  if(statusAxis==="yahoo")   return r.yahooStatus || "";
+  return r.status || "";
+}
 function statusMatch(rowStatus, sel){
   if(sel==="allfull") return true;            // 全件（完了分も含む）
-  if(sel==="all") return rowStatus!=="done";  // ①-⑥全体（完了分は除く）
+  if(sel==="all") return statusAxis==="status" ? rowStatus!=="done" : true; // 商品状態軸は完了分除外、他軸は全部
   if(sel==="none") return !rowStatus;
   return rowStatus===sel;
 }
 function countForCat(id){
-  return state.rows.filter(r=> catMatch(r.category, id) && statusMatch(r.status, currentStatus)).length;
+  return state.rows.filter(r=> catMatch(r.category, id) && statusMatch(rowStatusForAxis(r), currentStatus)).length;
 }
 // 下段カウント: 現在の上段カテゴリ絞り込みを反映
 function countForStatus(id){
-  return state.rows.filter(r=> catMatch(r.category, currentCat) && statusMatch(r.status, id)).length;
+  return state.rows.filter(r=> catMatch(r.category, currentCat) && statusMatch(rowStatusForAxis(r), id)).length;
 }
 function filteredRows(){
-  let arr = state.rows.map((r,i)=>({r,i})).filter(x=> catMatch(x.r.category, currentCat) && statusMatch(x.r.status, currentStatus));
+  let arr = state.rows.map((r,i)=>({r,i})).filter(x=> catMatch(x.r.category, currentCat) && statusMatch(rowStatusForAxis(x.r), currentStatus));
   if(dateSort!=="none"){
     arr = arr.slice().sort((a,b)=>{
       const da = a.r.date || "", db = b.r.date || "";
@@ -617,6 +672,8 @@ function render(){
       if(c.key==="actions") th.className="col-actions";
       if(c.key==="catSel") th.className="col-catsel";
       if(c.key==="statusSel") th.className="col-statussel";
+      if(c.key==="rakutenSel") th.className="col-statussel";
+      if(c.key==="yahooSel") th.className="col-statussel";
       th.textContent = c.label;
     }
     applyColStyle(th, cc, true);
@@ -837,9 +894,34 @@ function render(){
     });
     tdCat.appendChild(catSel);
 
-    // 左からカテゴリ・ステータス・操作
+    // 楽天・Yahoo 状態ドロップダウン（即時反映。GitHubは手動保存）
+    const makeAxisCell = (axisKey, statusList)=>{
+      const td = document.createElement("td");
+      td.className = "col-statussel";
+      const cur = row[axisKey] || "";
+      const items = [
+        { value:"", label:"— 未設定 —", iconHtml:"" },
+        ...statusList.map(st=>({ value: st.id, label: st.label||"", iconHtml:"" }))
+      ];
+      const sel = createCustomSelect({
+        items,
+        value: cur,
+        placeholder: "— 未設定 —",
+        onChange: (v)=>{
+          if(state.rows[ri]){ state.rows[ri][axisKey] = v; persistLocal(); renderTabs(); }
+        }
+      });
+      td.appendChild(sel);
+      return td;
+    };
+    const tdRakuten = makeAxisCell("rakutenStatus", state.rakutenStatuses);
+    const tdYahoo   = makeAxisCell("yahooStatus", state.yahooStatuses);
+
+    // 左からカテゴリ・商品状態・楽天・Yahoo・操作（COLUMNS順に一致させる）
     trb.appendChild(tdCat);
     trb.appendChild(tdStatus);
+    trb.appendChild(tdRakuten);
+    trb.appendChild(tdYahoo);
     trb.appendChild(tdAct);
 
     // 列設定に従って各tdを表示/非表示・スタイル適用（COLUMNS順とtd追加順は一致）
@@ -1131,10 +1213,15 @@ function openEntry(editIndex, mode){
   entry.category = row ? (row.category||"") : ((currentCat==="all"||currentCat==="none") ? "" : currentCat);
   // ステータス: 編集時はその値、新規時は現在の下段タブ（"all"の場合は未設定）
   entry.status = row ? (row.status||"") : ((currentStatus==="all"||currentStatus==="none") ? "" : currentStatus);
+  // 楽天・Yahoo 状態（軸で絞り込み中ならその値を新規初期値に）
+  entry.rakutenStatus = row ? (row.rakutenStatus||"") : ((statusAxis==="rakuten" && currentStatus!=="all" && currentStatus!=="none") ? currentStatus : "");
+  entry.yahooStatus   = row ? (row.yahooStatus||"")   : ((statusAxis==="yahoo"   && currentStatus!=="all" && currentStatus!=="none") ? currentStatus : "");
   // 新規作成時はセクションを閉じておく（必要なものだけ開いて使う）。編集時は展開。
   sectionCollapsed = isEdit ? { rakumart:false, suppliers:false, tables:false } : { rakumart:true, suppliers:true, tables:true };
   renderCatSelect();
   renderStatusSelect();
+  renderAxisSelect("fRakutenStatus", state.rakutenStatuses, entry.rakutenStatus);
+  renderAxisSelect("fYahooStatus", state.yahooStatuses, entry.yahooStatus);
 
   renderEntryImage();
   renderRivals();
@@ -1198,6 +1285,22 @@ function renderStatusSelect(){
     const o = document.createElement("option");
     o.value = s.id; o.textContent = s.label;
     if(s.id===entry.status) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+// 楽天・Yahoo 状態のセレクトを描画（汎用）
+function renderAxisSelect(selId, statusList, currentVal){
+  const sel = document.getElementById(selId);
+  if(!sel) return;
+  sel.innerHTML = "";
+  const opt0 = document.createElement("option");
+  opt0.value = ""; opt0.textContent = "— 未設定 —";
+  sel.appendChild(opt0);
+  (statusList||[]).forEach(s=>{
+    const o = document.createElement("option");
+    o.value = s.id; o.textContent = s.label;
+    if(s.id===currentVal) o.selected = true;
     sel.appendChild(o);
   });
 }
@@ -2013,6 +2116,8 @@ function saveEntry(keepOpen){
     const fDone = document.getElementById("fDoneDate");
     const fCat  = document.getElementById("fCategory");
     const fSt   = document.getElementById("fStatus");
+    const fRak  = document.getElementById("fRakutenStatus");
+    const fYah  = document.getElementById("fYahooStatus");
     const fExp  = document.getElementById("fExpectedSales");
     let expectedSales = 0;
     if(fExp){
@@ -2032,6 +2137,8 @@ function saveEntry(keepOpen){
       freeNote:     entry.freeNote || "",
       category: (fCat && fCat.value) || "",
       status:   (fSt  && fSt.value)  || "",
+      rakutenStatus: (fRak && fRak.value) || "",
+      yahooStatus:   (fYah && fYah.value) || "",
       rakumart: entry.rakumart.map(r=>({ text:((r&&r.text)||"").trim(), url:((r&&r.url)||"").trim() })).filter(r=>r.text||r.url),
       suppliers: entry.suppliers.map(s=>({ image:(s&&s.image)||"", url:((s&&s.url)||"").trim(), memo:((s&&s.memo)||"").trim() })),
       tables: entry.tables.map(t=>{
@@ -2614,23 +2721,44 @@ function openStatusManager(){
 }
 function closeStatusManager(){ document.getElementById("statusModal").hidden = true; }
 
+function statusAxisInfo(axis){
+  if(axis==="rakuten") return { list: state.rakutenStatuses, rowField:"rakutenStatus", hasIcon:false, idPrefix:"r_" };
+  if(axis==="yahoo")   return { list: state.yahooStatuses,   rowField:"yahooStatus",   hasIcon:false, idPrefix:"y_" };
+  return { list: state.statuses, rowField:"status", hasIcon:true, idPrefix:"s_" };
+}
 function renderStatusManager(){
   const list = document.getElementById("statusList");
   list.innerHTML = "";
-  state.statuses.forEach((s, idx)=>{
+  // 軸切替タブ（商品状態 / 楽天 / Yahoo）
+  const axisBar = document.createElement("div"); axisBar.className = "status-mgr-axes";
+  [["status","商品状態"],["rakuten","楽天"],["yahoo","Yahoo"]].forEach(([id,lbl])=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className = "status-mgr-axis" + (statusMgrAxis===id ? " active" : "");
+    b.textContent = lbl;
+    b.onclick = ()=>{ statusMgrAxis = id; renderStatusManager(); };
+    axisBar.appendChild(b);
+  });
+  list.appendChild(axisBar);
+
+  const info = statusAxisInfo(statusMgrAxis);
+  const arr = info.list;
+  arr.forEach((s, idx)=>{
     const row = document.createElement("div"); row.className = "cat-row";
-    // 番号ロゴ選択（なし/1/2/3/4）
-    const numWrap = document.createElement("div"); numWrap.className = "status-num-picker";
-    [null,1,2,3,4,5,6].forEach(n=>{
-      const btn = document.createElement("button");
-      btn.type = "button"; btn.className = "status-num-opt";
-      const val = n===null ? "" : ("num:"+n);
-      if((s.icon||"")===val) btn.classList.add("selected");
-      if(n===null){ btn.textContent = "—"; btn.title = "番号なし"; btn.classList.add("status-num-none"); }
-      else { btn.innerHTML = statusNumSvg("num:"+n); btn.title = n+"番"; }
-      btn.onclick = ()=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); };
-      numWrap.appendChild(btn);
-    });
+    if(info.hasIcon){
+      // 番号ロゴ選択（なし/1〜6）※商品状態のみ
+      const numWrap = document.createElement("div"); numWrap.className = "status-num-picker";
+      [null,1,2,3,4,5,6].forEach(n=>{
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "status-num-opt";
+        const val = n===null ? "" : ("num:"+n);
+        if((s.icon||"")===val) btn.classList.add("selected");
+        if(n===null){ btn.textContent = "—"; btn.title = "番号なし"; btn.classList.add("status-num-none"); }
+        else { btn.innerHTML = statusNumSvg("num:"+n); btn.title = n+"番"; }
+        btn.onclick = ()=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); };
+        numWrap.appendChild(btn);
+      });
+      row.appendChild(numWrap);
+    }
     const labelInp = document.createElement("input");
     labelInp.type = "text";
     labelInp.value = (s.label||"").replace(/^[①②③④⑤⑥]\s*/,"");
@@ -2643,30 +2771,32 @@ function renderStatusManager(){
     };
     const up = document.createElement("button"); up.className="cat-mv"; up.textContent="▲";
     up.disabled = idx===0;
-    up.onclick = ()=>{ if(idx>0){ [state.statuses[idx-1], state.statuses[idx]] = [state.statuses[idx], state.statuses[idx-1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
+    up.onclick = ()=>{ if(idx>0){ [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
     const dn = document.createElement("button"); dn.className="cat-mv"; dn.textContent="▼";
-    dn.disabled = idx===state.statuses.length-1;
-    dn.onclick = ()=>{ if(idx<state.statuses.length-1){ [state.statuses[idx+1], state.statuses[idx]] = [state.statuses[idx], state.statuses[idx+1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
+    dn.disabled = idx===arr.length-1;
+    dn.onclick = ()=>{ if(idx<arr.length-1){ [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]]; persistLocal(); renderStatusManager(); renderTabs(); } };
     const del = document.createElement("button"); del.className="cat-del"; del.textContent="🗑";
-    del.title = "このステータスを削除（中のデータは「未設定」になります）";
+    del.title = "この状態を削除（割り当て済みは「未設定」になります）";
     del.onclick = ()=>{
-      if(!confirm(`ステータス「${s.label}」を削除しますか？\n中のデータは「未設定」になります（データ自体は消えません）。`)) return;
-      state.rows.forEach(r=>{ if(r.status===s.id) r.status=""; });
-      state.statuses.splice(idx,1);
+      if(!confirm(`「${s.label}」を削除しますか？\n割り当て済みの商品は「未設定」になります（商品自体は消えません）。`)) return;
+      state.rows.forEach(r=>{ if(r[info.rowField]===s.id) r[info.rowField]=""; });
+      arr.splice(idx,1);
       if(currentStatus===s.id) currentStatus="all";
       persistLocal(); renderStatusManager(); render();
     };
-    row.append(numWrap, labelInp, up, dn, del);
+    row.append(labelInp, up, dn, del);
     list.appendChild(row);
   });
 }
 
 function addStatus(){
-  const label = document.getElementById("newStatusLabel").value.trim();
-  if(!label){ setStatus("⚠️ ステータス名を入力してください"); return; }
-  const id = "s_"+Date.now().toString(36);
-  state.statuses.push({ id, label });
-  document.getElementById("newStatusLabel").value = "";
+  const inp = document.getElementById("newStatusLabel");
+  const label = inp.value.trim();
+  if(!label){ setStatus("⚠️ 名前を入力してください"); return; }
+  const info = statusAxisInfo(statusMgrAxis);
+  const id = info.idPrefix + Date.now().toString(36);
+  info.list.push({ id, label });
+  inp.value = "";
   persistLocal(); renderStatusManager(); renderTabs();
 }
 
