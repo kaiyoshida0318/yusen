@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.49.0";
+const VERSION = "1.49.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -341,23 +341,10 @@ function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
 
 /* ---------- カテゴリタブ ---------- */
 function renderTabs(){
-  // 上段：販路カテゴリ
+  // 上段：カテゴリ絞り込みタブは非表示（機能ボタンのみ残す）。currentCatは常にall。
   const wrap = document.getElementById("catTabs");
   wrap.innerHTML = "";
-  const all = [ALL_CAT, ...state.categories];
-  all.forEach(c=>{
-    const tab = document.createElement("button");
-    tab.className = "cat-tab" + (c.id===currentCat ? " active" : "");
-    tab.innerHTML = `<span class="cat-icon">${iconHtml(c.icon)}</span><span class="cat-label">${escapeHtml(c.label)}</span><span class="cat-count">${countForCat(c.id)}</span>`;
-    tab.onclick = ()=>{ currentCat = c.id; render(); };
-    wrap.appendChild(tab);
-  });
-  // 未設定タブ（一番右寄り）
-  const noneTab = document.createElement("button");
-  noneTab.className = "cat-tab cat-none" + (currentCat===NONE_CAT.id ? " active" : "");
-  noneTab.innerHTML = `<span class="cat-icon">${NONE_CAT.icon}</span><span class="cat-label">${NONE_CAT.label}</span><span class="cat-count">${countForCat(NONE_CAT.id)}</span>`;
-  noneTab.onclick = ()=>{ currentCat = NONE_CAT.id; render(); };
-  wrap.appendChild(noneTab);
+  currentCat = "all";
   // 末尾に 一括削除 ＋行だけ ＋新規作成ボタン
   const bulkBtn = document.createElement("button");
   bulkBtn.className = "cat-tab cat-bulk" + (selectMode ? " active" : "");
