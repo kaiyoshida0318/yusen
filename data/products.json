@@ -1251,11 +1251,6 @@
       "icon": "num:2"
     },
     {
-      "id": "y_new_multi",
-      "label": "新規制作予定-複数枚",
-      "icon": "num:2"
-    },
-    {
       "id": "y_renew",
       "label": "リニューアル必要",
       "icon": "num:3"
