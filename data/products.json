@@ -1186,7 +1186,7 @@
     },
     {
       "id": "renewal",
-      "label": "両リニューアル検討分",
+      "label": "両リニュ検討分",
       "icon": "num:4"
     },
     {
@@ -1198,6 +1198,10 @@
       "id": "done",
       "label": "完了分",
       "icon": "txt:済"
+    },
+    {
+      "id": "s_mrin1a5d",
+      "label": "Yahooのみリニュ検討分"
     }
   ],
   "_statusMigV2": true,
