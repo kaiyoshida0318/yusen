@@ -1247,11 +1247,6 @@
       "icon": "num:4"
     },
     {
-      "id": "nextup",
-      "label": "次やる候補",
-      "icon": "num:5"
-    },
-    {
       "id": "done",
       "label": "完了分",
       "icon": "txt:済@11"
