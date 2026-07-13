@@ -763,3 +763,4 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .media-dropzone{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1.5px dashed var(--border);border-radius:8px;padding:12px;transition:all .15s}
 .media-dropzone.is-dragover{border-color:var(--accent);background:rgba(0,0,0,.03)}
 .media-dz-hint{font-size:12px;color:var(--muted)}
+.media-item a img{cursor:zoom-in}
