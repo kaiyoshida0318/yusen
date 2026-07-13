@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.54.3";
+const VERSION = "1.55.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -140,6 +140,7 @@ let currentCat = "all"; // 現在選択中のカテゴリID（上段）
 let statusMgrAxis = "status"; // ステータス管理モーダルで編集中の軸
 // 3軸それぞれの絞り込み選択（全部AND条件）。"all"はその軸で絞らない
 let currentStatusByAxis = { status:"all", rakuten:"all", yahoo:"all" };
+let currentMakeCount = "all"; // 制作枚数の絞り込み: "all" | "single" | "multi"
 let dateSort = "desc";   // 日付ソート初期値は降順（新しい日付が上）: "none" | "asc" | "desc"
 let pendingStatus = {};  // 一覧でのステータス保留変更 { rowIndex: newStatusId }
 let pendingCat = {};     // 一覧でのカテゴリ保留変更 { rowIndex: newCatId }
@@ -435,8 +436,17 @@ function renderTabs(){
       swrap.appendChild(rowEl);
     });
 
-    // 3行の下に機能ボタン行（一番右に 一括削除／行だけ／新規作成）
+    // 機能ボタン行：左に制作枚数の絞り込み、右に 一括削除／行だけ／新規作成
     const funcRow = document.createElement("div"); funcRow.className = "status-func-row";
+    const mcLabel = document.createElement("span"); mcLabel.className = "status-row-label"; mcLabel.textContent = "制作枚数";
+    funcRow.appendChild(mcLabel);
+    [{id:"all",label:"全体"},{id:"single",label:"1枚"},{id:"multi",label:"複数"}].forEach(m=>{
+      const tab = document.createElement("button");
+      tab.className = "status-tab" + (m.id===currentMakeCount ? " active" : "");
+      tab.innerHTML = `<span class="cat-label">${m.label}</span><span class="cat-count">${countForMakeCount(m.id)}</span>`;
+      tab.onclick = ()=>{ currentMakeCount = m.id; render(); };
+      funcRow.appendChild(tab);
+    });
     const funcSpacer = document.createElement("span"); funcSpacer.className = "func-spacer";
     funcRow.appendChild(funcSpacer);
     funcRow.appendChild(buildFuncButtons());
@@ -496,24 +506,38 @@ function statusMatchAxis(rowStatus, sel, axis){
   if(sel==="none") return !rowStatus;
   return rowStatus===sel;
 }
-// 3軸すべての現在選択にマッチするか（AND）
+// 制作枚数のマッチ
+function makeCountMatch(v, sel){ if(sel==="all") return true; return (v||"")===sel; }
+// 3軸＋制作枚数すべての現在選択にマッチするか（AND）
 function rowMatchesAllAxes(r){
   return statusMatchAxis(rowStatusOf(r,"status"),  currentStatusByAxis.status,  "status")
       && statusMatchAxis(rowStatusOf(r,"rakuten"), currentStatusByAxis.rakuten, "rakuten")
-      && statusMatchAxis(rowStatusOf(r,"yahoo"),   currentStatusByAxis.yahoo,   "yahoo");
+      && statusMatchAxis(rowStatusOf(r,"yahoo"),   currentStatusByAxis.yahoo,   "yahoo")
+      && makeCountMatch(r.makeCount, currentMakeCount);
 }
 function countForCat(id){
   return state.rows.filter(r=> catMatch(r.category, id) && rowMatchesAllAxes(r)).length;
 }
-// あるタブ(axis,id)のカウント：他の2軸は現在選択、対象軸はidで判定
+// あるタブ(axis,id)のカウント：他の2軸は現在選択、対象軸はidで判定（制作枚数も反映）
 function countForStatusAxisTab(axis, id){
   return state.rows.filter(r=>{
     if(!catMatch(r.category, currentCat)) return false;
+    if(!makeCountMatch(r.makeCount, currentMakeCount)) return false;
     for(const ax of ["status","rakuten","yahoo"]){
       const sel = ax===axis ? id : currentStatusByAxis[ax];
       if(!statusMatchAxis(rowStatusOf(r,ax), sel, ax)) return false;
     }
     return true;
+  }).length;
+}
+// 制作枚数タブのカウント（状態3軸の現在選択を反映）
+function countForMakeCount(sel){
+  return state.rows.filter(r=>{
+    if(!catMatch(r.category, currentCat)) return false;
+    if(!statusMatchAxis(rowStatusOf(r,"status"),  currentStatusByAxis.status,  "status")) return false;
+    if(!statusMatchAxis(rowStatusOf(r,"rakuten"), currentStatusByAxis.rakuten, "rakuten")) return false;
+    if(!statusMatchAxis(rowStatusOf(r,"yahoo"),   currentStatusByAxis.yahoo,   "yahoo")) return false;
+    return makeCountMatch(r.makeCount, sel);
   }).length;
 }
 function filteredRows(){
@@ -2949,6 +2973,8 @@ function bindUI(){
   if(btnResizeDone) btnResizeDone.onclick = exitColResizeMode;
   document.getElementById("btnManageStatus").onclick = openStatusManager;
   document.getElementById("btnCloseStatus").onclick = closeStatusManager;
+  const _btnCloseStatusX = document.getElementById("btnCloseStatusX");
+  if(_btnCloseStatusX) _btnCloseStatusX.onclick = closeStatusManager;
   document.getElementById("btnAddStatus").onclick = addStatus;
   document.getElementById("newStatusLabel").addEventListener("keydown", e=>{ if(e.key==="Enter") addStatus(); });
   document.getElementById("btnCloseSettings").onclick = closeSettings;
