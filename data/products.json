@@ -1271,13 +1271,13 @@
       "icon": "txt:済"
     },
     {
+      "id": "y_mrill4y6",
+      "label": "次やる候補"
+    },
+    {
       "id": "y_mremf1lq",
       "label": "一旦なしで",
       "icon": "txt:SKIP"
-    },
-    {
-      "id": "y_mrill4y6",
-      "label": "次やる候補"
     },
     {
       "id": "y_none",
