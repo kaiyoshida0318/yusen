@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.60.1";
+const VERSION = "1.60.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -3669,10 +3669,15 @@ function renderMediaInto(container, block){
   block.items.forEach((it, idx)=>{
     const cell = document.createElement("div"); cell.className = "media-item";
     if(it.kind === "image"){
+      const src = it.isDataUrl ? it.ref : imgUrl(it.ref);
+      const a = document.createElement("a");
+      a.href = src; a.target = "_blank"; a.rel = "noopener";
+      a.title = "クリックで別タブに大きく表示";
       const im = document.createElement("img");
-      im.src = it.isDataUrl ? it.ref : imgUrl(it.ref);
+      im.src = src;
       im.alt = it.name || "";
-      cell.appendChild(im);
+      a.appendChild(im);
+      cell.appendChild(a);
     }else{
       const a = document.createElement("a");
       a.href = it.isDataUrl ? it.ref : imgUrl(it.ref);
