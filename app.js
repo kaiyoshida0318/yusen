@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.53.0";
+const VERSION = "1.54.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -27,6 +27,7 @@ const COLUMNS = [
   { key:"statusSel", label:"商品状態" },
   { key:"rakutenSel", label:"楽天" },
   { key:"yahooSel", label:"Yahoo" },
+  { key:"makeCount", label:"制作枚数" },
   { key:"actions", label:"操作" },
 ];
 
@@ -109,6 +110,8 @@ const DEFAULT_RAKUTEN_STATUSES = [
   { id:"r_renew", label:"リニューアル必要" },
   { id:"r_none",  label:"不要" },
 ];
+// 制作枚数（一覧・編集で選ぶ固定2択）
+const MAKE_COUNT_OPTS = [{ id:"single", label:"1枚" }, { id:"multi", label:"複数" }];
 const DEFAULT_YAHOO_STATUSES = [
   { id:"y_pre",         label:"制作前" },
   { id:"y_new",         label:"新規制作予定" },
@@ -306,6 +309,7 @@ function migrate(data){
     if(typeof r.status !== "string") r.status = "";
     if(typeof r.rakutenStatus !== "string") r.rakutenStatus = "";
     if(typeof r.yahooStatus !== "string") r.yahooStatus = "";
+    if(typeof r.makeCount !== "string") r.makeCount = "";
   });
   return data;
 }
@@ -721,6 +725,7 @@ function render(){
       if(c.key==="statusSel") th.className="col-statussel";
       if(c.key==="rakutenSel") th.className="col-statussel";
       if(c.key==="yahooSel") th.className="col-statussel";
+      if(c.key==="makeCount") th.className="col-statussel";
       th.textContent = c.label;
     }
     applyColStyle(th, cc, true);
@@ -934,11 +939,13 @@ function render(){
     };
     const tdRakuten = makeAxisCell("rakutenStatus", state.rakutenStatuses);
     const tdYahoo   = makeAxisCell("yahooStatus", state.yahooStatuses);
+    const tdMakeCount = makeAxisCell("makeCount", MAKE_COUNT_OPTS);
 
-    // 商品状態・楽天・Yahoo・操作（COLUMNS順に一致させる）
+    // 商品状態・楽天・Yahoo・制作枚数・操作（COLUMNS順に一致させる）
     trb.appendChild(tdStatus);
     trb.appendChild(tdRakuten);
     trb.appendChild(tdYahoo);
+    trb.appendChild(tdMakeCount);
     trb.appendChild(tdAct);
 
     // 列設定に従って各tdを表示/非表示・スタイル適用（COLUMNS順とtd追加順は一致）
@@ -1234,12 +1241,14 @@ function openEntry(editIndex, mode){
   // 楽天・Yahoo 状態（その軸で特定の値に絞り込み中なら新規初期値に）
   entry.rakutenStatus = row ? (row.rakutenStatus||"") : axisInit(currentStatusByAxis.rakuten);
   entry.yahooStatus   = row ? (row.yahooStatus||"")   : axisInit(currentStatusByAxis.yahoo);
+  entry.makeCount = row ? (row.makeCount||"") : "";
   // 新規作成時はセクションを閉じておく（必要なものだけ開いて使う）。編集時は展開。
   sectionCollapsed = isEdit ? { rakumart:false, suppliers:false, tables:false } : { rakumart:true, suppliers:true, tables:true };
   renderCatSelect();
   renderStatusSelect();
   renderAxisSelect("fRakutenStatus", state.rakutenStatuses, entry.rakutenStatus);
   renderAxisSelect("fYahooStatus", state.yahooStatuses, entry.yahooStatus);
+  renderAxisSelect("fMakeCount", MAKE_COUNT_OPTS, entry.makeCount);
 
   renderEntryImage();
   renderRivals();
@@ -2137,6 +2146,7 @@ function saveEntry(keepOpen){
     const fSt   = document.getElementById("fStatus");
     const fRak  = document.getElementById("fRakutenStatus");
     const fYah  = document.getElementById("fYahooStatus");
+    const fMake = document.getElementById("fMakeCount");
     const fExp  = document.getElementById("fExpectedSales");
     let expectedSales = 0;
     if(fExp){
@@ -2158,6 +2168,7 @@ function saveEntry(keepOpen){
       status:   (fSt  && fSt.value)  || "",
       rakutenStatus: (fRak && fRak.value) || "",
       yahooStatus:   (fYah && fYah.value) || "",
+      makeCount:     (fMake && fMake.value) || "",
       rakumart: entry.rakumart.map(r=>({ text:((r&&r.text)||"").trim(), url:((r&&r.url)||"").trim() })).filter(r=>r.text||r.url),
       suppliers: entry.suppliers.map(s=>({ image:(s&&s.image)||"", url:((s&&s.url)||"").trim(), memo:((s&&s.memo)||"").trim() })),
       tables: entry.tables.map(t=>{
