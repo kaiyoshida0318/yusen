@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.54.2";
+const VERSION = "1.54.3";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -2778,9 +2778,10 @@ function renderStatusManager(){
   const info = statusAxisInfo(statusMgrAxis);
   const arr = info.list;
   arr.forEach((s, idx)=>{
-    const row = document.createElement("div"); row.className = "cat-row";
+    const row = document.createElement("div"); row.className = "cat-row status-mgr-row";
+    let pickCol = null;
     if(info.hasIcon){
-      const pickCol = document.createElement("div"); pickCol.className = "status-pick-col";
+      pickCol = document.createElement("div"); pickCol.className = "status-pick-col";
       // 番号ロゴ選択（なし/1〜6・色固定）＋文字バッジ（OK/NG/SKIP/保留/済）
       const numWrap = document.createElement("div"); numWrap.className = "status-num-picker";
       const curTxt = isTxtIcon(s.icon) ? parseTxtIcon(s.icon) : null;
@@ -2825,7 +2826,6 @@ function renderStatusManager(){
         });
         pickCol.appendChild(crow);
       }
-      row.appendChild(pickCol);
     }
     const labelInp = document.createElement("input");
     labelInp.type = "text";
@@ -2852,7 +2852,10 @@ function renderStatusManager(){
       if(currentStatusByAxis[statusMgrAxis]===s.id) currentStatusByAxis[statusMgrAxis]="all";
       persistLocal(); renderStatusManager(); render();
     };
-    row.append(labelInp, up, dn, del);
+    const topLine = document.createElement("div"); topLine.className = "status-mgr-top";
+    topLine.append(labelInp, up, dn, del);
+    row.appendChild(topLine);
+    if(pickCol) row.appendChild(pickCol);
     list.appendChild(row);
   });
 }
