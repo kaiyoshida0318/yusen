@@ -1141,7 +1141,12 @@
       "rakutenStatus": "r_pre",
       "yahooStatus": "y_mremf1lq",
       "makeCount": "",
-      "rakumart": [],
+      "rakumart": [
+        {
+          "text": "2026071017123731-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026071017123731-2147"
+        }
+      ],
       "suppliers": [],
       "tables": []
     }
