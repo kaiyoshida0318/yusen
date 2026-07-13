@@ -764,3 +764,10 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .media-dropzone.is-dragover{border-color:var(--accent);background:rgba(0,0,0,.03)}
 .media-dz-hint{font-size:12px;color:var(--muted)}
 .media-item a img{cursor:zoom-in}
+
+/* 画像・ファイルの並び替えボタン */
+.media-item{padding-bottom:26px}
+.media-mv-bar{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.media-mv{width:28px;height:20px;border:1px solid var(--border);border-radius:5px;background:#fff;color:var(--muted);font-size:11px;line-height:1;cursor:pointer;padding:0}
+.media-mv:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.media-mv:disabled{opacity:.3;cursor:default}
