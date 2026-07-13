@@ -1202,7 +1202,7 @@
     {
       "id": "done",
       "label": "完了分",
-      "icon": "txt:済@11"
+      "icon": "txt:済@12"
     }
   ],
   "_statusMigV2": true,
