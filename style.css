@@ -531,7 +531,7 @@ tbody td{font-size:13px}
 .cs-ico .cs-emoji{font-size:14px;line-height:1}
 .cs-lbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cs-lbl.cs-placeholder{color:var(--muted)}
-.cs-arrow{flex:0 0 12px;color:var(--muted);font-size:10px}
+.cs-arrow{display:none}
 .cs-menu{
   position:fixed;z-index:1000;
   background:#fff;border:1px solid var(--border);border-radius:8px;
