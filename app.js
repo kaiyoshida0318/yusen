@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.59.1";
+const VERSION = "1.60.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -310,6 +310,7 @@ function migrate(data){
     if(!Array.isArray(r.rivalAmazon)) r.rivalAmazon = [];
     if(!Array.isArray(r.rankingUrls)) r.rankingUrls = [];
     if(!Array.isArray(r.companyUrls)) r.companyUrls = [];
+    if(!Array.isArray(r.mediaBlocks)) r.mediaBlocks = [];
     if(typeof r.freeNote !== "string") r.freeNote = ""; // 自由記入欄（リンク含むHTMLを保持）
     if(typeof r.category !== "string") r.category = "";
     if(typeof r.status !== "string") r.status = "";
@@ -1230,6 +1231,8 @@ function openEntry(editIndex, mode){
   while(entry.companyUrls.length < 1) entry.companyUrls.push("");
   // 自由記入欄
   entry.freeNote = row ? (row.freeNote||"") : "";
+  // 画像・ファイルブロック
+  entry.mediaBlocks = (row && Array.isArray(row.mediaBlocks)) ? row.mediaBlocks.map(m=>({ items: Array.isArray(m.items) ? m.items.map(x=>({...x})) : [] })) : [];
   entry.image = row ? (row.image||"") : "";
   entry.suppliers = row && Array.isArray(row.suppliers)
     ? row.suppliers.map(s=>({ image:s.image||"", imageIsDataUrl:false, url:s.url||"", memo:s.memo||"", collapsed:false }))
@@ -1288,6 +1291,10 @@ function openEntry(editIndex, mode){
     if(entry.freeNote && entry.freeNote.trim()){
       entry.blocks.push({ type:"freenote", id:nextBlockId(), html: entry.freeNote });
     }
+    // 画像・ファイルブロックを復元
+    (entry.mediaBlocks || []).forEach(m=>{
+      entry.blocks.push({ type:"media", id:nextBlockId(), items: Array.isArray(m.items) ? m.items.map(x=>({...x})) : [] });
+    });
   }
   // カテゴリ: 編集時はその値、新規時は現在表示中のタブ（"all"の場合は未設定）
   entry.category = row ? (row.category||"") : ((currentCat==="all"||currentCat==="none") ? "" : currentCat);
@@ -2220,6 +2227,7 @@ function saveEntry(keepOpen){
       rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
       companyUrls:  (entry.companyUrls||[]).map(u=>(u||"").trim()).filter(u=>u),
       freeNote:     entry.freeNote || "",
+      mediaBlocks:  (entry.mediaBlocks||[]).map(m=>({ items: (m.items||[]).map(x=>({ kind:x.kind, name:x.name||"", ref:x.ref||"", isDataUrl:!!x.isDataUrl })) })).filter(m=>m.items.length),
       category: (fCat && fCat.value) || (entry.category || ""),
       status:   (fSt  && fSt.value)  || "",
       rakutenStatus: (fRak && fRak.value) || "",
@@ -3216,15 +3224,18 @@ function collectBlocksIntoEntry(){
   const sup = [];
   const tbls = [];
   const notes = [];
+  const media = [];
   (entry.blocks || []).forEach(b=>{
     if(b.type==="rakumart"){ (b.items||[]).forEach(it=> rak.push(it)); }
     else if(b.type==="supplier"){ (b.items||[]).forEach(it=> sup.push(it)); }
     else if(b.type==="table"){ if(b.data) tbls.push(b.data); }
     else if(b.type==="freenote"){ if(b.html && b.html.trim()) notes.push(b.html); }
+    else if(b.type==="media"){ if(Array.isArray(b.items) && b.items.length) media.push({ items: b.items.map(x=>({...x})) }); }
   });
   entry.rakumart = rak;
   entry.suppliers = sup;
   entry.tables = tbls;
+  entry.mediaBlocks = media;
   // 自由記入欄は複数ブロックあれば連結して1つの freeNote にまとめる
   entry.freeNote = notes.join("<hr>");
 }
@@ -3301,6 +3312,8 @@ function renderBlocks(){
       renderTableInto(body, block);
     }else if(block.type==="freenote"){
       renderFreeNoteInto(body, block);
+    }else if(block.type==="media"){
+      renderMediaInto(body, block);
     }
     sec.appendChild(body);
 
@@ -3313,6 +3326,7 @@ function blockTitle(type){
   if(type==="supplier") return "🏭 仕入先（中国輸入元）";
   if(type==="table") return "📋 表";
   if(type==="freenote") return "📝 自由記入欄";
+  if(type==="media") return "🖼️ 画像・ファイル";
   return "";
 }
 
@@ -3337,6 +3351,8 @@ function addBlock(type){
     entry.blocks.push({ type:"table", id:nextBlockId(), data:newTableData() });
   }else if(type==="freenote"){
     entry.blocks.push({ type:"freenote", id:nextBlockId(), html:"" });
+  }else if(type==="media"){
+    entry.blocks.push({ type:"media", id:nextBlockId(), items:[] });
   }else{
     return;
   }
@@ -3637,6 +3653,75 @@ function renderFreeNoteInto(container, block){
   });
   refreshPh();
   container.appendChild(box);
+}
+
+// 画像・ファイルブロック：アップロード＋表示（画像はサムネイル、それ以外はファイル名）
+const IMAGE_EXTS = ["png","jpg","jpeg","gif","webp","svg","bmp","avif"];
+function isImageItem(file){
+  if(file.type && file.type.startsWith("image/")) return true;
+  const ext = (file.name.split(".").pop()||"").toLowerCase();
+  return IMAGE_EXTS.includes(ext);
+}
+function renderMediaInto(container, block){
+  container.innerHTML = "";
+  if(!Array.isArray(block.items)) block.items = [];
+  const grid = document.createElement("div"); grid.className = "media-grid";
+  block.items.forEach((it, idx)=>{
+    const cell = document.createElement("div"); cell.className = "media-item";
+    if(it.kind === "image"){
+      const im = document.createElement("img");
+      im.src = it.isDataUrl ? it.ref : imgUrl(it.ref);
+      im.alt = it.name || "";
+      cell.appendChild(im);
+    }else{
+      const a = document.createElement("a");
+      a.href = it.isDataUrl ? it.ref : imgUrl(it.ref);
+      a.target = "_blank"; a.rel = "noopener";
+      a.className = "media-file";
+      a.textContent = "📎 " + (it.name || "ファイル");
+      if(it.isDataUrl && it.name) a.setAttribute("download", it.name);
+      cell.appendChild(a);
+    }
+    const del = document.createElement("button");
+    del.type = "button"; del.className = "media-del"; del.textContent = "×"; del.title = "削除";
+    del.onclick = ()=>{ block.items.splice(idx,1); renderBlocks(); };
+    cell.appendChild(del);
+    grid.appendChild(cell);
+  });
+  container.appendChild(grid);
+
+  // アップロードボタン
+  const bar = document.createElement("div"); bar.className = "media-upload-bar";
+  const input = document.createElement("input");
+  input.type = "file"; input.multiple = true; input.style.display = "none";
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "btn btn-ghost media-add-btn";
+  btn.textContent = "＋ 画像・ファイルを追加";
+  btn.onclick = ()=> input.click();
+  input.onchange = async ()=>{
+    const files = Array.from(input.files || []);
+    input.value = "";
+    for(const file of files){
+      const isImg = isImageItem(file);
+      try{
+        setStatus(`アップロード中… ${file.name}`);
+        const ref = await uploadImage(file); // 任意ファイルをGitHubへ保存（拡張子保持）
+        block.items.push({ kind: isImg ? "image" : "file", name: file.name, ref, isDataUrl:false });
+        setStatus(`✅ 追加しました: ${file.name}`);
+      }catch(e){
+        // GitHub未設定/失敗時はデータURLで保持（メモリ上。GitHub保存時に反映されないので注意）
+        try{
+          const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+          block.items.push({ kind: isImg ? "image" : "file", name: file.name, ref: dataUrl, isDataUrl:true });
+          setStatus(`⚠️ ${file.name} はローカル保持（GitHub設定時はアップロードされます）`);
+        }catch(e2){ setStatus(`❌ 追加失敗: ${file.name}`); }
+      }
+      renderBlocks();
+    }
+
+  };
+  bar.appendChild(btn); bar.appendChild(input);
+  container.appendChild(bar);
 }
 
 /* ▲▲▲ v1.12.0 追加ここまで ▲▲▲ */
