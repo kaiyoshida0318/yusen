@@ -1223,17 +1223,17 @@
     {
       "id": "y_new_multi",
       "label": "新規制作予定-複数枚",
-      "icon": "num:3"
+      "icon": "num:2"
     },
     {
       "id": "y_renew",
       "label": "リニューアル必要",
-      "icon": "num:4"
+      "icon": "num:3"
     },
     {
       "id": "y_renew_multi",
       "label": "リニューアル必要-複数枚",
-      "icon": "num:5"
+      "icon": "num:3"
     },
     {
       "id": "y_mrik3ne8",
