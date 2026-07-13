@@ -1237,6 +1237,10 @@
       "id": "r_none",
       "label": "不要",
       "icon": "txt:SKIP"
+    },
+    {
+      "id": "r_mrilkjrf",
+      "label": "次やる候補"
     }
   ],
   "yahooStatuses": [
