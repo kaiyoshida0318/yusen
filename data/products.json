@@ -655,7 +655,7 @@
       "companyUrls": [],
       "doneDate": "",
       "rakutenStatus": "r_renew",
-      "yahooStatus": "y_renew",
+      "yahooStatus": "y_mremf1lq",
       "makeCount": ""
     },
     {
@@ -755,7 +755,7 @@
       "companyUrls": [],
       "doneDate": "",
       "rakutenStatus": "r_renew",
-      "yahooStatus": "y_renew",
+      "yahooStatus": "y_mremf1lq",
       "makeCount": ""
     },
     {
@@ -869,7 +869,7 @@
       "companyUrls": [],
       "doneDate": "",
       "rakutenStatus": "r_renew",
-      "yahooStatus": "y_new",
+      "yahooStatus": "y_mremf1lq",
       "makeCount": ""
     },
     {
@@ -889,7 +889,7 @@
       "companyUrls": [],
       "doneDate": "",
       "rakutenStatus": "r_renew",
-      "yahooStatus": "y_renew",
+      "yahooStatus": "y_mremf1lq",
       "makeCount": ""
     },
     {
@@ -1191,7 +1191,7 @@
     },
     {
       "id": "s_mrin1a5d",
-      "label": "Yahooのみリニュ検討分",
+      "label": "Yahooのみ対応分",
       "icon": "num:4"
     },
     {
