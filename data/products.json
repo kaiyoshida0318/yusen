@@ -1230,7 +1230,8 @@
     },
     {
       "id": "r_mrilkjrf",
-      "label": "次やる候補"
+      "label": "次やる候補",
+      "icon": "num:5"
     },
     {
       "id": "r_mreo5165",
