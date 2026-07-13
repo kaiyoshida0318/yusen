@@ -736,3 +736,7 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .modal-status{position:relative}
 .modal-close-x{position:absolute;top:12px;right:14px;width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;z-index:3}
 .modal-close-x:hover{border-color:var(--accent);color:var(--accent)}
+
+/* 状態行の右端クリアボタン */
+.status-filter-clear{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+.status-filter-clear:hover{border-color:var(--accent);color:var(--accent)}
