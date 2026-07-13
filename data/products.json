@@ -1195,13 +1195,13 @@
       "icon": "num:5"
     },
     {
+      "id": "s_mrin1a5d",
+      "label": "Yahooのみリニュ検討分"
+    },
+    {
       "id": "done",
       "label": "完了分",
       "icon": "txt:済"
-    },
-    {
-      "id": "s_mrin1a5d",
-      "label": "Yahooのみリニュ検討分"
     }
   ],
   "_statusMigV2": true,
