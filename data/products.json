@@ -1190,11 +1190,6 @@
       "icon": "num:4"
     },
     {
-      "id": "nextup",
-      "label": "次やる候補",
-      "icon": "num:5"
-    },
-    {
       "id": "working",
       "label": "制作着手中",
       "icon": "num:6"
