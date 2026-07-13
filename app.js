@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.57.0";
+const VERSION = "1.58.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -426,7 +426,7 @@ function renderTabs(){
         tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===cur ? " active" : "");
         let labelHtml;
         if(s.id==="all" && def.axis==="status"){
-          labelHtml = `<span class="allnum" style="color:${STATUS_NUM_COLORS[1]}">①</span>-<span class="allnum" style="color:${STATUS_NUM_COLORS[4]}">④</span>全体`;
+          labelHtml = `<span class="allnum" style="color:${statusNumColor(1)}">①</span>-<span class="allnum" style="color:${statusNumColor(4)}">④</span>全体`;
         }else if(s.id==="all" || s.id==="allfull" || s.id==="none"){
           labelHtml = escapeHtml(s.label);
         }else{
@@ -642,14 +642,21 @@ const STATUS_NUM_COLORS = {
   4: "#8257c9", // 紫
   5: "#c0392b", // 赤
   6: "#0e7c8a", // 濃青緑
+  7: "#8d6e63", // 茶
+  8: "#4aa3df", // 水色
+  9: "#689f38", // ライム
+  10:"#5e35b1", // 濃紫
 };
-function isNumIcon(icon){ return typeof icon==="string" && /^num:[1-6]$/.test(icon); }
+const NUM_MAX = 10;
+function isNumIcon(icon){ return typeof icon==="string" && /^num:([1-9]|10)$/.test(icon); }
+// 番号の色：マスター(state.markColors["num:N"])を最優先、無ければ既定色
+function statusNumColor(n){ return (state.markColors && state.markColors["num:"+n]) || STATUS_NUM_COLORS[n] || "#7a756d"; }
 function statusNumSvg(icon){
   const n = parseInt(icon.split(":")[1], 10);
-  const color = STATUS_NUM_COLORS[n] || "#7a756d";
+  const color = statusNumColor(n);
   return `<svg class="status-num" viewBox="0 0 20 20" aria-label="${n}" role="img">`
     + `<circle cx="10" cy="10" r="9" fill="${color}"/>`
-    + `<text x="10" y="14.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="#fff">${n}</text>`
+    + `<text x="10" y="14.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="${n>=10?9:12}" fill="#fff">${n}</text>`
     + `</svg>`;
 }
 // ステータスのアイコンHTML（番号ロゴ or 文字バッジ。未設定は空）
@@ -681,7 +688,7 @@ function statusTxtBadge(icon){
   return `<span class="status-txt-badge" style="background:${color}">${escapeHtml(label)}</span>`;
 }
 // 番号のテキスト記号（option用、SVG不可な場所で使う）
-const NUM_CHARS = { 1:"①", 2:"②", 3:"③", 4:"④", 5:"⑤", 6:"⑥" };
+const NUM_CHARS = { 1:"①", 2:"②", 3:"③", 4:"④", 5:"⑤", 6:"⑥", 7:"⑦", 8:"⑧", 9:"⑨", 10:"⑩" };
 function statusNumChar(icon){
   if(!isNumIcon(icon)) return "";
   return NUM_CHARS[parseInt(icon.split(":")[1],10)] || "";
@@ -2866,6 +2873,29 @@ function renderMarkColorEditor(list){
   hint.textContent = "各マークの色を設定します。ここで選んだ色が、商品状態・楽天・Yahoo すべての同じマークに反映されます。";
   list.appendChild(hint);
   if(!state.markColors) state.markColors = { ...TXT_COLORS };
+  // 番号①〜⑩の色
+  const numTtl = document.createElement("div"); numTtl.className = "mark-sect-ttl"; numTtl.textContent = "番号";
+  list.appendChild(numTtl);
+  for(let n=1; n<=NUM_MAX; n++){
+    const row = document.createElement("div"); row.className = "mark-color-row";
+    const cur = statusNumColor(n);
+    const preview = document.createElement("span"); preview.className = "mark-color-preview";
+    preview.innerHTML = statusNumSvg("num:"+n);
+    row.appendChild(preview);
+    const pal = document.createElement("div"); pal.className = "mark-color-palette";
+    TXT_COLOR_PALETTE.forEach(col=>{
+      const chip = document.createElement("button");
+      chip.type = "button"; chip.className = "status-color-chip" + (cur===col ? " selected" : "");
+      chip.style.background = col; chip.title = "この色にする";
+      chip.onclick = ()=>{ state.markColors["num:"+n] = col; persistLocal(); renderStatusManager(); renderTabs(); render(); };
+      pal.appendChild(chip);
+    });
+    row.appendChild(pal);
+    list.appendChild(row);
+  }
+  // 文字・記号マーク
+  const txtTtl = document.createElement("div"); txtTtl.className = "mark-sect-ttl"; txtTtl.textContent = "文字・記号マーク";
+  list.appendChild(txtTtl);
   TXT_PRESETS.forEach(label=>{
     const row = document.createElement("div"); row.className = "mark-color-row";
     const cur = state.markColors[label] || TXT_COLORS[label] || "#7a756d";
@@ -2915,7 +2945,7 @@ function renderStatusManager(){
       const numWrap = document.createElement("div"); numWrap.className = "status-num-picker";
       const curTxt = isTxtIcon(s.icon) ? parseTxtIcon(s.icon) : null;
       const applyIcon = (val)=>{ s.icon = val; persistLocal(); renderStatusManager(); renderTabs(); render(); };
-      [null,1,2,3,4,5,6].forEach(n=>{
+      [null,1,2,3,4,5,6,7,8,9,10].forEach(n=>{
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "status-num-opt";
         if(n===null){
