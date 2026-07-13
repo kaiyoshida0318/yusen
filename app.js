@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.55.0";
+const VERSION = "1.55.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -433,6 +433,20 @@ function renderTabs(){
         tab.onclick = ()=>{ currentStatusByAxis[def.axis] = s.id; render(); };
         rowEl.appendChild(tab);
       });
+      // 状態行の一番右に「クリア」ボタン（全ての絞り込みをリセット）
+      if(def.axis==="status"){
+        const sp = document.createElement("span"); sp.className = "func-spacer"; rowEl.appendChild(sp);
+        const clr = document.createElement("button");
+        clr.className = "status-filter-clear";
+        clr.textContent = "クリア";
+        clr.title = "状態・楽天・Yahoo・制作枚数の絞り込みをすべて解除";
+        clr.onclick = ()=>{
+          currentStatusByAxis = { status:"all", rakuten:"all", yahoo:"all" };
+          currentMakeCount = "all";
+          render();
+        };
+        rowEl.appendChild(clr);
+      }
       swrap.appendChild(rowEl);
     });
 
