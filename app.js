@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.55.1";
+const VERSION = "1.55.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -99,7 +99,7 @@ const DEFAULT_STATUSES = [
   { id:"working",   label:"制作着手中",         icon:"num:6" },
   { id:"done",      label:"完了分" },
 ];
-const ALL_STATUS = { id:"all", label:"①-⑥全体" }; // 完了分を除いた行を表示
+const ALL_STATUS = { id:"all", label:"①-④全体" }; // 完了分を除いた行を表示
 const ALL_FULL_STATUS = { id:"allfull", label:"全件" }; // 完了分も含む全件
 const NONE_STATUS = { id:"none", label:"未設定" }; // 未設定の行を表示
 
@@ -422,7 +422,7 @@ function renderTabs(){
         tab.className = "status-tab" + (s.id===NONE_STATUS.id ? " status-none" : "") + (s.id===cur ? " active" : "");
         let labelHtml;
         if(s.id==="all" && def.axis==="status"){
-          labelHtml = `<span class="allnum" style="color:${STATUS_NUM_COLORS[1]}">①</span>-<span class="allnum" style="color:${STATUS_NUM_COLORS[6]}">⑥</span>全体`;
+          labelHtml = `<span class="allnum" style="color:${STATUS_NUM_COLORS[1]}">①</span>-<span class="allnum" style="color:${STATUS_NUM_COLORS[4]}">④</span>全体`;
         }else if(s.id==="all" || s.id==="allfull" || s.id==="none"){
           labelHtml = escapeHtml(s.label);
         }else{
