@@ -1186,8 +1186,13 @@
     },
     {
       "id": "renewal",
-      "label": "リニューアル検討分",
+      "label": "両リニューアル検討分",
       "icon": "num:4"
+    },
+    {
+      "id": "nextup",
+      "label": "次やる候補",
+      "icon": "num:5"
     },
     {
       "id": "done",
