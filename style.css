@@ -728,3 +728,11 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .status-mgr-top .cat-mv{width:34px;height:36px;font-size:13px}
 .status-mgr-top .cat-del{width:40px;height:36px;font-size:15px}
 .status-mgr-row .status-num-picker{flex-wrap:wrap}
+
+/* 状態管理の各行の枠をはっきり表示 */
+.status-mgr-row{background:#fff;border:1.5px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.05);padding:12px}
+.cat-list .status-mgr-row + .status-mgr-row{margin-top:2px}
+/* 項目管理モーダル右上の閉じるボタン */
+.modal-status{position:relative}
+.modal-close-x{position:absolute;top:12px;right:14px;width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;z-index:3}
+.modal-close-x:hover{border-color:var(--accent);color:var(--accent)}
