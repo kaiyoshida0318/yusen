@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.60.4";
+const VERSION = "1.60.5";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -3689,6 +3689,18 @@ function renderMediaInto(container, block){
     del.type = "button"; del.className = "media-del"; del.textContent = "×"; del.title = "削除";
     del.onclick = ()=>{ block.items.splice(idx,1); renderBlocks(); };
     cell.appendChild(del);
+    // 並び替え（◀ 前へ / ▶ 次へ）
+    const mv = document.createElement("div"); mv.className = "media-mv-bar";
+    const mvL = document.createElement("button");
+    mvL.type = "button"; mvL.className = "media-mv"; mvL.textContent = "◀"; mvL.title = "前へ";
+    mvL.disabled = idx===0;
+    mvL.onclick = ()=>{ moveItem(block.items, idx, -1); renderBlocks(); };
+    const mvR = document.createElement("button");
+    mvR.type = "button"; mvR.className = "media-mv"; mvR.textContent = "▶"; mvR.title = "次へ";
+    mvR.disabled = idx===block.items.length-1;
+    mvR.onclick = ()=>{ moveItem(block.items, idx, 1); renderBlocks(); };
+    mv.append(mvL, mvR);
+    cell.appendChild(mv);
     grid.appendChild(cell);
   });
   container.appendChild(grid);
