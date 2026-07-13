@@ -720,3 +720,11 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 /* 機能ボタン専用行（3状態行の下、右端に配置） */
 .status-func-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
 .status-func-row .func-spacer{flex:1 1 auto}
+
+/* 状態管理の各行：上段=名前+操作、下段=マークピッカー（押しやすさ確保） */
+.status-mgr-row{flex-direction:column;align-items:stretch;gap:8px}
+.status-mgr-top{display:flex;align-items:center;gap:6px}
+.status-mgr-top .cat-label-input{flex:1;min-width:0}
+.status-mgr-top .cat-mv{width:34px;height:36px;font-size:13px}
+.status-mgr-top .cat-del{width:40px;height:36px;font-size:15px}
+.status-mgr-row .status-num-picker{flex-wrap:wrap}
