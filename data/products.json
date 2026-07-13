@@ -1276,13 +1276,13 @@
       "icon": "txt:SKIP"
     },
     {
+      "id": "y_mrill4y6",
+      "label": "次やる候補"
+    },
+    {
       "id": "y_none",
       "label": "不要",
       "icon": "txt:SKIP"
-    },
-    {
-      "id": "y_mrill4y6",
-      "label": "次やる候補"
     }
   ]
 }
