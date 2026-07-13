@@ -1190,11 +1190,6 @@
       "icon": "num:4"
     },
     {
-      "id": "working",
-      "label": "制作着手中",
-      "icon": "num:6"
-    },
-    {
       "id": "done",
       "label": "完了分",
       "icon": "txt:済"
