@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.60.2";
+const VERSION = "1.60.3";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -436,7 +436,7 @@ function renderTabs(){
         }
         const icon = def.hasIcon ? statusIconHtml(s.icon) : "";
         tab.innerHTML = `<span class="status-ico">${icon}</span><span class="cat-label">${labelHtml}</span><span class="cat-count">${countForStatusAxisTab(def.axis, s.id)}</span>`;
-        tab.onclick = ()=>{ currentStatusByAxis[def.axis] = s.id; render(); };
+        tab.onclick = ()=>{ currentStatusByAxis[def.axis] = (currentStatusByAxis[def.axis]===s.id) ? "all" : s.id; render(); };
         rowEl.appendChild(tab);
       });
       // 状態行の一番右に「クリア」ボタン（全ての絞り込みをリセット）
@@ -464,7 +464,7 @@ function renderTabs(){
       const tab = document.createElement("button");
       tab.className = "status-tab" + (m.id===currentMakeCount ? " active" : "");
       tab.innerHTML = `<span class="cat-label">${m.label}</span><span class="cat-count">${countForMakeCount(m.id)}</span>`;
-      tab.onclick = ()=>{ currentMakeCount = m.id; render(); };
+      tab.onclick = ()=>{ currentMakeCount = (currentMakeCount===m.id) ? "all" : m.id; render(); };
       funcRow.appendChild(tab);
     });
     const funcSpacer = document.createElement("span"); funcSpacer.className = "func-spacer";
