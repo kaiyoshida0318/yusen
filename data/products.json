@@ -1236,6 +1236,10 @@
       "icon": "num:5"
     },
     {
+      "id": "y_mrik3ne8",
+      "label": "リニューアル着手中"
+    },
+    {
       "id": "y_mreo58aj",
       "label": "完了分",
       "icon": "txt:済"
@@ -1244,10 +1248,6 @@
       "id": "y_mremf1lq",
       "label": "一旦なしで",
       "icon": "txt:SKIP"
-    },
-    {
-      "id": "y_mrik3ne8",
-      "label": "リニューアル着手中"
     },
     {
       "id": "y_none",
