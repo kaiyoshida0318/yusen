@@ -29,7 +29,7 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .cat-icon-btn .cat-logo{width:22px;height:22px}
 .cat-icon-opt .cat-logo{width:20px;height:20px}
 .cat-label{font-weight:500}
-.cat-count{font-size:11px;background:rgba(0,0,0,.08);padding:1px 7px;border-radius:999px;min-width:18px;text-align:center}
+.cat-count{display:inline-block;box-sizing:border-box;font-size:11px;background:rgba(0,0,0,.08);padding:1px 6px;border-radius:999px;min-width:28px;text-align:center}
 .cat-tab.active .cat-count{background:rgba(255,255,255,.25)}
 .cat-tab.cat-manage{margin-left:auto;color:var(--muted);background:transparent;border-style:dashed}
 .cat-tab.cat-manage:hover{color:var(--accent);background:var(--surface)}
@@ -69,7 +69,7 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .status-tab:hover{border-color:var(--green);color:var(--green)}
 .status-tab.active{background:var(--green);border-color:var(--green);color:#fff}
 .status-tab.active .cat-count{background:rgba(255,255,255,.3);color:#fff}
-.status-tab .cat-count{font-size:11px;font-weight:600;background:var(--bg);color:var(--muted);padding:2px 8px;border-radius:999px;min-width:20px;text-align:center}
+.status-tab .cat-count{display:inline-block;box-sizing:border-box;font-size:11px;font-weight:600;background:var(--bg);color:var(--muted);padding:2px 6px;border-radius:999px;min-width:30px;text-align:center}
 /* ステータスタブ左の番号ロゴ */
 .status-ico{display:inline-flex;align-items:center}
 .status-ico:empty{display:none}
