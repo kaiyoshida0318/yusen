@@ -745,3 +745,6 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .mark-color-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:#fff;border:1.5px solid var(--border);border-radius:8px;margin-bottom:6px}
 .mark-color-preview{flex:0 0 60px;display:flex;justify-content:center}
 .mark-color-palette{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+
+/* マーク作成のセクション見出し */
+.mark-sect-ttl{font-size:12px;font-weight:700;color:var(--text);margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
