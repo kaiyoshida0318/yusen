@@ -1138,12 +1138,12 @@
       "freeNote": "",
       "category": "new",
       "status": "buy",
-      "rakumart": [],
-      "suppliers": [],
-      "tables": [],
       "rakutenStatus": "r_pre",
       "yahooStatus": "y_mremf1lq",
-      "makeCount": ""
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
