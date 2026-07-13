@@ -748,3 +748,13 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 
 /* マーク作成のセクション見出し */
 .mark-sect-ttl{font-size:12px;font-weight:700;color:var(--text);margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+
+/* 画像・ファイルブロック */
+.media-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.media-item{position:relative;border:1px solid var(--border);border-radius:8px;padding:6px;background:#fff;display:flex;align-items:center;justify-content:center;min-width:80px;max-width:220px}
+.media-item img{max-width:200px;max-height:200px;border-radius:5px;display:block}
+.media-file{display:inline-block;padding:8px 12px;font-size:13px;color:var(--accent);text-decoration:none;word-break:break-all}
+.media-file:hover{text-decoration:underline}
+.media-del{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;border:1px solid var(--border);background:#fff;color:var(--muted);font-size:14px;line-height:1;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.media-del:hover{color:#c0392b;border-color:#c0392b}
+.media-add-btn{font-size:13px}
