@@ -533,15 +533,15 @@
         {
           "items": [
             {
-              "kind": "image",
-              "name": "157e0204937f0b3ea2e031cbdc6098c6.png",
-              "ref": "img_mriuyh2z_653.png",
-              "isDataUrl": false
-            },
-            {
               "kind": "file",
               "name": "おしゃぶりホルダー.xmind",
               "ref": "img_mriuyqwn_124.xmind",
+              "isDataUrl": false
+            },
+            {
+              "kind": "image",
+              "name": "8d14902f-838f-449b-b79c-605fd8e94648.png",
+              "ref": "img_mrivqwg9_477.png",
               "isDataUrl": false
             }
           ]
