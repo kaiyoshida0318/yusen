@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.60.0";
+const VERSION = "1.60.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -3691,16 +3691,16 @@ function renderMediaInto(container, block){
   container.appendChild(grid);
 
   // アップロードボタン
-  const bar = document.createElement("div"); bar.className = "media-upload-bar";
+  const dz = document.createElement("div"); dz.className = "media-dropzone";
   const input = document.createElement("input");
   input.type = "file"; input.multiple = true; input.style.display = "none";
   const btn = document.createElement("button");
   btn.type = "button"; btn.className = "btn btn-ghost media-add-btn";
   btn.textContent = "＋ 画像・ファイルを追加";
   btn.onclick = ()=> input.click();
-  input.onchange = async ()=>{
-    const files = Array.from(input.files || []);
-    input.value = "";
+  const hint = document.createElement("span"); hint.className = "media-dz-hint";
+  hint.textContent = "またはここにドラッグ＆ドロップ";
+  const handleFiles = async (files)=>{
     for(const file of files){
       const isImg = isImageItem(file);
       try{
@@ -3718,10 +3718,18 @@ function renderMediaInto(container, block){
       }
       renderBlocks();
     }
-
   };
-  bar.appendChild(btn); bar.appendChild(input);
-  container.appendChild(bar);
+  input.onchange = ()=>{ const files = Array.from(input.files || []); input.value = ""; handleFiles(files); };
+  dz.addEventListener("dragover", (e)=>{ e.preventDefault(); e.stopPropagation(); dz.classList.add("is-dragover"); });
+  dz.addEventListener("dragleave", (e)=>{ e.preventDefault(); e.stopPropagation(); dz.classList.remove("is-dragover"); });
+  dz.addEventListener("drop", (e)=>{
+    e.preventDefault(); e.stopPropagation();
+    dz.classList.remove("is-dragover");
+    const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+    if(files.length) handleFiles(files);
+  });
+  dz.appendChild(btn); dz.appendChild(hint); dz.appendChild(input);
+  container.appendChild(dz);
 }
 
 /* ▲▲▲ v1.12.0 追加ここまで ▲▲▲ */
