@@ -1261,11 +1261,6 @@
       "icon": "num:3"
     },
     {
-      "id": "y_renew_multi",
-      "label": "リニューアル必要-複数枚",
-      "icon": "num:3"
-    },
-    {
       "id": "y_mrik3ne8",
       "label": "リニューアル着手中",
       "icon": "num:4"
