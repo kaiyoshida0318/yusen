@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.55.2";
+const VERSION = "1.56.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -2543,6 +2543,59 @@ async function loadFromGitHub(){
 
 function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
 
+/* ---------- 列設定（列名管理）をGitHubで全端末共有 ---------- */
+const COLCFG_PATH = "data/colcfg.json";
+let colCfgSha = null;
+async function fetchColCfgSha(){
+  try{
+    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${COLCFG_PATH}?ref=${cfg.branch}&_=${Date.now()}`;
+    const res = await fetch(url, { cache:"no-store", headers:{ Authorization:`token ${cfg.pat}`, Accept:"application/vnd.github+json" } });
+    if(res.ok){ const j = await res.json(); if(j && j.sha) colCfgSha = j.sha; }
+  }catch(e){ /* 保持 */ }
+}
+async function uploadColCfg(){
+  if(!cfg.pat||!cfg.owner||!cfg.repo){ setStatus("⚠️ 先にGitHub設定（⚙️設定）を入力してください"); return; }
+  const btn = document.getElementById("btnUploadColCfg");
+  if(btn) btn.disabled = true;
+  try{
+    setStatus("列設定をアップロード中…");
+    await fetchColCfgSha();
+    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${COLCFG_PATH}`;
+    const content = b64encode(JSON.stringify(colCfg, null, 2));
+    const body = { message:`update ${COLCFG_PATH}`, content, branch:cfg.branch };
+    if(colCfgSha) body.sha = colCfgSha;
+    const res = await fetch(url, { method:"PUT", headers:{ Authorization:`token ${cfg.pat}`, Accept:"application/vnd.github+json" }, body: JSON.stringify(body) });
+    if(!res.ok){ let m; try{ m=(await res.json()).message; }catch(_){} throw new Error(m || ("HTTP "+res.status)); }
+    const ok = await res.json(); colCfgSha = ok.content ? ok.content.sha : colCfgSha;
+    setStatus("✅ 列設定をアップロードしました（他の端末で「共有ダウンロード」すると同じ設定になります）");
+  }catch(e){
+    setStatus("❌ 列設定のアップロード失敗: " + (e && e.message ? e.message : e));
+  }finally{ if(btn) btn.disabled = false; }
+}
+async function downloadColCfg(){
+  if(!cfg.owner||!cfg.repo){ setStatus("⚠️ 先にGitHub設定（⚙️設定）を入力してください"); return; }
+  const btn = document.getElementById("btnDownloadColCfg");
+  if(btn) btn.disabled = true;
+  try{
+    setStatus("列設定をダウンロード中…");
+    const raw = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${COLCFG_PATH}?t=${Date.now()}`;
+    const res = await fetch(raw, { cache:"no-store" });
+    if(!res.ok) throw new Error("共有設定が見つかりません（先にどこかの端末で『共有アップロード』してください）");
+    const data = await res.json();
+    if(data && typeof data === "object" && !Array.isArray(data)){
+      colCfg = data;
+      saveColCfg();
+      render();
+      renderColManager();
+      setStatus("✅ 列設定をダウンロードして反映しました");
+    }else{
+      throw new Error("設定の形式が不正です");
+    }
+  }catch(e){
+    setStatus("❌ 列設定のダウンロード失敗: " + (e && e.message ? e.message : e));
+  }finally{ if(btn) btn.disabled = false; }
+}
+
 /* ---------- 項目（列）管理 ---------- */
 function openColManager(){
   renderColManager();
@@ -2981,6 +3034,10 @@ function bindUI(){
   document.getElementById("btnManageCols").onclick = openColManager;
   document.getElementById("btnCloseCols").onclick = closeColManager;
   document.getElementById("btnResetCols").onclick = resetColCfg;
+  const btnUploadColCfg = document.getElementById("btnUploadColCfg");
+  if(btnUploadColCfg) btnUploadColCfg.onclick = uploadColCfg;
+  const btnDownloadColCfg = document.getElementById("btnDownloadColCfg");
+  if(btnDownloadColCfg) btnDownloadColCfg.onclick = downloadColCfg;
   const btnDragResize = document.getElementById("btnDragResize");
   if(btnDragResize) btnDragResize.onclick = enterColResizeMode;
   const btnResizeDone = document.getElementById("btnResizeDone");
