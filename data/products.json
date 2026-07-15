@@ -1308,13 +1308,13 @@
       "icon": "num:2"
     },
     {
+      "id": "y_mrloqf90",
+      "label": "着手中"
+    },
+    {
       "id": "y_mreo58aj",
       "label": "完了分",
       "icon": "txt:済@11"
-    },
-    {
-      "id": "y_mrloqf90",
-      "label": "着手中"
     },
     {
       "id": "y_mremf1lq",
