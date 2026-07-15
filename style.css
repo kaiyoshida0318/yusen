@@ -734,8 +734,10 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .cat-list .status-mgr-row + .status-mgr-row{margin-top:2px}
 /* 項目管理モーダル右上の閉じるボタン */
 .modal-status{position:relative}
-.modal-close-x{position:absolute;top:12px;right:14px;width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;z-index:3}
-.modal-close-x:hover{border-color:var(--accent);color:var(--accent)}
+/* モーダルの外側・画面右上に固定する閉じるボタン。本文をスクロールしても常にクリック可能 */
+.modal-close-x{position:fixed;top:16px;right:20px;width:48px;height:48px;border:1px solid var(--border);border-radius:50%;background:#fff;color:var(--text);font-size:28px;line-height:1;cursor:pointer;z-index:60;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.28)}
+.modal-close-x:hover{border-color:var(--accent);color:var(--accent);background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.34)}
+.modal-close-x:active{transform:scale(.94)}
 
 /* 状態行の右端クリアボタン */
 .status-filter-clear{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
