@@ -1348,13 +1348,8 @@
   },
   "makeCounts": [
     {
-      "id": "single",
-      "label": "1枚"
-    },
-    {
       "id": "multi",
-      "label": "複数",
-      "icon": "txt:★"
+      "label": "複数"
     }
   ]
 }
