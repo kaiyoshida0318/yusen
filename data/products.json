@@ -1321,6 +1321,10 @@
       "id": "y_none",
       "label": "不要",
       "icon": "txt:SKIP"
+    },
+    {
+      "id": "y_mrloqf90",
+      "label": "着手中"
     }
   ],
   "markColors": {
