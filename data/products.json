@@ -1298,13 +1298,13 @@
       "icon": "num:1"
     },
     {
-      "id": "y_new",
-      "label": "新規制作予定",
+      "id": "y_renew",
+      "label": "リニュ必要",
       "icon": "num:2"
     },
     {
-      "id": "y_renew",
-      "label": "リニュ必要",
+      "id": "y_new",
+      "label": "新規制作予定",
       "icon": "num:2"
     },
     {
