@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.62.2";
+const VERSION = "1.63.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -815,7 +815,10 @@ function render(){
     tdImg.className="col-image";
     const imgWrap = document.createElement("div"); imgWrap.className="img-cell-multi";
     if(row.image){
-      const im=document.createElement("img"); im.src=imgUrl(row.image); imgWrap.appendChild(im);
+      const im=document.createElement("img"); im.src=imgUrl(row.image);
+      im.className="zoomable"; im.title="クリックで大きく表示";
+      im.addEventListener("click", (e)=>{ e.stopPropagation(); openImageLightbox(im.src); });
+      imgWrap.appendChild(im);
     }else{
       const span=document.createElement("span"); span.className="muted"; span.textContent="—";
       imgWrap.appendChild(span);
@@ -1038,6 +1041,35 @@ function imgUrl(filename){
     return `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${IMG_DIR}/${filename}`;
   }
   return filename;
+}
+
+/* ---------- 画像ライトボックス（クリックで大きく表示） ---------- */
+function openImageLightbox(src){
+  if(!src) return;
+  let ov = document.getElementById("imgLightbox");
+  if(!ov){
+    ov = document.createElement("div");
+    ov.id = "imgLightbox"; ov.className = "img-lightbox"; ov.hidden = true;
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button"; closeBtn.className = "img-lightbox-close";
+    closeBtn.title = "閉じる"; closeBtn.setAttribute("aria-label","閉じる"); closeBtn.textContent = "×";
+    const img = document.createElement("img");
+    img.className = "img-lightbox-img"; img.alt = "";
+    ov.append(closeBtn, img);
+    // オーバーレイのどこをクリックしても閉じる
+    ov.addEventListener("click", closeImageLightbox);
+    document.body.appendChild(ov);
+    // Escで閉じる
+    document.addEventListener("keydown", (e)=>{
+      if(e.key === "Escape" && ov && !ov.hidden) closeImageLightbox();
+    });
+  }
+  ov.querySelector(".img-lightbox-img").src = src;
+  ov.hidden = false;
+}
+function closeImageLightbox(){
+  const ov = document.getElementById("imgLightbox");
+  if(ov) ov.hidden = true;
 }
 
 /* ---------- カスタムドロップダウン（色付きバッジ付き） ----------
@@ -3621,7 +3653,14 @@ function renderMediaInto(container, block){
       const src = it.isDataUrl ? it.ref : imgUrl(it.ref);
       const a = document.createElement("a");
       a.href = src; a.target = "_blank"; a.rel = "noopener";
-      a.title = "クリックで別タブに大きく表示";
+      a.title = "クリックで大きく表示";
+      a.classList.add("zoomable");
+      // 通常クリックはその場で大きく表示。Ctrl/⌘/中クリックは従来通り別タブ
+      a.addEventListener("click", (e)=>{
+        if(e.metaKey || e.ctrlKey || e.button===1) return;
+        e.preventDefault();
+        openImageLightbox(src);
+      });
       const im = document.createElement("img");
       im.src = src;
       im.alt = it.name || "";
