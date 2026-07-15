@@ -1271,11 +1271,6 @@
       "icon": "num:1"
     },
     {
-      "id": "r_new",
-      "label": "新規制作予定",
-      "icon": "num:2"
-    },
-    {
       "id": "r_mrilkjrf",
       "label": "次やる候補",
       "icon": "num:3"
