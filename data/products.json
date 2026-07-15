@@ -1345,5 +1345,16 @@
     "num:2": "#8257c9",
     "num:4": "#2f6fb0",
     "num:5": "#c0392b"
-  }
+  },
+  "makeCounts": [
+    {
+      "id": "single",
+      "label": "1枚"
+    },
+    {
+      "id": "multi",
+      "label": "複数",
+      "icon": "txt:★"
+    }
+  ]
 }
