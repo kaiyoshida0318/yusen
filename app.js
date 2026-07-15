@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.62.1";
+const VERSION = "1.62.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -459,10 +459,11 @@ function renderTabs(){
     const funcRow = document.createElement("div"); funcRow.className = "status-func-row";
     const mcLabel = document.createElement("span"); mcLabel.className = "status-row-label"; mcLabel.textContent = "制作枚数";
     funcRow.appendChild(mcLabel);
-    [{id:"all",label:"全体"}, {id:"none",label:"未設定"}, ...(state.makeCounts||[]).map(m=>({id:m.id,label:(m.label||"").replace(/^[①②③④⑤⑥]\s*/,"")}))].forEach(m=>{
+    [{id:"all",label:"全体"}, {id:"none",label:"未設定"}, ...(state.makeCounts||[]).map(m=>({id:m.id,label:(m.label||"").replace(/^[①②③④⑤⑥]\s*/,""),icon:m.icon}))].forEach(m=>{
       const tab = document.createElement("button");
       tab.className = "status-tab" + (m.id==="none" ? " status-none" : "") + (m.id===currentMakeCount ? " active" : "");
-      tab.innerHTML = `<span class="cat-label">${escapeHtml(m.label)}</span><span class="cat-count">${countForMakeCount(m.id)}</span>`;
+      const icon = (m.id==="all"||m.id==="none") ? "" : statusIconHtml(m.icon);
+      tab.innerHTML = `<span class="status-ico">${icon}</span><span class="cat-label">${escapeHtml(m.label)}</span><span class="cat-count">${countForMakeCount(m.id)}</span>`;
       tab.onclick = ()=>{ currentMakeCount = (currentMakeCount===m.id) ? "all" : m.id; render(); };
       funcRow.appendChild(tab);
     });
