@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.62.0";
+const VERSION = "1.62.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -459,9 +459,9 @@ function renderTabs(){
     const funcRow = document.createElement("div"); funcRow.className = "status-func-row";
     const mcLabel = document.createElement("span"); mcLabel.className = "status-row-label"; mcLabel.textContent = "制作枚数";
     funcRow.appendChild(mcLabel);
-    [{id:"all",label:"全体"}, ...(state.makeCounts||[]).map(m=>({id:m.id,label:(m.label||"").replace(/^[①②③④⑤⑥]\s*/,"")}))].forEach(m=>{
+    [{id:"all",label:"全体"}, {id:"none",label:"未設定"}, ...(state.makeCounts||[]).map(m=>({id:m.id,label:(m.label||"").replace(/^[①②③④⑤⑥]\s*/,"")}))].forEach(m=>{
       const tab = document.createElement("button");
-      tab.className = "status-tab" + (m.id===currentMakeCount ? " active" : "");
+      tab.className = "status-tab" + (m.id==="none" ? " status-none" : "") + (m.id===currentMakeCount ? " active" : "");
       tab.innerHTML = `<span class="cat-label">${escapeHtml(m.label)}</span><span class="cat-count">${countForMakeCount(m.id)}</span>`;
       tab.onclick = ()=>{ currentMakeCount = (currentMakeCount===m.id) ? "all" : m.id; render(); };
       funcRow.appendChild(tab);
@@ -509,7 +509,7 @@ function statusMatchAxis(rowStatus, sel, axis){
   return rowStatus===sel;
 }
 // 制作枚数のマッチ
-function makeCountMatch(v, sel){ if(sel==="all") return true; return (v||"")===sel; }
+function makeCountMatch(v, sel){ if(sel==="all") return true; if(sel==="none") return !v; return (v||"")===sel; }
 // 3軸＋制作枚数すべての現在選択にマッチするか（AND）
 function rowMatchesAllAxes(r){
   return statusMatchAxis(rowStatusOf(r,"status"),  currentStatusByAxis.status,  "status")
