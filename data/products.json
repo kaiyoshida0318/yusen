@@ -1313,13 +1313,13 @@
       "icon": "txt:済@11"
     },
     {
+      "id": "y_mrloqf90",
+      "label": "着手中"
+    },
+    {
       "id": "y_mremf1lq",
       "label": "一旦なしで",
       "icon": "txt:SKIP"
-    },
-    {
-      "id": "y_mrloqf90",
-      "label": "着手中"
     },
     {
       "id": "y_none",
