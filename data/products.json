@@ -985,6 +985,7 @@
     },
     {
       "date": "2026-06-17",
+      "doneDate": "",
       "image": "https://shop.r10s.jp/umiwo/cabinet/photo7/0358_11.jpg",
       "name": "バンドクリップ",
       "expectedSales": 10,
@@ -994,9 +995,13 @@
       "rivalAmazon": [],
       "rankingUrls": [],
       "companyUrls": [],
-      "freeNote": "",
+      "freeNote": "原価0.12元　６個で0.72元　25円",
+      "mediaBlocks": [],
       "category": "new",
       "status": "arrived",
+      "rakutenStatus": "r_pre",
+      "yahooStatus": "y_mremf1lq",
+      "makeCount": "",
       "rakumart": [
         {
           "text": "2026061714363571-2147",
@@ -1004,12 +1009,7 @@
         }
       ],
       "suppliers": [],
-      "tables": [],
-      "doneDate": "",
-      "rakutenStatus": "r_pre",
-      "yahooStatus": "y_mremf1lq",
-      "makeCount": "",
-      "mediaBlocks": []
+      "tables": []
     },
     {
       "date": "2026-06-22",
