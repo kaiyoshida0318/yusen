@@ -1349,7 +1349,8 @@
   "makeCounts": [
     {
       "id": "multi",
-      "label": "複数"
+      "label": "複数",
+      "icon": "txt:★"
     }
   ]
 }
