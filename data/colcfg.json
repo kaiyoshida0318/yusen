@@ -1,0 +1,118 @@
+{
+  "date": {
+    "visible": true,
+    "width": 100,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "image": {
+    "visible": true,
+    "width": 80,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "name": {
+    "visible": true,
+    "width": 200,
+    "wrap": "clip",
+    "align": "left",
+    "headAlign": "center"
+  },
+  "expectedSales": {
+    "visible": true,
+    "width": 85,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "ranking": {
+    "visible": true,
+    "width": 90,
+    "wrap": "clip",
+    "align": "left",
+    "headAlign": "center"
+  },
+  "rivalR": {
+    "visible": true,
+    "width": 98,
+    "wrap": "clip",
+    "headAlign": "center"
+  },
+  "rivalA": {
+    "visible": true,
+    "width": 110,
+    "wrap": "clip",
+    "headAlign": "center"
+  },
+  "rakumart": {
+    "visible": true,
+    "width": 83,
+    "wrap": "clip",
+    "headAlign": "center"
+  },
+  "supply": {
+    "visible": true,
+    "width": 100,
+    "wrap": "clip",
+    "headAlign": "center",
+    "align": "left"
+  },
+  "actions": {
+    "visible": true,
+    "width": 104,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "statusSel": {
+    "visible": true,
+    "width": 166,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "catSel": {
+    "visible": true,
+    "width": 144,
+    "wrap": "wrap",
+    "align": "left",
+    "headAlign": "center"
+  },
+  "doneDate": {
+    "visible": true,
+    "width": 100,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "rakutenSel": {
+    "visible": true,
+    "width": 179,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "yahooSel": {
+    "visible": true,
+    "width": 175,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "makeCount": {
+    "visible": true,
+    "width": 108,
+    "wrap": "clip",
+    "align": "center",
+    "headAlign": "center"
+  },
+  "companyUrls": {
+    "visible": true,
+    "width": 75,
+    "wrap": "clip",
+    "align": "left",
+    "headAlign": "center"
+  }
+}
