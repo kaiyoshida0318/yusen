@@ -326,6 +326,13 @@ tbody td{font-size:13px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
 [hidden]{display:none!important}
 
+/* 画像ライトボックス（クリックで大きく表示） */
+img.zoomable,a.zoomable{cursor:zoom-in}
+.img-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100;cursor:zoom-out;padding:24px}
+.img-lightbox-img{max-width:94vw;max-height:94vh;object-fit:contain;border-radius:6px;background:#fff;box-shadow:0 10px 48px rgba(0,0,0,.55)}
+.img-lightbox-close{position:fixed;top:16px;right:20px;width:48px;height:48px;border:1px solid rgba(255,255,255,.55);border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:28px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:101}
+.img-lightbox-close:hover{background:rgba(0,0,0,.75)}
+
 /* ===================================================================
    ▼▼▼ v1.12.0 追加：ブロック方式の項目追加（v1.15.0 視認性強化） ▼▼▼
    =================================================================== */
