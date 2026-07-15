@@ -1276,14 +1276,14 @@
       "icon": "num:2"
     },
     {
-      "id": "r_mrik2nos",
-      "label": "リニュ着手中",
-      "icon": "num:4"
-    },
-    {
       "id": "r_mrilkjrf",
       "label": "次やる候補",
       "icon": "num:5"
+    },
+    {
+      "id": "r_mrik2nos",
+      "label": "リニュ着手中",
+      "icon": "num:4"
     },
     {
       "id": "r_mreo5165",
