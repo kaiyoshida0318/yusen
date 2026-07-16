@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.63.0";
+const VERSION = "1.63.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -2906,19 +2906,20 @@ function renderMarkColorEditor(list){
   });
 }
 function renderStatusManager(){
+  // 軸切替タブ（商品状態 / 楽天 / Yahoo / 制作枚数 / マーク作成）→ 固定ヘッダーに描画（スクロールしても常に表示）
+  const axisBar = document.getElementById("statusAxisBar");
+  if(axisBar){
+    axisBar.innerHTML = "";
+    [["status","商品状態"],["rakuten","楽天"],["yahoo","Yahoo"],["makeCount","制作枚数"],["marks","マーク作成"]].forEach(([id,lbl])=>{
+      const b = document.createElement("button");
+      b.type="button"; b.className = "status-mgr-axis" + (statusMgrAxis===id ? " active" : "");
+      b.textContent = lbl;
+      b.onclick = ()=>{ statusMgrAxis = id; renderStatusManager(); };
+      axisBar.appendChild(b);
+    });
+  }
   const list = document.getElementById("statusList");
   list.innerHTML = "";
-  // 軸切替タブ（商品状態 / 楽天 / Yahoo / マーク作成）
-  const axisBar = document.createElement("div"); axisBar.className = "status-mgr-axes";
-  [["status","商品状態"],["rakuten","楽天"],["yahoo","Yahoo"],["makeCount","制作枚数"],["marks","マーク作成"]].forEach(([id,lbl])=>{
-    const b = document.createElement("button");
-    b.type="button"; b.className = "status-mgr-axis" + (statusMgrAxis===id ? " active" : "");
-    b.textContent = lbl;
-    b.onclick = ()=>{ statusMgrAxis = id; renderStatusManager(); };
-    axisBar.appendChild(b);
-  });
-  list.appendChild(axisBar);
-
   // マーク作成タブ：各マークの色を設定（全軸共通）
   if(statusMgrAxis==="marks"){
     renderMarkColorEditor(list);
