@@ -1196,6 +1196,100 @@
       "suppliers": [],
       "tables": [],
       "mediaBlocks": []
+    },
+    {
+      "date": "2026-07-16",
+      "doneDate": "",
+      "image": "https://item-shopping.c.yimg.jp/i/n/burariya_tak-24-06_i_20240621143556",
+      "name": "ケーブルボックス",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [
+        "https://shopping.yahoo.co.jp/categoryranking/49249/list"
+      ],
+      "companyUrls": [
+        "https://store.shopping.yahoo.co.jp/burariya/tak-24-06.html?sc_i=shopping-pc-web-result-storesch-rsltlst-img&ea="
+      ],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "s_mrmt4i1m",
+      "rakutenStatus": "r_mreo5165",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": [
+        {
+          "columns": [
+            {
+              "type": "text"
+            },
+            {
+              "type": "text"
+            },
+            {
+              "type": "text"
+            }
+          ],
+          "header": [
+            "",
+            "",
+            ""
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "text": "S/M/L",
+                  "url": ""
+                },
+                {
+                  "text": "楽天通りの価格",
+                  "url": ""
+                },
+                {
+                  "text": "PR30％？？",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "SS/SM/SL/MM/LL/ML",
+                  "url": ""
+                },
+                {
+                  "text": "楽天通りの価格",
+                  "url": ""
+                },
+                {
+                  "text": "PR7%",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "text": "SML",
+                  "url": ""
+                },
+                {
+                  "text": "楽天通りの価格",
+                  "url": ""
+                },
+                {
+                  "text": "PR7%",
+                  "url": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ],
   "categories": [
