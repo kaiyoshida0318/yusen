@@ -1255,6 +1255,10 @@
       "id": "done",
       "label": "完了分",
       "icon": "txt:済@11"
+    },
+    {
+      "id": "s_mrmt4i1m",
+      "label": "半-完了分"
     }
   ],
   "_statusMigV2": true,
