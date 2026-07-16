@@ -643,9 +643,10 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 .col-name-cell .list-edit-input{text-align:center}
 
 /* ステータス管理：番号ピッカーで狭くなる名前入力欄を確保するため横幅を広げる */
-/* 少し下げた位置に固定。ヘッダー（タイトル・追加欄・軸タブ）は固定、リストだけスクロール */
+/* 一覧の1行目が見える位置まで下げる（marginTop/maxHeightはJSで実測して設定）。
+   ヘッダー（タイトル・追加欄・軸タブ）は固定、リストだけスクロール */
 #statusModal{align-items:flex-start}
-.modal.modal-status{width:1200px;max-width:95vw;max-height:86vh;margin-top:7vh;overflow:hidden;display:flex;flex-direction:column}
+.modal.modal-status{width:1200px;max-width:95vw;max-height:86vh;margin-top:40vh;overflow:hidden;display:flex;flex-direction:column}
 .modal-status .status-mgr-head{flex:0 0 auto;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:12px}
 .modal-status .status-mgr-head .status-mgr-axes{margin-bottom:0}
 .modal-status .status-mgr-body{flex:1 1 auto;min-height:0;overflow-y:auto}
