@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.63.1";
+const VERSION = "1.63.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -170,6 +170,11 @@ function init(){
   loadFromGitHub();
   updateStickyHeight();
   window.addEventListener("resize", updateStickyHeight);
+  // 項目管理モーダルが開いているときはリサイズで再配置
+  window.addEventListener("resize", ()=>{
+    const m = document.getElementById("statusModal");
+    if(m && !m.hidden) positionStatusModal();
+  });
   appReady = true;
   // 未保存（GitHub未反映）の変更があるままページを閉じようとしたら確認する
   window.addEventListener("beforeunload", (e)=>{
@@ -2848,9 +2853,30 @@ function addCategory(){
 /* ---------- ステータス管理 ---------- */
 function openStatusManager(){
   renderStatusManager();
+  positionStatusModal();
   document.getElementById("statusModal").hidden = false;
 }
 function closeStatusManager(){ document.getElementById("statusModal").hidden = true; }
+// 項目管理モーダルを「一覧の1行目の下」に配置（1行目が完全に見える位置まで下げる）。
+// 画面サイズに応じて基準位置が変わるため、開くたびに実測して配置する。
+function positionStatusModal(){
+  const box = document.querySelector("#statusModal .modal-status");
+  if(!box) return;
+  const vh = window.innerHeight || 900;
+  let baseY = 0;
+  const firstRow = document.querySelector("#gridBody tr");
+  if(firstRow){
+    baseY = firstRow.getBoundingClientRect().bottom; // 一覧1行目の下端
+  }else{
+    const sticky = document.querySelector(".sticky-top");
+    baseY = sticky ? sticky.getBoundingClientRect().bottom : Math.round(vh*0.35);
+  }
+  let top = Math.round(baseY + 10);
+  // 下げすぎ・上げすぎを防ぐ（画面の12%〜62%の範囲）
+  top = Math.max(Math.round(vh*0.12), Math.min(Math.round(vh*0.62), top));
+  box.style.marginTop = top + "px";
+  box.style.maxHeight = Math.max(240, vh - top - 24) + "px"; // 残り高さに収める（下24px余白）
+}
 
 function statusAxisInfo(axis){
   if(axis==="rakuten")   return { list: state.rakutenStatuses, rowField:"rakutenStatus", hasIcon:true, idPrefix:"r_" };
