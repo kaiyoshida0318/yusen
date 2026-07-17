@@ -1321,11 +1321,6 @@
       "icon": "num:2"
     },
     {
-      "id": "prearrive",
-      "label": "到着前",
-      "icon": "num:3"
-    },
-    {
       "id": "arrived",
       "label": "到着分",
       "icon": "num:4"
