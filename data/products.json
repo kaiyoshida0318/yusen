@@ -1323,7 +1323,7 @@
     {
       "id": "arrived",
       "label": "到着分",
-      "icon": "num:4"
+      "icon": "num:3"
     },
     {
       "id": "renewal",
