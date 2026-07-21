@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.64.0";
+const VERSION = "1.64.1";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -444,23 +444,9 @@ function renderTabs(){
         tab.onclick = ()=>{ selectStatusAxisTab(def.axis, s.id); };
         rowEl.appendChild(tab);
       });
-      // 状態行の一番右に「選択個数モード（1個/複数）」＋その下に「クリア」ボタン
+      // 状態行の一番右に「クリア」ボタン（全ての絞り込みをリセット）
       if(def.axis==="status"){
         const sp = document.createElement("span"); sp.className = "func-spacer"; rowEl.appendChild(sp);
-        const rightCol = document.createElement("div"); rightCol.className = "status-right-col";
-        // 選択個数モード切替
-        const modeWrap = document.createElement("div"); modeWrap.className = "select-mode-wrap";
-        const modeLbl = document.createElement("span"); modeLbl.className = "select-mode-label"; modeLbl.textContent = "選択個数";
-        const singleBtn = document.createElement("button");
-        singleBtn.className = "select-mode-btn" + (filterSelectMode==="single" ? " active" : "");
-        singleBtn.textContent = "1個"; singleBtn.title = "1軸だけ絞り込む（他を選ぶと前の選択は全体に戻る）";
-        singleBtn.onclick = ()=> setFilterSelectMode("single");
-        const multiBtn = document.createElement("button");
-        multiBtn.className = "select-mode-btn" + (filterSelectMode==="multi" ? " active" : "");
-        multiBtn.textContent = "複数"; multiBtn.title = "状態・楽天・Yahoo・制作枚数を組み合わせて絞り込む";
-        multiBtn.onclick = ()=> setFilterSelectMode("multi");
-        modeWrap.append(modeLbl, singleBtn, multiBtn);
-        // クリア
         const clr = document.createElement("button");
         clr.className = "status-filter-clear";
         clr.textContent = "クリア";
@@ -470,8 +456,7 @@ function renderTabs(){
           currentMakeCount = "all";
           render();
         };
-        rightCol.append(modeWrap, clr);
-        rowEl.appendChild(rightCol);
+        rowEl.appendChild(clr);
       }
       swrap.appendChild(rowEl);
     });
@@ -490,6 +475,7 @@ function renderTabs(){
     });
     const funcSpacer = document.createElement("span"); funcSpacer.className = "func-spacer";
     funcRow.appendChild(funcSpacer);
+    funcRow.appendChild(buildSelectModeToggle()); // 一括削除の左に「選択個数」トグル
     funcRow.appendChild(buildFuncButtons());
     swrap.appendChild(funcRow);
 
@@ -554,6 +540,20 @@ function selectMakeCountTab(id){
     currentMakeCount = next;
   }
   render();
+}
+// 選択個数のスライドトグル（同じ場所をクリックでON/OFF、ツマミが左右に動く）
+function buildSelectModeToggle(){
+  const wrap = document.createElement("button");
+  wrap.type = "button";
+  wrap.className = "select-mode-toggle" + (filterSelectMode==="multi" ? " is-multi" : " is-single");
+  wrap.title = "選択個数：1個（1軸だけ）⇄ 複数（組み合わせ）";
+  wrap.setAttribute("aria-label", "選択個数モード");
+  wrap.innerHTML =
+    `<span class="smt-side smt-left">1個</span>`+
+    `<span class="smt-track"><span class="smt-knob"></span></span>`+
+    `<span class="smt-side smt-right">複数</span>`;
+  wrap.onclick = ()=> setFilterSelectMode(filterSelectMode==="single" ? "multi" : "single");
+  return wrap;
 }
 function setFilterSelectMode(mode){
   if(mode!=="single" && mode!=="multi") return;
