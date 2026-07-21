@@ -756,14 +756,15 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 /* 状態行の右端クリアボタン */
 .status-filter-clear{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
 .status-filter-clear:hover{border-color:var(--accent);color:var(--accent)}
-/* 絞り込みの選択個数モード（1個/複数）。クリアの上に配置 */
-.status-right-col{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.status-right-col .status-filter-clear{width:100%}
-.select-mode-wrap{display:flex;align-items:center;gap:4px}
-.select-mode-label{font-size:12px;font-weight:600;color:var(--muted);margin-right:2px}
-.select-mode-btn{background:#fff;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
-.select-mode-btn:hover{border-color:var(--accent);color:var(--accent)}
-.select-mode-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* 絞り込みの選択個数トグル（1個⇄複数）。一括削除の左に配置。同じ場所クリックでON/OFF */
+.select-mode-toggle{display:inline-flex;align-items:center;gap:6px;background:transparent;border:none;cursor:pointer;padding:0;font:inherit;margin-right:8px}
+.select-mode-toggle .smt-side{font-size:12px;font-weight:600;color:var(--muted);transition:color .15s;line-height:1}
+.select-mode-toggle.is-single .smt-left{color:var(--accent)}
+.select-mode-toggle.is-multi .smt-right{color:var(--accent)}
+.select-mode-toggle .smt-track{position:relative;width:40px;height:22px;border-radius:999px;background:var(--border);transition:background .15s;flex:0 0 auto}
+.select-mode-toggle.is-multi .smt-track{background:var(--accent)}
+.select-mode-toggle .smt-knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
+.select-mode-toggle.is-multi .smt-knob{left:20px}
 
 /* マーク作成（色マスター設定） */
 .mark-color-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:#fff;border:1.5px solid var(--border);border-radius:8px;margin-bottom:6px}
