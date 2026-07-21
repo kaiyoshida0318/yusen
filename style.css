@@ -756,6 +756,14 @@ tbody tr:nth-child(even) .list-edit-cell{background:#fbeee9}
 /* 状態行の右端クリアボタン */
 .status-filter-clear{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
 .status-filter-clear:hover{border-color:var(--accent);color:var(--accent)}
+/* 絞り込みの選択個数モード（1個/複数）。クリアの上に配置 */
+.status-right-col{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.status-right-col .status-filter-clear{width:100%}
+.select-mode-wrap{display:flex;align-items:center;gap:4px}
+.select-mode-label{font-size:12px;font-weight:600;color:var(--muted);margin-right:2px}
+.select-mode-btn{background:#fff;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+.select-mode-btn:hover{border-color:var(--accent);color:var(--accent)}
+.select-mode-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
 /* マーク作成（色マスター設定） */
 .mark-color-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:#fff;border:1.5px solid var(--border);border-radius:8px;margin-bottom:6px}
