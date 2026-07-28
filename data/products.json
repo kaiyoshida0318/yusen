@@ -1311,6 +1311,29 @@
           ]
         }
       ]
+    },
+    {
+      "date": "2026-07-28",
+      "doneDate": "",
+      "image": "",
+      "name": "IHマット　ih-25-03",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [
+        "https://item.rakuten.co.jp/yukaiya/10001305/"
+      ],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "s_mrin1a5d",
+      "rakutenStatus": "",
+      "yahooStatus": "y_pre",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
