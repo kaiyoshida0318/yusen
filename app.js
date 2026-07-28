@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.64.1";
+const VERSION = "1.64.2";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -328,6 +328,9 @@ function migrate(data){
   return data;
 }
 function persistLocal(){
+  // 実際のローカル変更のときだけ保存時刻を更新（リモート取り込み中=suppressAutoSaveは除く）。
+  // これで再読込時に「ローカルが新しいか」を判定でき、作成直後データの消失を防ぐ。
+  if(appReady && !suppressAutoSave){ state._savedAt = Date.now(); }
   try{
     localStorage.setItem(LS_DATA, JSON.stringify(state));
     if(appReady && !suppressAutoSave) markDirty();
@@ -2596,20 +2599,45 @@ async function fetchDataSha(){
 async function loadFromGitHub(){
   if(!cfg.owner||!cfg.repo) return;
   try{
-    const raw = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${DATA_PATH}?t=${Date.now()}`;
-    const res = await fetch(raw);
-    if(res.ok){
-      const data = await res.json();
-      if(data && Array.isArray(data.rows)){
-        suppressAutoSave = true;
-        state = migrate(data); persistLocal(); render();
-        suppressAutoSave = false;
+    let data = null, sha = null;
+    // PATがあれば認証付きContents APIで“最新”を取得。
+    // ※ raw.githubusercontent.com はCDNキャッシュで古い版を返すことがあり、
+    //   保存直後の再読込で作成データが消える原因になっていたため。
+    if(cfg.pat){
+      const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${DATA_PATH}?ref=${cfg.branch}&_=${Date.now()}`;
+      const res = await fetch(url, { cache:"no-store", headers:{ Authorization:`token ${cfg.pat}`, Accept:"application/vnd.github+json" } });
+      if(res.ok){
+        const j = await res.json();
+        sha = j.sha || null;
+        if(j.content){ try{ data = JSON.parse(b64decode(j.content)); }catch(_){ data = null; } }
       }
     }
+    // PAT未設定など：公開rawから取得（フォールバック）
+    if(!data){
+      const raw = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch}/${DATA_PATH}?t=${Date.now()}`;
+      const res2 = await fetch(raw, { cache:"no-store" });
+      if(res2.ok){ try{ data = await res2.json(); }catch(_){ data = null; } }
+    }
+    if(sha) dataSha = sha; // 正しいSHAを控えて以後の保存の競合を防ぐ
+    if(!(data && Array.isArray(data.rows))) return;
+    const localEmpty = !state || !Array.isArray(state.rows) || state.rows.length===0;
+    const localT  = Number(state && state._savedAt) || 0;
+    const remoteT = Number(data._savedAt) || 0;
+    // 未保存のローカル変更、またはローカルの方が新しい場合はリモートで上書きしない
+    // （新規作成直後や、前回pushが未完了のケースでのデータ消失を防ぐ）
+    if(!localEmpty && (ghDirty || remoteT <= localT)){
+      // ローカルが新しい＝リモートが古い（前回pushが未完了など）。設定済みなら同期のため再push。
+      if(!ghDirty && remoteT < localT && cfg.pat) markDirty();
+      return;
+    }
+    suppressAutoSave = true;
+    state = migrate(data); persistLocal(); render();
+    suppressAutoSave = false;
   }catch(e){ /* 初回はファイルが無いので無視 */ }
 }
 
 function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
+function b64decode(b64){ return decodeURIComponent(escape(atob((b64||"").replace(/\s/g,"")))); }
 
 /* ---------- 列設定（列名管理）をGitHubで全端末共有 ---------- */
 const COLCFG_PATH = "data/colcfg.json";
