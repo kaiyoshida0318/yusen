@@ -1015,7 +1015,7 @@
       "date": "2026-06-22",
       "doneDate": "2026-07-10",
       "image": "https://shop.r10s.jp/yukaiya/cabinet/si/si-26a-01-b-01.jpg",
-      "name": "耳ツボ　スティック",
+      "name": "耳ツボ　スティック　si-26-01",
       "expectedSales": 2,
       "rivalRakuten": [],
       "rivalAmazon": [],
@@ -1026,8 +1026,12 @@
         "https://item.rakuten.co.jp/yukaiya/10001325/"
       ],
       "freeNote": "",
+      "mediaBlocks": [],
       "category": "rakuten",
       "status": "s_mrin1a5d",
+      "rakutenStatus": "r_mreo5165",
+      "yahooStatus": "y_pre",
+      "makeCount": "",
       "rakumart": [],
       "suppliers": [],
       "tables": [
@@ -1111,11 +1115,7 @@
             }
           ]
         }
-      ],
-      "rakutenStatus": "r_mreo5165",
-      "yahooStatus": "y_pre",
-      "makeCount": "",
-      "mediaBlocks": []
+      ]
     },
     {
       "date": "2026-06-26",
@@ -1762,5 +1762,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785224115924
+  "_savedAt": 1785224178582
 }
