@@ -1182,20 +1182,24 @@
       ],
       "companyUrls": [],
       "freeNote": "",
+      "mediaBlocks": [],
       "category": "new",
-      "status": "renewal",
-      "rakutenStatus": "r_mrik2nos",
+      "status": "bought",
+      "rakutenStatus": "r_mrilkjrf",
       "yahooStatus": "y_mremf1lq",
       "makeCount": "",
       "rakumart": [
+        {
+          "text": "2026072812410670-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026072812410670-2147"
+        },
         {
           "text": "2026071017123731-2147",
           "url": "https://www.rakumart.com/OrderDetails?order_sn=2026071017123731-2147"
         }
       ],
       "suppliers": [],
-      "tables": [],
-      "mediaBlocks": []
+      "tables": []
     },
     {
       "date": "2026-07-16",
