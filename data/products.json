@@ -1472,6 +1472,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-07-28",
+      "doneDate": "",
+      "image": "img_ms4c242x_492.webp",
+      "name": "脇汗パッド さらリーナ　ih-25-02",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [
+        "https://item.rakuten.co.jp/yukaiya/10001303/"
+      ],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "s_mrin1a5d",
+      "rakutenStatus": "",
+      "yahooStatus": "y_pre",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -1624,5 +1647,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785223586231
+  "_savedAt": 1785223649376
 }
