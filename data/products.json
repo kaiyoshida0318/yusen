@@ -1338,27 +1338,6 @@
     {
       "date": "2026-07-28",
       "doneDate": "",
-      "image": "img_ms4bcoec_815.webp",
-      "name": "",
-      "expectedSales": 0,
-      "rivalRakuten": [],
-      "rivalAmazon": [],
-      "rankingUrls": [],
-      "companyUrls": [],
-      "freeNote": "",
-      "mediaBlocks": [],
-      "category": "",
-      "status": "",
-      "rakutenStatus": "",
-      "yahooStatus": "",
-      "makeCount": "",
-      "rakumart": [],
-      "suppliers": [],
-      "tables": []
-    },
-    {
-      "date": "2026-07-28",
-      "doneDate": "",
       "image": "img_ms4bsjid_537.webp",
       "name": "joy-conカバー　si-25-05",
       "expectedSales": 0,
@@ -1530,5 +1509,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785223202729
+  "_savedAt": 1785223214572
 }
