@@ -1495,6 +1495,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-07-28",
+      "doneDate": "",
+      "image": "img_ms4c3319_472.jpg",
+      "name": "プロテクションフィルム 4パターン  ca-02-01",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [
+        "https://store.shopping.yahoo.co.jp/yukaiya/ca-02-01-hera.html?sc_i=shopping-pc-web-result-storesch-rsltlst-title&ea="
+      ],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "s_mrin1a5d",
+      "rakutenStatus": "",
+      "yahooStatus": "y_pre",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -1647,5 +1670,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785223649376
+  "_savedAt": 1785223723851
 }
