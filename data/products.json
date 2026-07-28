@@ -1182,7 +1182,24 @@
       ],
       "companyUrls": [],
       "freeNote": "",
-      "mediaBlocks": [],
+      "mediaBlocks": [
+        {
+          "items": [
+            {
+              "kind": "image",
+              "name": "1dccdd0501fef4712dcc4e454e05f00b.png",
+              "ref": "img_ms4al0f7_775.png",
+              "isDataUrl": false
+            },
+            {
+              "kind": "file",
+              "name": "噛み噛みネックレス1.xlsx",
+              "ref": "img_ms4akh3c_4.xlsx",
+              "isDataUrl": false
+            }
+          ]
+        }
+      ],
       "category": "new",
       "status": "bought",
       "rakutenStatus": "r_mrilkjrf",
