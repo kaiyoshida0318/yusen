@@ -1426,6 +1426,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-07-28",
+      "doneDate": "",
+      "image": "img_ms4bzlry_145.webp",
+      "name": "携帯トイレ700　eq-22-05-toilet",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [
+        "https://item.rakuten.co.jp/yukaiya/10001267/"
+      ],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "s_mrin1a5d",
+      "rakutenStatus": "",
+      "yahooStatus": "y_pre",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -1578,5 +1601,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785223485664
+  "_savedAt": 1785223532846
 }
