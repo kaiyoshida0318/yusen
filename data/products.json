@@ -798,7 +798,7 @@
       "date": "2026-06-01",
       "doneDate": "2026-06-01",
       "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/yukaiya/cabinet/si/si-24-03-01.jpg",
-      "name": "汗取りパッド",
+      "name": "汗取りパッド　si-24-03",
       "expectedSales": 4,
       "rivalRakuten": [
         "https://item.rakuten.co.jp/e-monoplus/sw20/"
@@ -809,8 +809,12 @@
       ],
       "companyUrls": [],
       "freeNote": "",
+      "mediaBlocks": [],
       "category": "rakuten",
       "status": "s_mrin1a5d",
+      "rakutenStatus": "r_mreo5165",
+      "yahooStatus": "y_pre",
+      "makeCount": "",
       "rakumart": [],
       "suppliers": [],
       "tables": [
@@ -863,11 +867,7 @@
             }
           ]
         }
-      ],
-      "rakutenStatus": "r_mreo5165",
-      "yahooStatus": "y_pre",
-      "makeCount": "",
-      "mediaBlocks": []
+      ]
     },
     {
       "date": "2026-06-01",
@@ -1762,5 +1762,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785224073889
+  "_savedAt": 1785224115924
 }
