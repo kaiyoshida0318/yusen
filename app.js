@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.64.2";
+const VERSION = "1.64.3";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -3124,6 +3124,11 @@ function addStatus(){
 /* ---------- 設定モーダル ---------- */
 function openSettings(){
   document.getElementById("cfgPat").value = cfg.pat;
+  // PATは毎回マスク状態で開く
+  const patInp = document.getElementById("cfgPat");
+  const patTgl = document.getElementById("btnTogglePat");
+  if(patInp) patInp.type = "password";
+  if(patTgl) patTgl.textContent = "👁 表示";
   document.getElementById("cfgOwner").value = cfg.owner || "kaiyoshida0318";
   document.getElementById("cfgRepo").value = cfg.repo || "yusen";
   document.getElementById("cfgBranch").value = cfg.branch || "main";
@@ -3216,6 +3221,15 @@ function bindUI(){
       const showing = !wrap.hidden;
       wrap.hidden = showing;
       btnToggleAdv.textContent = (showing ? "▶" : "▼") + " 詳細設定（オーナー／リポジトリ／ブランチ）";
+    };
+  }
+  const btnTogglePat = document.getElementById("btnTogglePat");
+  if(btnTogglePat){
+    btnTogglePat.onclick = ()=>{
+      const inp = document.getElementById("cfgPat");
+      const masked = inp.type === "password";
+      inp.type = masked ? "text" : "password";
+      btnTogglePat.textContent = masked ? "🙈 隠す" : "👁 表示";
     };
   }
   document.getElementById("btnCloseCat").onclick = closeCatManager;
