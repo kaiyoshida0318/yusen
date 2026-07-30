@@ -1610,6 +1610,30 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-07-30",
+      "doneDate": "",
+      "image": "img_ms72g9j9_426.jpg",
+      "name": "排水口ゴミ受け si-21-01 cg-22-01",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [
+        "https://store.shopping.yahoo.co.jp/yukaiya/si-21-01.html",
+        "https://item.rakuten.co.jp/yukaiya/10001135/?l-id=shoptop_widget_item_list"
+      ],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "s_mrin1a5d",
+      "rakutenStatus": "",
+      "yahooStatus": "y_pre",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -1762,5 +1786,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785380550263
+  "_savedAt": 1785389004213
 }
