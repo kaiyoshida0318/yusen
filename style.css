@@ -482,6 +482,11 @@ img.zoomable,a.zoomable{cursor:zoom-in}
   padding:6px 0;margin:-4px 0 10px;cursor:pointer;text-align:left;display:block;
 }
 .btn-toggle-advanced:hover{color:var(--accent)}
+/* PAT入力欄の表示/非表示トグル */
+.pat-input-wrap{display:flex;gap:6px;align-items:center;margin-top:5px}
+.pat-input-wrap #cfgPat{flex:1 1 auto;margin-top:0}
+.pat-toggle{flex:0 0 auto;white-space:nowrap;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+.pat-toggle:hover{border-color:var(--accent);color:var(--accent)}
 
 /* 画像アップロード中オーバーレイ（スピナー＋経過秒） */
 .upload-overlay{
