@@ -1163,7 +1163,7 @@
       "tables": [],
       "doneDate": "",
       "rakutenStatus": "r_mreo5165",
-      "yahooStatus": "y_renew",
+      "yahooStatus": "y_pre",
       "makeCount": "",
       "mediaBlocks": []
     },
@@ -1786,5 +1786,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785744212935
+  "_savedAt": 1785744216065
 }
