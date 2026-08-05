@@ -1670,7 +1670,9 @@
       "image": "https://image.rakuten.co.jp/phoenix-loupe/cabinet/nsm/1-10000017.jpg",
       "name": "ジュエリールーペ（低単価）",
       "expectedSales": 0,
-      "rivalRakuten": [],
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/phoenix-loupe/10000017/?iasid=07rpp_10095___30-msfqa7l9-1k-367bd0c5-015a-4639-82f8-36400c015b88"
+      ],
       "rivalAmazon": [],
       "rankingUrls": [],
       "companyUrls": [],
@@ -1836,5 +1838,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785912707487
+  "_savedAt": 1785912779748
 }
