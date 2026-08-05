@@ -1686,7 +1686,7 @@
       "freeNote": "",
       "mediaBlocks": [],
       "category": "",
-      "status": "nextup",
+      "status": "buy",
       "rakutenStatus": "",
       "yahooStatus": "",
       "makeCount": "",
@@ -1899,5 +1899,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785920631358
+  "_savedAt": 1785920632784
 }
