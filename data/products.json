@@ -1679,7 +1679,7 @@
       "freeNote": "",
       "mediaBlocks": [],
       "category": "",
-      "status": "",
+      "status": "nextup",
       "rakutenStatus": "",
       "yahooStatus": "",
       "makeCount": "",
@@ -1867,5 +1867,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785916240497
+  "_savedAt": 1785916242051
 }
