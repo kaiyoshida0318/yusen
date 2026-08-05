@@ -1655,7 +1655,13 @@
       "yahooStatus": "",
       "makeCount": "",
       "rakumart": [],
-      "suppliers": [],
+      "suppliers": [
+        {
+          "image": "",
+          "url": "https://detail.1688.com/offer/701980712870.html?kj_agent_plugin=aliprice&fromkv=xytTrace:0b52090217859112218172574e0be3&token=qkn0CmlZhKNQcFPweTKdA2vuiJFHCft7hzmcmY3RvCmOOjMV8KRVq2BasGUCikzO",
+          "memo": ""
+        }
+      ],
       "tables": []
     }
   ],
@@ -1809,5 +1815,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785910349338
+  "_savedAt": 1785911638997
 }
