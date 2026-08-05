@@ -416,28 +416,30 @@
     },
     {
       "date": "2026-06-01",
+      "doneDate": "",
       "image": "img_mpusoycx_511.webp",
       "name": "ボールグラッパー",
+      "expectedSales": 0,
       "rivalRakuten": [
+        "https://item.rakuten.co.jp/rinrinrin/bpo-0005/",
+        "https://item.rakuten.co.jp/auc-roque/tool-grapper/",
         "https://item.rakuten.co.jp/three-lack-store/2024061401/"
       ],
       "rivalAmazon": [],
       "rankingUrls": [
         "https://ranking.rakuten.co.jp/daily/100532/"
       ],
+      "companyUrls": [],
       "freeNote": "\n\n<!--StartFragment--><table width=\"247px\" style=\"width: 247px;\" data-pm-slice=\"1 1 []\" data-en-clipboard=\"true\"><colgroup><col style=\"width: 151px;\"><col style=\"width: 96px;\"></colgroup><tbody><tr><td style=\"background-color:rgb(234, 234, 234);color:#333;border-color:hsl(0, 0%, 73.4%);border-width:1px;border-style:solid;padding:10px;\" data-colwidth=\"151\"><div draggable=\"false\">主要トラフィックワード</div><div draggable=\"false\">（amazonセラスプ）</div></td><td style=\"background-color:rgb(234, 234, 234);color:#333;border-color:hsl(0, 0%, 73.4%);border-width:1px;border-style:solid;padding:10px;\" data-colwidth=\"96\"><div draggable=\"false\">月間検索数</div></td></tr><tr><td style=\"border-color:#ccc;border-width:1px;border-style:solid;padding:10px;\" data-colwidth=\"151\"><div draggable=\"false\">ボディピアス</div></td><td style=\"border-color:#ccc;border-width:1px;border-style:solid;padding:10px;\" data-colwidth=\"96\"><div draggable=\"false\">8122</div></td></tr><tr><td style=\"border-color:#ccc;border-width:1px;border-style:solid;padding:10px;\" data-colwidth=\"151\"><div draggable=\"false\">ピアス　キャッチ</div></td><td style=\"border-color:#ccc;border-width:1px;border-style:solid;padding:10px;\" data-colwidth=\"96\"><div draggable=\"false\">3602</div></td></tr><tr><td style=\"border-color:#ccc;border-width:1px;border-style:solid;padding:10px;\" data-colwidth=\"151\"><div draggable=\"false\">ボールグラッパー</div></td><td style=\"border-color:#ccc;border-width:1px;border-style:solid;padding:10px;\" data-colwidth=\"96\"><div draggable=\"false\">1287</div></td></tr></tbody></table><!--EndFragment-->\n\n<br>",
+      "mediaBlocks": [],
       "category": "new",
       "status": "arrived",
-      "rakumart": [],
-      "suppliers": [],
-      "tables": [],
-      "expectedSales": 0,
-      "companyUrls": [],
-      "doneDate": "",
       "rakutenStatus": "r_mrik2nos",
       "yahooStatus": "y_mremf1lq",
       "makeCount": "",
-      "mediaBlocks": []
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     },
     {
       "date": "2026-06-01",
@@ -1867,5 +1869,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785918395418
+  "_savedAt": 1785919581368
 }
