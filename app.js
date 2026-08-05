@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.64.3";
+const VERSION = "1.64.4";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -129,13 +129,22 @@ let appReady = false;         // 初期化完了フラグ（初期ロード中�
 let ghDirty = false;          // GitHub未反映の変更があるか
 let autoSaveTimer = null;     // 自動保存のデバウンス
 let suppressAutoSave = false; // GitHub読込直後など、自動保存を一時抑制
+let authInvalid = false;      // PATが無効/期限切れ（401）。復旧まで自動保存を止める
 // 変更が起きたら未保存フラグを立て、少し待ってから自動でGitHub保存
 function markDirty(){ ghDirty = true; scheduleAutoSave(); }
 function scheduleAutoSave(){
   if(!appReady || suppressAutoSave) return;
+  if(authInvalid) return; // トークンが無効な間は無駄打ちしない（401連発を防止）
   if(!(cfg.pat && cfg.owner && cfg.repo)) return; // GitHub未設定なら自動保存しない
   clearTimeout(autoSaveTimer);
   autoSaveTimer = setTimeout(()=>{ saveToGitHub().catch(()=>{}); }, 800);
+}
+// 401など認証エラーの判定
+function isAuthError(e){
+  if(!e) return false;
+  if(e.authError) return true;
+  const m = (e.message||"")+"";
+  return /bad credentials/i.test(m) || /\b401\b/.test(m) || /requires authentication/i.test(m);
 }
 let currentCat = "all"; // 現在選択中のカテゴリID（上段）
 let statusMgrAxis = "status"; // ステータス管理モーダルで編集中の軸
@@ -2171,7 +2180,13 @@ async function handleImageFile(file, obj, key, cb, containerEl){
     if(!viewmode) setStatus("✅ 画像アップロード完了");
   }catch(e){
     if(overlay) overlay.stop("❌");
-    setStatus("❌ 画像アップロード失敗: "+e.message);
+    if(isAuthError(e)){
+      authInvalid = true;
+      setStatus("❌ GitHubトークンが無効か期限切れです。⚙️設定から新しいPATを入力してください");
+      try{ openSettings(); }catch(_){}
+    }else{
+      setStatus("❌ 画像アップロード失敗: "+e.message);
+    }
   }
 }
 
@@ -2377,7 +2392,9 @@ async function uploadImage(file){
   if(!res.ok){
     const m = (await res.json()).message || res.status;
     logError("uploadImage: 失敗", { filename, status: res.status, msg: m });
-    throw new Error(m);
+    const err = new Error(m);
+    if(res.status===401 || res.status===403){ err.authError = true; authInvalid = true; }
+    throw err;
   }
   logInfo("uploadImage: 成功", { filename });
   return filename;
@@ -2464,20 +2481,34 @@ async function saveToGitHub(){
         await putDataJson();
         setStatus("✅ GitHubに保存しました");
         ghDirty = false;
+        authInvalid = false; // 保存できたのでトークンは有効
         if(prog) prog.success("GitHubに保存しました");
       }catch(e){
-        const msg = "❌ 保存失敗: "+(e && e.message ? e.message : e);
-        setStatus(msg);
-        if(prog) prog.error(msg);
+        if(isAuthError(e)){
+          // トークン失効/無効：無駄なリトライを止め、原因と対処を明確に案内
+          authInvalid = true;
+          saveToGitHubPending = false;
+          clearTimeout(autoSaveTimer);
+          const msg = "❌ GitHubトークンが無効か期限切れです。⚙️設定から新しいPATを入力してください（保存はローカルには残っています）";
+          setStatus(msg);
+          if(prog) prog.error("トークン無効/期限切れ：設定を確認してください");
+          try{ openSettings(); }catch(_){}
+        }else{
+          const msg = "❌ 保存失敗: "+(e && e.message ? e.message : e);
+          setStatus(msg);
+          if(prog) prog.error(msg);
+        }
       }
     }finally{
       saveToGitHubRunning = null;
       if(btn) btn.disabled = false;
-      // 実行中に追加呼び出しがあった場合、最新の state でもう一度保存
-      if(saveToGitHubPending){
+      // 実行中に追加呼び出しがあった場合、最新の state でもう一度保存（認証エラー中は再実行しない）
+      if(saveToGitHubPending && !authInvalid){
         saveToGitHubPending = false;
         // 即座にではなく、競合を避けるため少し待ってから最新stateで再保存
         setTimeout(()=>{ saveToGitHub(); }, 300);
+      }else{
+        saveToGitHubPending = false;
       }
     }
   })();
@@ -2515,7 +2546,9 @@ async function putDataJson(){
       (/sha/i.test(msg) && /match/i.test(msg));
     logWarn(`putDataJson: PUT失敗 attempt=${attempt}`, { status: res.status, msg, looksLikeShaMismatch });
     if(!looksLikeShaMismatch){
-      throw new Error(msg);
+      const err = new Error(msg);
+      if(res.status===401 || res.status===403) err.authError = true;
+      throw err;
     }
     const wait = Math.min(2500, 500 + 300 * attempt); // 500ms→最大2.5sの短い待機
     setStatus(`⚠️ 競合検出。最新版に追従して再保存中…(${attempt+1}回目, ${wait}ms待機)`);
@@ -3236,13 +3269,18 @@ function bindUI(){
   document.getElementById("btnAddCat").onclick = addCategory;
   document.getElementById("newCatLabel").addEventListener("keydown", e=>{ if(e.key==="Enter") addCategory(); });
   document.getElementById("btnSaveSettings").onclick = ()=>{
+    const prevPat = cfg.pat;
     cfg.pat = document.getElementById("cfgPat").value.trim();
     cfg.owner = document.getElementById("cfgOwner").value.trim() || "kaiyoshida0318";
     cfg.repo = document.getElementById("cfgRepo").value.trim() || "yusen";
     cfg.branch = document.getElementById("cfgBranch").value.trim() || "main";
     saveCfg(); closeSettings();
     setStatus("✅ 設定を保存しました");
+    // 新しいPATが入ったので認証エラー状態を解除。SHAは取り直し、未保存分があれば再保存
+    if(cfg.pat !== prevPat){ authInvalid = false; dataSha = null; }
     loadFromGitHub();
+    // トークン更新後、未反映のローカル変更があればGitHubへ再保存を試みる
+    if(cfg.pat && ghDirty){ setStatus("新しいトークンで保存を再試行中…"); saveToGitHub().catch(()=>{}); }
   };
   // ログモーダル
   document.getElementById("btnViewLog").onclick = openLogModal;
