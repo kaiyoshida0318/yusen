@@ -1693,29 +1693,6 @@
       "tables": []
     },
     {
-      "date": "2026-08-05",
-      "doneDate": "",
-      "image": "https://image.rakuten.co.jp/phoenix-loupe/cabinet/nsm/1-10000005.jpg",
-      "name": "ルーペ",
-      "expectedSales": 0,
-      "rivalRakuten": [
-        "https://item.rakuten.co.jp/phoenix-loupe/10000005/?s-id=rk_shop_pc_rnkInShop"
-      ],
-      "rivalAmazon": [],
-      "rankingUrls": [],
-      "companyUrls": [],
-      "freeNote": "",
-      "mediaBlocks": [],
-      "category": "",
-      "status": "",
-      "rakutenStatus": "",
-      "yahooStatus": "",
-      "makeCount": "",
-      "rakumart": [],
-      "suppliers": [],
-      "tables": []
-    },
-    {
       "date": "2026-08-06",
       "doneDate": "",
       "image": "https://shop.r10s.jp/grancraft/cabinet/compass1757294291.jpg",
@@ -1887,5 +1864,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785914810515
+  "_savedAt": 1785914846932
 }
