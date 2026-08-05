@@ -1634,6 +1634,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-08-05",
+      "doneDate": "",
+      "image": "https://image.rakuten.co.jp/smarttime/cabinet/kogu/rupe/f302811.jpg",
+      "name": "ジュエリールーペ",
+      "expectedSales": 0,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/smarttime/f30281/"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -1786,5 +1809,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785907290700
+  "_savedAt": 1785910349338
 }
