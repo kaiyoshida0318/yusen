@@ -1718,7 +1718,7 @@
     {
       "date": "2026-08-05",
       "doneDate": "",
-      "image": "",
+      "image": "https://shop.r10s.jp/grancraft/cabinet/compass1757294291.jpg",
       "name": "ジュエリールーペ",
       "expectedSales": 0,
       "rivalRakuten": [],
@@ -1887,5 +1887,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785914670640
+  "_savedAt": 1785914687435
 }
