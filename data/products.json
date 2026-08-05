@@ -1714,6 +1714,27 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-08-05",
+      "doneDate": "",
+      "image": "",
+      "name": "ジュエリールーペ",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -1866,5 +1887,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785914356732
+  "_savedAt": 1785914670640
 }
