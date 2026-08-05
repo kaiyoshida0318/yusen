@@ -485,6 +485,8 @@ img.zoomable,a.zoomable{cursor:zoom-in}
 /* PAT入力欄の表示/非表示トグル */
 .pat-input-wrap{display:flex;gap:6px;align-items:center;margin-top:5px}
 .pat-input-wrap #cfgPat{flex:1 1 auto;margin-top:0}
+/* type=password を使わずCSSでマスク（Chromeのパスワード保存ダイアログを出さないため） */
+.pat-masked{-webkit-text-security:disc;text-security:disc}
 .pat-toggle{flex:0 0 auto;white-space:nowrap;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
 .pat-toggle:hover{border-color:var(--accent);color:var(--accent)}
 
