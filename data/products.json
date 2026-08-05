@@ -1647,7 +1647,7 @@
       "rivalAmazon": [],
       "rankingUrls": [],
       "companyUrls": [],
-      "freeNote": "",
+      "freeNote": "<div>ライバルのメインのやつが、</div><div><span style=\"font-family: inherit; font-size: inherit; font-style: inherit; font-variant-ligatures: inherit; font-variant-caps: inherit; font-weight: inherit;\">ケースとかをしっかりとやれてない　</span></div><div><span style=\"font-family: inherit; font-size: inherit; font-style: inherit; font-variant-ligatures: inherit; font-variant-caps: inherit; font-weight: inherit;\">さらには、宝石用ルーペっていうKWでもしっかりと戦い切れていない。</span></div><div>（ジュエリールーペのみ頑張っている）</div><div><br></div><div>ざっくりと原価で26元 650円（700円）</div><div>だから、2980で送料460円だとしたら、</div><div>利益額1500円で利益率50%</div><div><br></div><div><br></div><br>",
       "mediaBlocks": [],
       "category": "",
       "status": "nextup",
@@ -1662,6 +1662,27 @@
           "memo": ""
         }
       ],
+      "tables": []
+    },
+    {
+      "date": "2026-08-05",
+      "doneDate": "",
+      "image": "https://image.rakuten.co.jp/phoenix-loupe/cabinet/nsm/1-10000017.jpg",
+      "name": "ジュエリールーペ（低単価）",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
       "tables": []
     }
   ],
@@ -1815,5 +1836,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785911644001
+  "_savedAt": 1785912707487
 }
