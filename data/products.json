@@ -353,7 +353,7 @@
       "expectedSales": 0,
       "companyUrls": [],
       "doneDate": "",
-      "rakutenStatus": "r_pre",
+      "rakutenStatus": "r_mrik2nos",
       "yahooStatus": "y_mremf1lq",
       "makeCount": "",
       "mediaBlocks": []
@@ -1786,5 +1786,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785900370181
+  "_savedAt": 1785907290700
 }
