@@ -437,7 +437,12 @@
       "rakutenStatus": "r_mrik2nos",
       "yahooStatus": "y_mremf1lq",
       "makeCount": "",
-      "rakumart": [],
+      "rakumart": [
+        {
+          "text": "https://www.rakumart.com/OrderDetails?order_sn=2026020309370636-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026020309370636-2147"
+        }
+      ],
       "suppliers": [],
       "tables": []
     },
@@ -1869,5 +1874,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785919581368
+  "_savedAt": 1785919719421
 }
