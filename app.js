@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.64.4";
+const VERSION = "1.64.5";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -2183,7 +2183,6 @@ async function handleImageFile(file, obj, key, cb, containerEl){
     if(isAuthError(e)){
       authInvalid = true;
       setStatus("❌ GitHubトークンが無効か期限切れです。⚙️設定から新しいPATを入力してください");
-      try{ openSettings(); }catch(_){}
     }else{
       setStatus("❌ 画像アップロード失敗: "+e.message);
     }
@@ -2491,8 +2490,7 @@ async function saveToGitHub(){
           clearTimeout(autoSaveTimer);
           const msg = "❌ GitHubトークンが無効か期限切れです。⚙️設定から新しいPATを入力してください（保存はローカルには残っています）";
           setStatus(msg);
-          if(prog) prog.error("トークン無効/期限切れ：設定を確認してください");
-          try{ openSettings(); }catch(_){}
+          if(prog) prog.error("トークン無効/期限切れ：⚙️設定を確認してください");
         }else{
           const msg = "❌ 保存失敗: "+(e && e.message ? e.message : e);
           setStatus(msg);
