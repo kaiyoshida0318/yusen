@@ -1722,6 +1722,21 @@
         }
       ],
       "tables": []
+    },
+    {
+      "date": "2026-08-05",
+      "image": "",
+      "name": "",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "freeNote": "",
+      "category": "",
+      "status": "",
+      "rakumart": [],
+      "tables": [],
+      "suppliers": []
     }
   ],
   "categories": [
@@ -1874,5 +1889,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785919719421
+  "_savedAt": 1785920446873
 }
