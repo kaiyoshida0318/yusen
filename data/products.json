@@ -1657,8 +1657,8 @@
       "rakumart": [],
       "suppliers": [
         {
-          "image": "",
-          "url": "",
+          "image": "https://cbu01.alicdn.com/img/ibank/O1CN014gZWfg2BvG4U0jGxJ_!!2221581038400-0-cib.jpg",
+          "url": "https://detail.1688.com/offer/1014081666638.html?kj_agent_plugin=aliprice&fromkv=xytTrace:0b51056217859152166503862e0d4d&token=QCeb3ZPBENwk09kwZjl%2Ffni8rrmmRxCtlGHz%2Fw3OUMZXcC3qb96otXfJqiQQE2Xx",
           "memo": ""
         }
       ],
@@ -1865,5 +1865,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1785915193798
+  "_savedAt": 1785915314921
 }
