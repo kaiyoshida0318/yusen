@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.64.6";
+const VERSION = "1.64.7";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -890,7 +890,7 @@ function render(){
     tdImg.className="col-image";
     const imgWrap = document.createElement("div"); imgWrap.className="img-cell-multi";
     if(row.image){
-      const im=document.createElement("img"); im.src=imgUrl(row.image);
+      const im=document.createElement("img"); im.referrerPolicy="no-referrer"; im.src=imgUrl(row.image);
       im.className="zoomable"; im.title="クリックで大きく表示";
       im.addEventListener("click", (e)=>{ e.stopPropagation(); openImageLightbox(im.src); });
       imgWrap.appendChild(im);
@@ -1129,7 +1129,7 @@ function openImageLightbox(src){
     closeBtn.type = "button"; closeBtn.className = "img-lightbox-close";
     closeBtn.title = "閉じる"; closeBtn.setAttribute("aria-label","閉じる"); closeBtn.textContent = "×";
     const img = document.createElement("img");
-    img.className = "img-lightbox-img"; img.alt = "";
+    img.className = "img-lightbox-img"; img.alt = ""; img.referrerPolicy = "no-referrer";
     ov.append(closeBtn, img);
     // オーバーレイのどこをクリックしても閉じる
     ov.addEventListener("click", closeImageLightbox);
@@ -3824,6 +3824,7 @@ function renderMediaInto(container, block){
         openImageLightbox(src);
       });
       const im = document.createElement("img");
+      im.referrerPolicy = "no-referrer";
       im.src = src;
       im.alt = it.name || "";
       a.appendChild(im);
