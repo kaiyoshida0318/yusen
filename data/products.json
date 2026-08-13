@@ -448,17 +448,26 @@
     },
     {
       "date": "2026-06-01",
+      "doneDate": "",
       "image": "img_mpusztm8_327.webp",
       "name": "ゲーミング指サック",
+      "expectedSales": 0,
       "rivalRakuten": [
         "https://item.rakuten.co.jp/apnshop/finger-sliver100/?s-id=rk_shop_pc_rnkInShop",
         "https://item.rakuten.co.jp/hbridge/o0300098a/?s-id=rk_shop_pc_rnkInShop"
       ],
       "rivalAmazon": [],
-      "rankingUrls": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/keyword/finger_sack/"
+      ],
+      "companyUrls": [],
       "freeNote": "",
+      "mediaBlocks": [],
       "category": "new",
       "status": "arrived",
+      "rakutenStatus": "r_mrik2nos",
+      "yahooStatus": "y_mremf1lq",
+      "makeCount": "",
       "rakumart": [
         {
           "text": "2026051214502515-2147",
@@ -477,14 +486,127 @@
           "memo": "01set 3.02 / 03set 3.45 / 05set 3.88 / 10set 4.96"
         }
       ],
-      "tables": [],
-      "expectedSales": 0,
-      "companyUrls": [],
-      "doneDate": "",
-      "rakutenStatus": "r_mrik2nos",
-      "yahooStatus": "y_mremf1lq",
-      "makeCount": "",
-      "mediaBlocks": []
+      "tables": [
+        {
+          "columns": [
+            {
+              "type": "image"
+            },
+            {
+              "type": "text"
+            },
+            {
+              "type": "text"
+            },
+            {
+              "type": "text"
+            }
+          ],
+          "header": [
+            "画像",
+            "URL",
+            "ランキング順位",
+            ""
+          ],
+          "rows": [
+            {
+              "cells": [
+                {
+                  "image": "img_msr4pgxt_807.webp"
+                },
+                {
+                  "text": "https://x.gd/c5luU",
+                  "url": "https://x.gd/c5luU"
+                },
+                {
+                  "text": "1",
+                  "url": ""
+                },
+                {
+                  "text": "8個/770円",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_msr4pjil_304.webp"
+                },
+                {
+                  "text": "https://x.gd/3qdyn",
+                  "url": "https://x.gd/3qdyn"
+                },
+                {
+                  "text": "4",
+                  "url": ""
+                },
+                {
+                  "text": "10個/1580円",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_msr4plf2_361.webp"
+                },
+                {
+                  "text": "https://x.gd/TAK7b",
+                  "url": "https://x.gd/TAK7b"
+                },
+                {
+                  "text": "5",
+                  "url": ""
+                },
+                {
+                  "text": "10個/2652円",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_msr4prw0_338.webp"
+                },
+                {
+                  "text": "https://x.gd/Ai3WG",
+                  "url": "https://x.gd/Ai3WG"
+                },
+                {
+                  "text": "10",
+                  "url": ""
+                },
+                {
+                  "text": "8個/770円",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "image": "img_msr4u7ey_113.webp"
+                },
+                {
+                  "text": "https://x.gd/Lyr0w",
+                  "url": "https://x.gd/Lyr0w"
+                },
+                {
+                  "text": "11",
+                  "url": ""
+                },
+                {
+                  "text": "6個/1280円",
+                  "url": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "date": "2026-06-01",
@@ -1747,43 +1869,6 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
-    },
-    {
-      "date": "2026-08-13",
-      "doneDate": "",
-      "image": "https://image.rakuten.co.jp/long-lifeservice/cabinet/05812558/06240634/ls1415-01.jpg",
-      "name": "ペット　歯ブラシ",
-      "expectedSales": 0,
-      "rivalRakuten": [
-        "https://item.rakuten.co.jp/long-lifeservice/ls1415/?s-id=rk_rank2item_pc_2",
-        "https://item.rakuten.co.jp/fukuryusen/pele-sacks/?s-id=rk_rank2item_pc_9"
-      ],
-      "rivalAmazon": [],
-      "rankingUrls": [
-        "https://ranking.rakuten.co.jp/keyword/finger_sack/"
-      ],
-      "companyUrls": [],
-      "freeNote": "",
-      "mediaBlocks": [],
-      "category": "",
-      "status": "bought",
-      "rakutenStatus": "r_pre",
-      "yahooStatus": "y_pre",
-      "makeCount": "",
-      "rakumart": [
-        {
-          "text": "2026081314093169-2147",
-          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026081314093169-2147"
-        }
-      ],
-      "suppliers": [
-        {
-          "image": "img_msr45nhp_73.jpg",
-          "url": "https://detail.1688.com/offer/898458371616.html?kj_agent_plugin=aliprice&fromkv=xytTrace:0bab14ad17865980918554958e0f79&token=Y3268ZzkD%2FYOZGQQ8%2F%2BBqBoGaJHLITP9bK5md4mBZMMXsYzV%2FHoq5HLTAQnAIHa4",
-          "memo": ""
-        }
-      ],
-      "tables": []
     }
   ],
   "categories": [
@@ -1936,5 +2021,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1786601874642
+  "_savedAt": 1786602527662
 }
