@@ -1768,7 +1768,7 @@
       "category": "",
       "status": "buy",
       "rakutenStatus": "r_pre",
-      "yahooStatus": "",
+      "yahooStatus": "y_pre",
       "makeCount": "",
       "rakumart": [],
       "suppliers": [
@@ -1931,5 +1931,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1786601669297
+  "_savedAt": 1786601671095
 }
