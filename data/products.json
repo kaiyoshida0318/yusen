@@ -1770,7 +1770,12 @@
       "rakutenStatus": "r_pre",
       "yahooStatus": "y_pre",
       "makeCount": "",
-      "rakumart": [],
+      "rakumart": [
+        {
+          "text": "2026081314093169-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026081314093169-2147"
+        }
+      ],
       "suppliers": [
         {
           "image": "img_msr45nhp_73.jpg",
@@ -1931,5 +1936,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1786601678071
+  "_savedAt": 1786601696657
 }
