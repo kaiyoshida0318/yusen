@@ -1747,6 +1747,38 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-08-13",
+      "doneDate": "",
+      "image": "https://image.rakuten.co.jp/long-lifeservice/cabinet/05812558/06240634/ls1415-01.jpg",
+      "name": "ペット　歯ブラシ",
+      "expectedSales": 0,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/long-lifeservice/ls1415/?s-id=rk_rank2item_pc_2",
+        "https://item.rakuten.co.jp/fukuryusen/pele-sacks/?s-id=rk_rank2item_pc_9"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/keyword/finger_sack/"
+      ],
+      "companyUrls": [],
+      "freeNote": "",
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [
+        {
+          "image": "img_msr45nhp_73.jpg",
+          "url": "https://detail.1688.com/offer/898458371616.html?kj_agent_plugin=aliprice&fromkv=xytTrace:0bab14ad17865980918554958e0f79&token=Y3268ZzkD%2FYOZGQQ8%2F%2BBqBoGaJHLITP9bK5md4mBZMMXsYzV%2FHoq5HLTAQnAIHa4",
+          "memo": ""
+        }
+      ],
+      "tables": []
     }
   ],
   "categories": [
@@ -1899,5 +1931,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1786591371294
+  "_savedAt": 1786601108495
 }
