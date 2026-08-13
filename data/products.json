@@ -1767,7 +1767,7 @@
       "mediaBlocks": [],
       "category": "",
       "status": "buy",
-      "rakutenStatus": "",
+      "rakutenStatus": "r_pre",
       "yahooStatus": "",
       "makeCount": "",
       "rakumart": [],
@@ -1931,5 +1931,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1786601248960
+  "_savedAt": 1786601669297
 }
