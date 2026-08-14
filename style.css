@@ -358,6 +358,14 @@ img.zoomable,a.zoomable{cursor:zoom-in}
 .block-section.block-supplier{--blk:#2f6fb0;--blk-soft:#eaf2fa;--blk-bar:#c2d8ee}
 .block-section.block-table   {--blk:#d98324;--blk-soft:#fbf0e1;--blk-bar:#f2d6b0}
 .block-section.block-freenote{--blk:#8257c9;--blk-soft:#f2ecfb;--blk-bar:#d8c7f0}
+.block-section.block-reginfo {--blk:#c0562e;--blk-soft:#fdefe8;--blk-bar:#f2cbb6}
+/* 登録時情報ブロックの入力欄レイアウト */
+.reginfo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.reginfo-field{display:flex;flex-direction:column;gap:4px;margin:0;font-size:12px;font-weight:600;color:var(--muted)}
+.reginfo-field.reginfo-full{grid-column:1 / -1}
+.reginfo-label{font-size:12px;font-weight:600;color:var(--muted)}
+.reginfo-input{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:inherit;color:var(--text);background:#fff}
+.reginfo-input:focus{outline:none;border-color:var(--accent)}
 
 /* ブロック並び替え 上↑下↓ボタン */
 .block-mv{background:#fff;border:1.5px solid var(--border);border-radius:6px;width:28px;height:30px;cursor:pointer;font-size:12px;color:var(--muted);line-height:1;padding:0;margin-left:2px}
