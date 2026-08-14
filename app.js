@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.64.7";
+const VERSION = "1.65.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1311,6 +1311,10 @@ function openEntry(editIndex, mode){
   // 自社URL（最低1行）
   entry.companyUrls = row && Array.isArray(row.companyUrls) ? row.companyUrls.slice() : [];
   while(entry.companyUrls.length < 1) entry.companyUrls.push("");
+  // 登録時情報（商品管理番号/商品番号/キャッチコピー/原価）
+  entry.regInfo = (row && row.regInfo && typeof row.regInfo==="object")
+    ? { mgmtNo:row.regInfo.mgmtNo||"", itemNo:row.regInfo.itemNo||"", catchCopy:row.regInfo.catchCopy||"", cost:row.regInfo.cost||"" }
+    : null;
   // 自由記入欄
   entry.freeNote = row ? (row.freeNote||"") : "";
   // 画像・ファイルブロック
@@ -1360,6 +1364,10 @@ function openEntry(editIndex, mode){
   // 新規時: ブロックは空（スッキリ表示）。
   entry.blocks = [];
   if(isEdit){
+    // 登録時情報は先頭に復元
+    if(entry.regInfo && (entry.regInfo.mgmtNo||entry.regInfo.itemNo||entry.regInfo.catchCopy||entry.regInfo.cost)){
+      entry.blocks.push({ type:"reginfo", id:nextBlockId(), mgmtNo:entry.regInfo.mgmtNo||"", itemNo:entry.regInfo.itemNo||"", catchCopy:entry.regInfo.catchCopy||"", cost:entry.regInfo.cost||"" });
+    }
     if(entry.rakumart.length > 0){
       entry.blocks.push({ type:"rakumart", id:nextBlockId(), items: entry.rakumart });
     }
@@ -2314,6 +2322,7 @@ function saveEntry(keepOpen){
       rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
       companyUrls:  (entry.companyUrls||[]).map(u=>(u||"").trim()).filter(u=>u),
       freeNote:     entry.freeNote || "",
+      regInfo:      entry.regInfo || null,
       mediaBlocks:  (entry.mediaBlocks||[]).map(m=>({ items: (m.items||[]).map(x=>({ kind:x.kind, name:x.name||"", ref:x.ref||"", isDataUrl:!!x.isDataUrl })) })).filter(m=>m.items.length),
       category: (fCat && fCat.value) || (entry.category || ""),
       status:   (fSt  && fSt.value)  || "",
@@ -3368,17 +3377,23 @@ function collectBlocksIntoEntry(){
   const tbls = [];
   const notes = [];
   const media = [];
+  let regInfo = null;
   (entry.blocks || []).forEach(b=>{
     if(b.type==="rakumart"){ (b.items||[]).forEach(it=> rak.push(it)); }
     else if(b.type==="supplier"){ (b.items||[]).forEach(it=> sup.push(it)); }
     else if(b.type==="table"){ if(b.data) tbls.push(b.data); }
     else if(b.type==="freenote"){ if(b.html && b.html.trim()) notes.push(b.html); }
     else if(b.type==="media"){ if(Array.isArray(b.items) && b.items.length) media.push({ items: b.items.map(x=>({...x})) }); }
+    else if(b.type==="reginfo"){
+      const ri = { mgmtNo:(b.mgmtNo||"").trim(), itemNo:(b.itemNo||"").trim(), catchCopy:(b.catchCopy||"").trim(), cost:(b.cost||"").trim() };
+      if(ri.mgmtNo||ri.itemNo||ri.catchCopy||ri.cost) regInfo = ri; // 空なら保存しない
+    }
   });
   entry.rakumart = rak;
   entry.suppliers = sup;
   entry.tables = tbls;
   entry.mediaBlocks = media;
+  entry.regInfo = regInfo;
   // 自由記入欄は複数ブロックあれば連結して1つの freeNote にまとめる
   entry.freeNote = notes.join("<hr>");
 }
@@ -3441,7 +3456,9 @@ function renderBlocks(){
 
     // 本文
     const body = document.createElement("div"); body.className = "block-body";
-    if(block.type==="rakumart"){
+    if(block.type==="reginfo"){
+      renderRegInfoInto(body, block);
+    }else if(block.type==="rakumart"){
       if(!Array.isArray(block.items)) block.items = [];
       renderRakumartInto(body, block.items);
       const hint = document.createElement("p"); hint.className="hint-inline";
@@ -3464,7 +3481,32 @@ function renderBlocks(){
   });
 }
 
+// 登録時情報ブロック（商品管理番号/商品番号/キャッチコピー/原価）を描画
+function renderRegInfoInto(container, block){
+  container.innerHTML = "";
+  const grid = document.createElement("div"); grid.className = "reginfo-grid";
+  const fields = [
+    { key:"mgmtNo",    label:"商品管理番号", ph:"例: A-00123" },
+    { key:"itemNo",    label:"商品番号",     ph:"例: 12345" },
+    { key:"catchCopy", label:"キャッチコピー", ph:"商品のキャッチコピー", full:true },
+    { key:"cost",      label:"原価",         ph:"例: 350" }
+  ];
+  fields.forEach(f=>{
+    const lab = document.createElement("label");
+    lab.className = "reginfo-field" + (f.full ? " reginfo-full" : "");
+    const sp = document.createElement("span"); sp.className = "reginfo-label"; sp.textContent = f.label;
+    const inp = document.createElement("input");
+    inp.type = "text"; inp.className = "reginfo-input";
+    inp.placeholder = f.ph;
+    inp.value = block[f.key] || "";
+    inp.addEventListener("input", ()=>{ block[f.key] = inp.value; });
+    lab.append(sp, inp);
+    grid.appendChild(lab);
+  });
+  container.appendChild(grid);
+}
 function blockTitle(type){
+  if(type==="reginfo") return "🧾 登録時情報";
   if(type==="rakumart") return "🛒 ラクマート";
   if(type==="supplier") return "🏭 仕入先（中国輸入元）";
   if(type==="table") return "📋 表";
@@ -3486,7 +3528,9 @@ function newTableData(){
 // 指定タイプの空ブロックを追加
 function addBlock(type){
   if(!Array.isArray(entry.blocks)) entry.blocks = [];
-  if(type==="rakumart"){
+  if(type==="reginfo"){
+    entry.blocks.push({ type:"reginfo", id:nextBlockId(), mgmtNo:"", itemNo:"", catchCopy:"", cost:"" });
+  }else if(type==="rakumart"){
     entry.blocks.push({ type:"rakumart", id:nextBlockId(), items:[{ text:"", url:"", collapsed:false }] });
   }else if(type==="supplier"){
     entry.blocks.push({ type:"supplier", id:nextBlockId(), items:[{ image:"", imageIsDataUrl:false, url:"", memo:"", collapsed:false }] });
