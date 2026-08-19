@@ -1869,6 +1869,30 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-08-19",
+      "doneDate": "",
+      "image": "https://shop.r10s.jp/berykoko/cabinet/06723629/imgrc0081898439.jpg",
+      "name": "ファスナー 引き手",
+      "expectedSales": 0,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/berykoko/10000837/"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2021,5 +2045,5 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1786602527662
+  "_savedAt": 1787126912565
 }
