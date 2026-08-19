@@ -1899,7 +1899,7 @@
       "doneDate": "",
       "image": "https://tshop.r10s.jp/soku/cabinet/ni/sb/lsbm/microlock_top2.jpg?fitin=128:128",
       "name": "極小カラビナ",
-      "expectedSales": 0,
+      "expectedSales": 20,
       "rivalRakuten": [
         "https://item.rakuten.co.jp/soku/lsbm/"
       ],
@@ -2072,7 +2072,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787131557797,
+  "_savedAt": 1787131620290,
   "rivalCounts": [
     {
       "id": "few",
