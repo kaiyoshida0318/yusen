@@ -1886,7 +1886,7 @@
       "regInfo": null,
       "mediaBlocks": [],
       "category": "",
-      "status": "",
+      "status": "buy",
       "rakutenStatus": "",
       "yahooStatus": "",
       "makeCount": "",
@@ -2072,7 +2072,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787131620290,
+  "_savedAt": 1787131647202,
   "rivalCounts": [
     {
       "id": "few",
