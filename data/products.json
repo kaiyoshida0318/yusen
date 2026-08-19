@@ -2072,7 +2072,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787129941181,
+  "_savedAt": 1787129942193,
   "rivalCounts": [
     {
       "id": "few",
@@ -2081,7 +2081,8 @@
     },
     {
       "id": "many",
-      "label": "多数"
+      "label": "多数",
+      "icon": "txt:△"
     }
   ]
 }
