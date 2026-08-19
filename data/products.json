@@ -1893,6 +1893,33 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-08-19",
+      "doneDate": "",
+      "image": "https://tshop.r10s.jp/soku/cabinet/ni/sb/lsbm/microlock_top2.jpg?fitin=128:128",
+      "name": "極小カラビナ",
+      "expectedSales": 0,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/soku/lsbm/"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [
+        "https://ranking.rakuten.co.jp/daily/402234/"
+      ],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2045,5 +2072,15 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787126912565
+  "_savedAt": 1787129723173,
+  "rivalCounts": [
+    {
+      "id": "few",
+      "label": "少数"
+    },
+    {
+      "id": "many",
+      "label": "多数"
+    }
+  ]
 }
