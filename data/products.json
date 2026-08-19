@@ -1916,7 +1916,7 @@
       "rakutenStatus": "",
       "yahooStatus": "",
       "makeCount": "",
-      "rivalCount": "",
+      "rivalCount": "few",
       "rakumart": [],
       "suppliers": [],
       "tables": []
@@ -2072,7 +2072,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787129942193,
+  "_savedAt": 1787129947672,
   "rivalCounts": [
     {
       "id": "few",
