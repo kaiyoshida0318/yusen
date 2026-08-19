@@ -1912,7 +1912,7 @@
       "regInfo": null,
       "mediaBlocks": [],
       "category": "",
-      "status": "",
+      "status": "buy",
       "rakutenStatus": "",
       "yahooStatus": "",
       "makeCount": "",
@@ -2072,7 +2072,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787131647202,
+  "_savedAt": 1787131649002,
   "rivalCounts": [
     {
       "id": "few",
