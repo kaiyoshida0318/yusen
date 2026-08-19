@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.66.0";
+const VERSION = "1.67.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -125,7 +125,7 @@ const DEFAULT_YAHOO_STATUSES = [
   { id:"y_none",        label:"不要" },
 ];
 
-let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice(), rakutenStatuses: DEFAULT_RAKUTEN_STATUSES.slice(), yahooStatuses: DEFAULT_YAHOO_STATUSES.slice(), makeCounts: MAKE_COUNT_OPTS.map(o=>({...o})), markColors: {} };
+let state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice(), rakutenStatuses: DEFAULT_RAKUTEN_STATUSES.slice(), yahooStatuses: DEFAULT_YAHOO_STATUSES.slice(), makeCounts: MAKE_COUNT_OPTS.map(o=>({...o})), rivalCounts: RIVAL_COUNT_OPTS.map(o=>({...o})), markColors: {} };
 let cfg = { pat:"", owner:"kaiyoshida0318", repo:"yusen", branch:"main" };
 let dataSha = null;
 let appReady = false;         // 初期化完了フラグ（初期ロード中は自動保存しない）
@@ -213,7 +213,7 @@ function loadData(){
   let saved = null;
   try{ saved = JSON.parse(localStorage.getItem(LS_DATA)); }catch(e){}
   if(saved && Array.isArray(saved.rows)){ state = migrate(saved); persistLocal(); return; }
-  state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice(), rakutenStatuses: DEFAULT_RAKUTEN_STATUSES.slice(), yahooStatuses: DEFAULT_YAHOO_STATUSES.slice(), makeCounts: MAKE_COUNT_OPTS.map(o=>({...o})), markColors: {} };
+  state = { rows: [], categories: DEFAULT_CATEGORIES.slice(), statuses: DEFAULT_STATUSES.slice(), rakutenStatuses: DEFAULT_RAKUTEN_STATUSES.slice(), yahooStatuses: DEFAULT_YAHOO_STATUSES.slice(), makeCounts: MAKE_COUNT_OPTS.map(o=>({...o})), rivalCounts: RIVAL_COUNT_OPTS.map(o=>({...o})), markColors: {} };
 }
 // 旧データ（supply文字列・categoriesなし）を新スキーマに変換
 function migrate(data){
@@ -237,6 +237,9 @@ function migrate(data){
   }
   if(!Array.isArray(data.makeCounts) || data.makeCounts.length===0){
     data.makeCounts = MAKE_COUNT_OPTS.map(o=>({...o}));
+  }
+  if(!Array.isArray(data.rivalCounts) || data.rivalCounts.length===0){
+    data.rivalCounts = RIVAL_COUNT_OPTS.map(o=>({...o}));
   }
   // マーク色マスター（各マークの色。商品状態/楽天/Yahoo全軸で共通）
   if(!data.markColors || typeof data.markColors !== "object"){
@@ -1051,7 +1054,7 @@ function render(){
       td.appendChild(sel);
       return td;
     };
-    const tdRival   = makeAxisCell("rivalCount", RIVAL_COUNT_OPTS);
+    const tdRival   = makeAxisCell("rivalCount", state.rivalCounts);
     const tdRakuten = makeAxisCell("rakutenStatus", state.rakutenStatuses);
     const tdYahoo   = makeAxisCell("yahooStatus", state.yahooStatuses);
     const tdMakeCount = makeAxisCell("makeCount", state.makeCounts);
@@ -1409,7 +1412,7 @@ function openEntry(editIndex, mode){
   renderAxisSelect("fRakutenStatus", state.rakutenStatuses, entry.rakutenStatus);
   renderAxisSelect("fYahooStatus", state.yahooStatuses, entry.yahooStatus);
   renderAxisSelect("fMakeCount", state.makeCounts, entry.makeCount);
-  renderAxisSelect("fRivalCount", RIVAL_COUNT_OPTS, entry.rivalCount);
+  renderAxisSelect("fRivalCount", state.rivalCounts, entry.rivalCount);
 
   renderEntryImage();
   renderRivals();
@@ -3017,6 +3020,7 @@ function statusAxisInfo(axis){
   if(axis==="rakuten")   return { list: state.rakutenStatuses, rowField:"rakutenStatus", hasIcon:true, idPrefix:"r_" };
   if(axis==="yahoo")     return { list: state.yahooStatuses,   rowField:"yahooStatus",   hasIcon:true, idPrefix:"y_" };
   if(axis==="makeCount") return { list: state.makeCounts,      rowField:"makeCount",     hasIcon:true, idPrefix:"m_" };
+  if(axis==="rivalCount") return { list: state.rivalCounts,    rowField:"rivalCount",    hasIcon:true, idPrefix:"rc_" };
   return { list: state.statuses, rowField:"status", hasIcon:true, idPrefix:"s_" };
 }
 // 「マーク作成」：各マーク（文字バッジ）の色を設定。全軸(商品状態/楽天/Yahoo)で共通反映
@@ -3071,7 +3075,7 @@ function renderStatusManager(){
   const axisBar = document.getElementById("statusAxisBar");
   if(axisBar){
     axisBar.innerHTML = "";
-    [["status","商品状態"],["rakuten","楽天"],["yahoo","Yahoo"],["makeCount","制作枚数"],["marks","マーク作成"]].forEach(([id,lbl])=>{
+    [["status","商品状態"],["rakuten","楽天"],["yahoo","Yahoo"],["makeCount","制作枚数"],["rivalCount","ライバル数"],["marks","マーク作成"]].forEach(([id,lbl])=>{
       const b = document.createElement("button");
       b.type="button"; b.className = "status-mgr-axis" + (statusMgrAxis===id ? " active" : "");
       b.textContent = lbl;
