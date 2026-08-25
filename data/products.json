@@ -1969,7 +1969,7 @@
       "regInfo": null,
       "mediaBlocks": [],
       "category": "",
-      "status": "buy",
+      "status": "bought",
       "rakutenStatus": "",
       "yahooStatus": "",
       "makeCount": "",
@@ -2194,7 +2194,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787627331682,
+  "_savedAt": 1787627347293,
   "rivalCounts": [
     {
       "id": "few",
