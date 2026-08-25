@@ -1951,7 +1951,7 @@
       "rakutenStatus": "",
       "yahooStatus": "",
       "makeCount": "",
-      "rivalCount": "few",
+      "rivalCount": "many",
       "rakumart": [
         {
           "text": "2026082511392577-2147",
@@ -2210,7 +2210,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787629245458,
+  "_savedAt": 1787629248222,
   "rivalCounts": [
     {
       "id": "few",
