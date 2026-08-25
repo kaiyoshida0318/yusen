@@ -2001,7 +2001,12 @@
       "yahooStatus": "",
       "makeCount": "",
       "rivalCount": "",
-      "rakumart": [],
+      "rakumart": [
+        {
+          "text": "2026082510395622-2147",
+          "url": "https://www.rakumart.com/OrderDetails?order_sn=2026082510395622-2147"
+        }
+      ],
       "suppliers": [],
       "tables": []
     },
@@ -2184,7 +2189,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787625128536,
+  "_savedAt": 1787625626564,
   "rivalCounts": [
     {
       "id": "few",
