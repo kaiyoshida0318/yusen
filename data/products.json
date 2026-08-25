@@ -1977,7 +1977,8 @@
     },
     {
       "id": "s_mt8094ap",
-      "label": "SKIP"
+      "label": "SKIP",
+      "icon": "txt:SKIP"
     }
   ],
   "_statusMigV2": true,
@@ -2076,7 +2077,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787622452738,
+  "_savedAt": 1787622458163,
   "rivalCounts": [
     {
       "id": "few",
