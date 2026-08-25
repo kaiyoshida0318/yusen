@@ -1974,6 +1974,10 @@
       "id": "done",
       "label": "完了分",
       "icon": "txt:済@11"
+    },
+    {
+      "id": "s_mt8094ap",
+      "label": "SKIP"
     }
   ],
   "_statusMigV2": true,
@@ -2072,7 +2076,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787622325755,
+  "_savedAt": 1787622452738,
   "rivalCounts": [
     {
       "id": "few",
