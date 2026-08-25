@@ -1977,7 +1977,7 @@
     },
     {
       "id": "s_mt8094ap",
-      "label": "SKIP",
+      "label": "やめておく",
       "icon": "txt:SKIP"
     }
   ],
@@ -2077,7 +2077,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787622458163,
+  "_savedAt": 1787622466014,
   "rivalCounts": [
     {
       "id": "few",
