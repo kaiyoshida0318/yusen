@@ -108,6 +108,12 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .rival-row input:focus{border-color:var(--accent);outline:none}
 .rival-del{flex:0 0 32px;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:15px;cursor:pointer}
 .rival-del:hover{border-color:var(--accent);color:var(--accent)}
+/* ランキング欄の URL/テキスト 切替ボタン（小さめ） */
+.rank-mode-toggle{flex:0 0 auto;min-width:38px;padding:0 8px;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--muted);font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+.rank-mode-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.rank-mode-toggle.is-text{background:var(--accent);border-color:var(--accent);color:#fff}
+/* 一覧でテキスト入力（リンクでない）の表示 */
+.rank-text{color:var(--text)}
 
 /* カテゴリ管理モーダル */
 .cat-add-row{display:flex;gap:8px;margin-bottom:14px}
@@ -443,6 +449,7 @@ img.zoomable,a.zoomable{cursor:zoom-in}
 .modal-entry.is-viewmode .tbl-mv,
 .modal-entry.is-viewmode .tbl-head .btn,
 .modal-entry.is-viewmode .rival-del,
+.modal-entry.is-viewmode .rank-mode-toggle,
 .modal-entry.is-viewmode #btnAddRivalR,
 .modal-entry.is-viewmode #btnAddRivalA,
 .modal-entry.is-viewmode #btnAddRanking{
