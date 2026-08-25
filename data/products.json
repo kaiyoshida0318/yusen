@@ -1999,6 +1999,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-08-25",
+      "doneDate": "",
+      "image": "https://shop.r10s.jp/soku/cabinet/ni/sb/g-series/gsl4_top1.jpg",
+      "name": "鍵 紛失防止 キーホルダー",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2156,7 +2179,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787623565150,
+  "_savedAt": 1787624708190,
   "rivalCounts": [
     {
       "id": "few",
