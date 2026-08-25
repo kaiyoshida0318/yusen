@@ -1977,7 +1977,7 @@
     },
     {
       "id": "s_mt8094ap",
-      "label": "やめておく",
+      "label": "購入やめ",
       "icon": "txt:SKIP"
     }
   ],
@@ -2077,7 +2077,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787622466014,
+  "_savedAt": 1787622486444,
   "rivalCounts": [
     {
       "id": "few",
