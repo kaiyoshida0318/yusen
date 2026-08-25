@@ -7,7 +7,7 @@
    - 新規作成モーダルで登録 → 表形式で一覧表示
    - GitHub Contents API でデータ(data/products.json)と画像(images/)を直接保存 */
 
-const VERSION = "1.67.0";
+const VERSION = "1.68.0";
 const DATA_PATH = "data/products.json";
 const IMG_DIR = "images";
 const LS_CFG = "yusen_cfg_v1";
@@ -1096,20 +1096,30 @@ function urlCell(url){
   return td;
 }
 // 複数URLを縦並びで表示
+// URLリストの各要素は「文字列(URL)」または「{v, text:true}(テキスト入力)」を許容
+function rkVal(e){ return (typeof e === "string") ? e : ((e && e.v) || ""); }
+function rkIsText(e){ return !!(e && typeof e === "object" && e.text); }
 function urlListCell(urls){
   const td = document.createElement("td");
-  const list = (urls||[]).filter(u=>u && u.trim());
+  const list = (urls||[]).filter(e=> rkVal(e).trim());
   if(list.length===0){
     const span = document.createElement("span"); span.className="muted"; span.textContent="—";
     td.appendChild(span);
     return td;
   }
-  list.forEach(url=>{
+  list.forEach(e=>{
     const line = document.createElement("div"); line.className="sup-line";
-    const a = document.createElement("a");
-    a.href = url; a.target="_blank"; a.rel="noopener";
-    a.className="url-link"; a.textContent = shorten(url); a.title = url;
-    line.appendChild(a);
+    const val = rkVal(e);
+    if(rkIsText(e)){
+      // テキスト入力：リンクにせずそのまま文言表示（例: 店舗内9位）
+      const sp = document.createElement("span"); sp.className="rank-text"; sp.textContent = val; sp.title = val;
+      line.appendChild(sp);
+    }else{
+      const a = document.createElement("a");
+      a.href = val; a.target="_blank"; a.rel="noopener";
+      a.className="url-link"; a.textContent = shorten(val); a.title = val;
+      line.appendChild(a);
+    }
     td.appendChild(line);
   });
   return td;
@@ -1517,7 +1527,7 @@ function closeEntry(){ document.getElementById("entryModal").hidden = true; }
 function snapshotEntry(){
   collectBlocksIntoEntry();
   const name = (document.getElementById("fName")?.value || "").trim();
-  const ranking = (entry.rankingUrls||[]).map(u=>(u||"").trim()).filter(Boolean);
+  const ranking = (entry.rankingUrls||[]).map(u=>rkVal(u).trim()).filter(Boolean);
   const company = (entry.companyUrls||[]).map(u=>(u||"").trim()).filter(Boolean);
   const rivR = (entry.rivalRakuten||[]).map(u=>(u||"").trim()).filter(Boolean);
   const rivA = (entry.rivalAmazon||[]).map(u=>(u||"").trim()).filter(Boolean);
@@ -1611,15 +1621,30 @@ function renderRanking(){
   const wrap = document.getElementById("rankingList");
   if(!wrap) return;
   wrap.innerHTML = "";
-  entry.rankingUrls.forEach((url, idx)=>{
+  entry.rankingUrls.forEach((e, idx)=>{
+    const isText = rkIsText(e);
     const rowEl = document.createElement("div"); rowEl.className="rival-row";
     const inp = document.createElement("input");
-    inp.type="text"; inp.placeholder="https://..."; inp.value=url;
-    inp.oninput = e=>{ entry.rankingUrls[idx] = e.target.value; };
+    inp.type="text";
+    inp.placeholder = isText ? "例: 店舗内9位" : "https://...";
+    inp.value = rkVal(e);
+    inp.oninput = ev=>{
+      entry.rankingUrls[idx] = rkIsText(entry.rankingUrls[idx]) ? { v: ev.target.value, text:true } : ev.target.value;
+    };
+    // URL / テキスト 切替ボタン（現在のモードを表示、クリックで切替）
+    const tg = document.createElement("button");
+    tg.type="button"; tg.className="rank-mode-toggle" + (isText ? " is-text" : "");
+    tg.textContent = isText ? "文字" : "URL";
+    tg.title = "URL入力 ⇄ テキスト入力 を切り替え";
+    tg.onclick = ()=>{
+      const v = rkVal(entry.rankingUrls[idx]);
+      entry.rankingUrls[idx] = isText ? v : { v, text:true }; // トグル
+      renderRanking();
+    };
     const rm = document.createElement("button");
     rm.type="button"; rm.className="rival-del"; rm.textContent="×"; rm.title="この欄を削除";
     rm.onclick = ()=>{ entry.rankingUrls.splice(idx,1); if(entry.rankingUrls.length===0) entry.rankingUrls.push(""); renderRanking(); };
-    rowEl.append(inp, rm);
+    rowEl.append(inp, tg, rm);
     wrap.appendChild(rowEl);
   });
 }
@@ -2330,7 +2355,7 @@ function saveEntry(keepOpen){
       expectedSales,
       rivalRakuten: entry.rivalRakuten.map(u=>(u||"").trim()).filter(u=>u),
       rivalAmazon:  entry.rivalAmazon.map(u=>(u||"").trim()).filter(u=>u),
-      rankingUrls:  entry.rankingUrls.map(u=>(u||"").trim()).filter(u=>u),
+      rankingUrls:  entry.rankingUrls.map(e=>{ const v=rkVal(e).trim(); return rkIsText(e) ? { v, text:true } : v; }).filter(e=> rkIsText(e) ? e.v : e),
       companyUrls:  (entry.companyUrls||[]).map(u=>(u||"").trim()).filter(u=>u),
       freeNote:     entry.freeNote || "",
       regInfo:      entry.regInfo || null,
