@@ -1945,6 +1945,31 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-08-25",
+      "doneDate": "",
+      "image": "https://shop.r10s.jp/berykoko/cabinet/06723629/magnetclasp_new_kk.jpg",
+      "name": "マグネット　クラスプ",
+      "expectedSales": 0,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/berykoko/10000632/?s-id=rk_shop_pc_rnkInShop"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "buy",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2102,7 +2127,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787622940727,
+  "_savedAt": 1787623379794,
   "rivalCounts": [
     {
       "id": "few",
