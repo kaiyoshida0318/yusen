@@ -2210,12 +2210,12 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787629277390,
+  "_savedAt": 1787629279432,
   "rivalCounts": [
     {
       "id": "few",
       "label": "少数",
-      "icon": "txt:○"
+      "icon": "txt:◎"
     },
     {
       "id": "rc_mt84bc2s",
