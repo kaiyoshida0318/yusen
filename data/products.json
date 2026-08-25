@@ -1963,7 +1963,7 @@
       "rivalAmazon": [],
       "rankingUrls": [
         {
-          "v": "自社8位",
+          "v": "自社rank8位",
           "text": true
         }
       ],
@@ -2200,7 +2200,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787628692547,
+  "_savedAt": 1787628699628,
   "rivalCounts": [
     {
       "id": "few",
