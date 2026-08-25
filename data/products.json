@@ -1920,6 +1920,31 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-08-25",
+      "doneDate": "",
+      "image": "https://shop.r10s.jp/berykoko/cabinet/06723629/imgrc0078833893.jpg",
+      "name": "メガネストラップ　スエード",
+      "expectedSales": 0,
+      "rivalRakuten": [
+        "https://item.rakuten.co.jp/berykoko/10000522/?s-id=rk_shop_pc_rnkInShop"
+      ],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "buy",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2077,7 +2102,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787622509520,
+  "_savedAt": 1787622940727,
   "rivalCounts": [
     {
       "id": "few",
