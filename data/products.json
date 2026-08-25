@@ -2210,7 +2210,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787629274596,
+  "_savedAt": 1787629277390,
   "rivalCounts": [
     {
       "id": "few",
@@ -2218,13 +2218,13 @@
       "icon": "txt:○"
     },
     {
+      "id": "rc_mt84bc2s",
+      "label": "そこそこ"
+    },
+    {
       "id": "many",
       "label": "多数",
       "icon": "txt:△"
-    },
-    {
-      "id": "rc_mt84bc2s",
-      "label": "そこそこ"
     }
   ]
 }
