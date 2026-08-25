@@ -1936,7 +1936,12 @@
         "https://item.rakuten.co.jp/berykoko/10000522/?s-id=rk_shop_pc_rnkInShop"
       ],
       "rivalAmazon": [],
-      "rankingUrls": [],
+      "rankingUrls": [
+        {
+          "v": "自社rank1位",
+          "text": true
+        }
+      ],
       "companyUrls": [],
       "freeNote": "メガネストラップのKWで２位",
       "regInfo": null,
@@ -2200,7 +2205,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787628699628,
+  "_savedAt": 1787628808924,
   "rivalCounts": [
     {
       "id": "few",
