@@ -1981,7 +1981,9 @@
         "https://item.rakuten.co.jp/berykoko/10000823/?s-id=rk_shop_pc_rnkInShop"
       ],
       "rivalAmazon": [],
-      "rankingUrls": [],
+      "rankingUrls": [
+        "自社9位"
+      ],
       "companyUrls": [],
       "freeNote": "",
       "regInfo": null,
@@ -2152,7 +2154,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787623456608,
+  "_savedAt": 1787623536745,
   "rivalCounts": [
     {
       "id": "few",
