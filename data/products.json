@@ -1997,7 +1997,10 @@
       ],
       "rivalAmazon": [],
       "rankingUrls": [
-        "自社9位"
+        {
+          "v": "自社ランキング9位",
+          "text": true
+        }
       ],
       "companyUrls": [],
       "freeNote": "",
@@ -2197,7 +2200,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787628668785,
+  "_savedAt": 1787628679857,
   "rivalCounts": [
     {
       "id": "few",
