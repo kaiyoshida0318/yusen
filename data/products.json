@@ -1962,7 +1962,10 @@
       ],
       "rivalAmazon": [],
       "rankingUrls": [
-        "自社8位"
+        {
+          "v": "自社8位",
+          "text": true
+        }
       ],
       "companyUrls": [],
       "freeNote": "",
@@ -2194,7 +2197,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1787628017682,
+  "_savedAt": 1787628668785,
   "rivalCounts": [
     {
       "id": "few",
