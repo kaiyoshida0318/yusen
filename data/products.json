@@ -2122,6 +2122,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-09-16",
+      "doneDate": "",
+      "image": "img_mu3urht9_198.jpg",
+      "name": "精密ピンセット",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2279,7 +2302,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789548081585,
+  "_savedAt": 1789548152246,
   "rivalCounts": [
     {
       "id": "few",
