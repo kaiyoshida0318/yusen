@@ -2191,6 +2191,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-09-16",
+      "doneDate": "",
+      "image": "img_mu3uweoh_923.jpg",
+      "name": "Garmin ケーブル",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2348,7 +2371,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789548320233,
+  "_savedAt": 1789548384704,
   "rivalCounts": [
     {
       "id": "few",
