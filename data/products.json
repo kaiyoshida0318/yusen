@@ -2145,6 +2145,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-09-16",
+      "doneDate": "",
+      "image": "https://item-shopping.c.yimg.jp/i/n/yukaiya_ih-22-02",
+      "name": "精密ドライバー",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2302,7 +2325,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789548152246,
+  "_savedAt": 1789548201723,
   "rivalCounts": [
     {
       "id": "few",
