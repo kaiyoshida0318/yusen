@@ -2076,6 +2076,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-09-16",
+      "doneDate": "",
+      "image": "img_mu3uolt0_443.jpg",
+      "name": "外反母趾 サポーター",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2233,7 +2256,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789547972961,
+  "_savedAt": 1789548017142,
   "rivalCounts": [
     {
       "id": "few",
