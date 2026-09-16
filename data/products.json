@@ -2070,7 +2070,7 @@
       "category": "",
       "status": "s_mrin1a5d",
       "rakutenStatus": "r_none",
-      "yahooStatus": "",
+      "yahooStatus": "y_pre",
       "makeCount": "",
       "rivalCount": "",
       "rakumart": [],
@@ -2233,7 +2233,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789547971266,
+  "_savedAt": 1789547972961,
   "rivalCounts": [
     {
       "id": "few",
