@@ -2099,6 +2099,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-09-16",
+      "doneDate": "",
+      "image": "",
+      "name": "shokz ケーブル",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2256,7 +2279,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789548017142,
+  "_savedAt": 1789548040128,
   "rivalCounts": [
     {
       "id": "few",
