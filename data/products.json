@@ -2208,7 +2208,7 @@
       "category": "",
       "status": "s_mrin1a5d",
       "rakutenStatus": "r_none",
-      "yahooStatus": "",
+      "yahooStatus": "y_pre",
       "makeCount": "",
       "rivalCount": "",
       "rakumart": [],
@@ -2371,7 +2371,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789548980404,
+  "_savedAt": 1789548983358,
   "rivalCounts": [
     {
       "id": "few",
