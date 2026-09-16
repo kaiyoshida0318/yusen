@@ -2069,7 +2069,7 @@
       "mediaBlocks": [],
       "category": "",
       "status": "s_mrin1a5d",
-      "rakutenStatus": "",
+      "rakutenStatus": "r_none",
       "yahooStatus": "",
       "makeCount": "",
       "rivalCount": "",
@@ -2233,7 +2233,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789547964235,
+  "_savedAt": 1789547971266,
   "rivalCounts": [
     {
       "id": "few",
