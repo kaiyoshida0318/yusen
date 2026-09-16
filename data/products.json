@@ -2168,6 +2168,29 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-09-16",
+      "doneDate": "",
+      "image": "img_mu3uuyqw_321.jpg",
+      "name": "ゾンデ　垢取り",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2325,7 +2348,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789548201723,
+  "_savedAt": 1789548320233,
   "rivalCounts": [
     {
       "id": "few",
