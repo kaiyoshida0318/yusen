@@ -2214,6 +2214,31 @@
       "rakumart": [],
       "suppliers": [],
       "tables": []
+    },
+    {
+      "date": "2026-09-28",
+      "doneDate": "",
+      "image": "img_mukzuqtl_444.jpg",
+      "name": "スマートウォッチ ベルト",
+      "expectedSales": 0,
+      "rivalRakuten": [],
+      "rivalAmazon": [],
+      "rankingUrls": [],
+      "companyUrls": [
+        "https://store.shopping.yahoo.co.jp/yukaiya/wat-sma-10.html"
+      ],
+      "freeNote": "",
+      "regInfo": null,
+      "mediaBlocks": [],
+      "category": "",
+      "status": "",
+      "rakutenStatus": "",
+      "yahooStatus": "",
+      "makeCount": "",
+      "rivalCount": "",
+      "rakumart": [],
+      "suppliers": [],
+      "tables": []
     }
   ],
   "categories": [
@@ -2371,7 +2396,7 @@
       "icon": "txt:★"
     }
   ],
-  "_savedAt": 1789634423531,
+  "_savedAt": 1790584638765,
   "rivalCounts": [
     {
       "id": "few",
